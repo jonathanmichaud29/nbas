@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+
+  nbas-reactjs:
+    build:
+      context: reactjs
+      dockerfile: Dockerfile
+    #ports:
+      #- 3000:3000
+    volumes:
+      - type: bind
+        source: ./reactjs/my-app
+        target: /app
+      - '/app/node_modules'
+    env_file:
+      - .env.local
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+    depends_on:
+      - nbas-mysql
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    #command: cd my-app && npm start
+
+  nbas-mysql:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    env_file:
+      - .env.local
+    ports:
+      - 3306:3306
+    volumes:
+    - mysql-data:/var/lib/mysql
+    - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+
+volumes:
+  mysql-data:
+  
+  
