@@ -1,14 +1,11 @@
-FROM node:17-alpine3.12
-
+FROM node:18.2.0-alpine3.15
 WORKDIR /app
 
 # add `/app/node_modules/.bin` to $PATH
 ENV PATH /app/node_modules/.bin:$PATH
 
-#COPY ./package*.json ./
+COPY ./my-app/package.json .
 
-#RUN npm install
+RUN npm install
 
-#RUN mkdir node_modules/.cache && chmod -R 777 node_modules/.cache
-
-#CMD ["npm", "start"]
+CMD ["npm", "start"]

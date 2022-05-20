@@ -6,23 +6,31 @@ services:
     build:
       context: reactjs
       dockerfile: Dockerfile
-    #ports:
-      #- 3000:3000
+    ports:
+      - 80:4000
     volumes:
       - type: bind
-        source: ./reactjs/my-app
-        target: /app
-      - '/app/node_modules'
-    env_file:
-      - .env.local
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - NODE_ENV=development
+        source: ./reactjs/my-app/src
+        target: /app/src
+      - type: bind
+        source: ./reactjs/my-app/.babelrc
+        target: /app/.babelrc
+      - type: bind
+        source: ./reactjs/my-app/.eslintrc.json
+        target: /app/.eslintrc.json
+      - type: bind
+        source: ./reactjs/my-app/tsconfig.json
+        target: /app/tsconfig.json
+      - type: bind
+        source: ./reactjs/my-app/webpack.dev.config.ts
+        target: /app/webpack.dev.config.ts
+      - type: bind
+        source: ./reactjs/my-app/webpack.prod.config.ts
+        target: /app/webpack.prod.config.ts
     depends_on:
       - nbas-mysql
     stdin_open: true # docker run -i
     tty: true        # docker run -t
-    #command: cd my-app && npm start
 
   nbas-mysql:
     image: mysql:8.0
