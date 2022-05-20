@@ -7,8 +7,22 @@
     "build": "webpack --config webpack.prod.config.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.8.0",
+    "@mui/material": "^5.8.0",
+    "@react-firebase/auth": "^0.2.10",
+    "@reduxjs/toolkit": "^1.8.1",
+    "axios": "^0.27.2",
+    "chart.js": "^3.7.1",
+    "firebase": "^9.8.1",
     "react": "^18.1.0",
-    "react-dom": "^18.1.0"
+    "react-chartjs-2": "^4.1.0",
+    "react-dom": "^18.1.0",
+    "react-firebase-hooks": "^5.0.3",
+    "react-hook-form": "^7.31.1",
+    "react-redux": "^8.0.1",
+    "react-router-dom": "^6.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.0",
