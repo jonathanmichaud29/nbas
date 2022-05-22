@@ -6,27 +6,25 @@ services:
     build:
       context: reactjs
       dockerfile: Dockerfile
+      args:
+        FIREBASE_APIKEY: ${FIREBASE_APIKEY}
+        FIREBASE_AUTHDOMAIN: ${FIREBASE_AUTHDOMAIN}
+        FIREBASE_PROJECTID: ${FIREBASE_PROJECTID}
+        FIREBASE_STORAGEBUCKET: ${FIREBASE_STORAGEBUCKET}
+        FIREBASE_MESSAGINGSENDERID: ${FIREBASE_MESSAGINGSENDERID}
+        FIREBASE_APPID: ${FIREBASE_APPID}
     ports:
-      - 80:4000
+      - 80:3000
     volumes:
       - type: bind
         source: ./reactjs/my-app/src
         target: /app/src
       - type: bind
-        source: ./reactjs/my-app/.babelrc
-        target: /app/.babelrc
-      - type: bind
-        source: ./reactjs/my-app/.eslintrc.json
-        target: /app/.eslintrc.json
+        source: ./reactjs/my-app/public
+        target: /app/public
       - type: bind
         source: ./reactjs/my-app/tsconfig.json
         target: /app/tsconfig.json
-      - type: bind
-        source: ./reactjs/my-app/webpack.dev.config.ts
-        target: /app/webpack.dev.config.ts
-      - type: bind
-        source: ./reactjs/my-app/webpack.prod.config.ts
-        target: /app/webpack.prod.config.ts
     depends_on:
       - nbas-mysql
     stdin_open: true # docker run -i
@@ -36,8 +34,8 @@ services:
     image: mysql:8.0
     cap_add:
       - SYS_NICE
-    env_file:
-      - .env.local
+    #env_file:
+    #  - .env.local
     ports:
       - 3306:3306
     volumes:
@@ -49,4 +47,8 @@ services:
 volumes:
   mysql-data:
   
-  
+secrets:
+   db_password:
+     file: db_password.txt
+   db_root_password:
+     file: db_root_password.txt
