@@ -7,18 +7,23 @@ import {
   Routes, 
 } from "react-router-dom";
 
+import PublicMenu from './Menu/PublicMenu';
 import Login from './Firebase/Login';
-import DashboardHome from './Dashboard/DashboardHome';
-
+import AdminApp from './Admin/AdminApp';
+import DashboardHome from './Admin/DashboardHome';
 
 function App() {
-  console.log(process.env);
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<DashboardHome />} />
+          <Route path="/" element={<PublicMenu />}>
+            
+          </Route>
+          <Route path="/admin/" element={<AdminApp />}>
+            <Route path="login" element={<Login />} />
+            <Route path="dashboard" element={<DashboardHome />} />
+          </Route>
         </Routes>
       </Router>
     </div>

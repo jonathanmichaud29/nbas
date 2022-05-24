@@ -11,7 +11,7 @@ function Login() {
   
   useEffect(() => {
     if (loading) return;
-    if (user) navigate("/dashboard");
+    if (user) navigate("/admin/dashboard");
   }, [user, loading, navigate]);
 
   return (

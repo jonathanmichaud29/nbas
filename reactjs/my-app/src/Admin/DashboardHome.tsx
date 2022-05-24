@@ -1,20 +1,14 @@
-import React, { useEffect/* , useState */ } from "react";
+import React, { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-// import "./Dashboard.css";
-import { auth, /* db, */ logout } from "../Firebase/firebase";
-// import { query, collection, getDocs, where } from "firebase/firestore";
+import { auth, logout } from "../Firebase/firebase";
 function DashboardHome() {
   const [user, loading/* , error */] = useAuthState(auth);
   const navigate = useNavigate();
   
   useEffect(() => {
     if (loading) return;
-    
-    if (!user) {
-      // eslint-disable-next-line
-      navigate("/");
-    }
+    if (!user) navigate("/");
   }, [user, loading, navigate]);
 
   return (
