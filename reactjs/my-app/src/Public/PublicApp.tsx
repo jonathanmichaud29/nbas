@@ -1,12 +1,14 @@
 import { Outlet }from "react-router-dom"
+
 import PublicMenu from "../Menu/PublicMenu";
-function AdminApp() {
+
+function PublicApp() {
   return (
     <div className="public-layout">
-      <h1>Admin App</h1>
+      <h1>Public App</h1>
       <PublicMenu />
       <Outlet />
     </div>
   )
 }
-export default AdminApp;
+export default PublicApp;

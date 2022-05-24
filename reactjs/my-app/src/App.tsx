@@ -1,4 +1,4 @@
-import React from 'react';
+
 import './App.css';
 
 import { 
@@ -7,23 +7,35 @@ import {
   Routes, 
 } from "react-router-dom";
 
-import PublicMenu from './Menu/PublicMenu';
-import Login from './Firebase/Login';
+/**
+ * Public Components
+ */
+import PublicApp from './Public/PublicApp';
+import HomePage from './Public/HomePage'
+
+/**
+ * Admin Components
+ */
 import AdminApp from './Admin/AdminApp';
 import DashboardHome from './Admin/DashboardHome';
+import Login from './Firebase/Login';
+
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<PublicMenu />}>
-            
+
+          <Route path="/" element={<PublicApp />}>
+            <Route path="" element={<HomePage />} />
           </Route>
+
           <Route path="/admin/" element={<AdminApp />}>
             <Route path="login" element={<Login />} />
             <Route path="dashboard" element={<DashboardHome />} />
           </Route>
+
         </Routes>
       </Router>
     </div>
