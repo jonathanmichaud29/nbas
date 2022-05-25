@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -15,6 +15,7 @@ const defaultValues = {
 interface IFormInput {
   email: string;
   password: string;
+  apiError: string;
 }
 
 function Login() {
@@ -22,10 +23,20 @@ function Login() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
+  const [apiError, changeApiError] = useState("");
+
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
+    
     logInWithEmailAndPassword(data.email, data.password)
+      .catch(error => {
+        changeApiError(error.message);
+      })
+      .then(() =>{
+        changeApiError("");
+      });
+    
   } 
 
   useEffect(() => {
@@ -74,6 +85,9 @@ function Login() {
           )}
         />
         {errors.password && <span role="alert">{errors.password.message}</span>}
+        {apiError &&
+            <div className="alert alert-danger mt-3 mb-0">{apiError}</div>
+        }
         <Button 
           onClick={handleSubmit(onSubmit)}
           variant="contained"
