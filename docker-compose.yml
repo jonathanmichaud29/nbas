@@ -1,6 +1,20 @@
 version: "3.9"
 
 services:
+  nbas-api:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    ports:
+      - 4000:4000
+    volumes:
+      - type: bind
+        source: ./api/app
+        target: /app/
+    depends_on:
+      - nbas-mysql
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
 
   nbas-reactjs:
     build:
@@ -34,21 +48,15 @@ services:
     image: mysql:8.0
     cap_add:
       - SYS_NICE
-    #env_file:
-    #  - .env.local
+    env_file:
+      - .env
     ports:
       - 3306:3306
     volumes:
     - mysql-data:/var/lib/mysql
-    - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    - ./db:/docker-entrypoint-initdb.d
     stdin_open: true # docker run -i
     tty: true        # docker run -t
 
 volumes:
   mysql-data:
-  
-secrets:
-   db_password:
-     file: db_password.txt
-   db_root_password:
-     file: db_root_password.txt
