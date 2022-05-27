@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon /app/app.js"
+    "dev": "nodemon --ignore node_modules/ --watch /app /app/app.js"
   },
   "keywords": [],
   "author": "",
