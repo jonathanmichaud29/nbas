@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
 
-import {fetchTeams} from '../ApiCall/teams'
+import { fetchPlayers } from '../ApiCall/players'
 
-import { ITeam } from '../Interfaces/Team';
+import { IPlayer } from '../Interfaces/Player';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { addTeams } from "../redux/teamSlice";
+import { addPlayers } from "../redux/playerSlice";
 
-function TeamList() {
+function PlayerList() {
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const listTeams = useSelector((state: RootState) => state )
+  const listPlayers = useSelector((state: RootState) => state )
   
   useEffect(() => {
-    fetchTeams()
+    fetchPlayers()
       .then(response => {
-        dispatch(addTeams(response.data));
+        dispatch(addPlayers(response.data));
       })
       .catch(error => {
         setError(error);
@@ -28,9 +28,9 @@ function TeamList() {
       });
   }, [dispatch])
 
-  const htmlTeams = ( listTeams.teams.length > 0 ? (
+  const htmlPlayers = ( listPlayers.players.length > 0 ? (
     <ul>
-      {listTeams.teams.map((team: ITeam) => {
+      {listPlayers.players.map((team: IPlayer) => {
         return (
           <li key={`team-${team.id}`}>{team.name}</li>
         )
@@ -49,11 +49,11 @@ function TeamList() {
 
   return (
     <div className="public-layout">
-      <h2>Team List</h2>
+      <h2>Player List</h2>
       { htmlLoading }
       { htmlError }
-      { htmlTeams }
+      { htmlPlayers }
     </div>
   )
 }
-export default TeamList;
+export default PlayerList;

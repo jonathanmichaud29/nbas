@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const fetchTeams = async () => {
-  return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
+const fetchPlayers = async () => {
+  return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -10,4 +10,4 @@ const fetchTeams = async () => {
     })
 }
 
-export { fetchTeams }
+export { fetchPlayers }
