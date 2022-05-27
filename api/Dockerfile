@@ -6,6 +6,8 @@ ENV PATH /node_modules/.bin:$PATH
 COPY ./package.json / \
   ./nodemon.json /
 
+RUN apk add nano
+
 RUN npm install
 
 WORKDIR /app
