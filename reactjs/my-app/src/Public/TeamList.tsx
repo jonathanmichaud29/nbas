@@ -13,7 +13,7 @@ function TeamList() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const listTeams = useSelector((state: RootState) => state )
+  const listTeams = useSelector((state: RootState) => state ).teams
   
   useEffect(() => {
     fetchTeams()
@@ -28,9 +28,9 @@ function TeamList() {
       });
   }, [dispatch])
 
-  const htmlTeams = ( listTeams.teams.length > 0 ? (
+  const htmlTeams = ( listTeams.length > 0 ? (
     <ul>
-      {listTeams.teams.map((team: ITeam) => {
+      {listTeams.map((team: ITeam) => {
         return (
           <li key={`team-${team.id}`}>{team.name}</li>
         )
