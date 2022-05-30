@@ -4,7 +4,8 @@ FROM node:18.2.0-alpine3.15
 ENV PATH /node_modules/.bin:$PATH
 
 COPY ./package.json / \
-  ./nodemon.json /
+  ./nodemon.json / \
+  ./firebase-service-account.json /
 
 RUN apk add nano
 

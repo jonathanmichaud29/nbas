@@ -22,7 +22,6 @@ function Login() {
   
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
-
   const [apiError, changeApiError] = useState("");
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
@@ -30,6 +29,12 @@ function Login() {
   const onSubmit: SubmitHandler<IFormInput> = data => {
     
     logInWithEmailAndPassword(data.email, data.password)
+      .then(userCredential => {
+        userCredential.user.getIdToken().then(token=>{
+          window.localStorage.setItem('userToken', token);
+        });
+        
+      })
       .catch(error => {
         changeApiError(error.message);
       })

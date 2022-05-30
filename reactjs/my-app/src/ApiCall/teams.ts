@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+const userToken = window.localStorage.getItem("userToken");
+const axiosProtected = axios.create();
+axiosProtected.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+
 const fetchTeam = async (id_team: number) => {
   return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/team/${id_team}`)
     .then(response => {
@@ -21,7 +25,8 @@ const fetchTeams = async () => {
 }
 
 const createTeam = async (argName: string) => {
-  return await axios.post(`${process.env.REACT_APP_API_DOMAIN}/team/`,{
+  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team/`,{
     name: argName
   })
     .then(response => {
