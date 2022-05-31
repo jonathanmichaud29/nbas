@@ -18,6 +18,7 @@ import HomePage from './Public/HomePage'
  */
 import AdminApp from './Admin/AdminApp';
 import DashboardHome from './Admin/DashboardHome';
+import PlayerManager from './Admin/PlayerManager';
 import Login from './Firebase/Login';
 
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/admin/" element={<AdminApp />}>
             <Route path="login" element={<Login />} />
             <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="players" element={<PlayerManager />} />
           </Route>
 
         </Routes>

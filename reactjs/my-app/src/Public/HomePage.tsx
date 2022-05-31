@@ -1,11 +1,11 @@
 import ListTeams from "../Teams/ListTeams";
-import PlayerList from "./PlayerList";
+import ListPlayers from "../Players/ListPlayers";
 function HomePage() {
   return (
     <div className="public-layout">
       <h1>Home Page</h1>
       <ListTeams />
-      <PlayerList />
+      <ListPlayers />
     </div>
   )
 }

@@ -7,11 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 import { addPlayers } from "../redux/playerSlice";
 
-function PlayerList() {
+function ListPlayers(props: any) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const { is_admin } = props;
 
   const listPlayers = useSelector((state: RootState) => state )
   
@@ -56,4 +58,4 @@ function PlayerList() {
     </div>
   )
 }
-export default PlayerList;
+export default ListPlayers;
