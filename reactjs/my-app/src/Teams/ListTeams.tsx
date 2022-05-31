@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react';
 
-import {fetchTeams} from '../ApiCall/teams'
+import { fetchTeams, deleteTeam } from '../ApiCall/teams'
 
-import { ITeam } from '../Interfaces/Team';
+import { ITeam, ITeamProps } from '../Interfaces/Team';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { addTeams } from "../redux/teamSlice";
+import { addTeams, removeTeam } from "../redux/teamSlice";
 
-function TeamList() {
+function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const {is_admin} = props;
+
   const listTeams = useSelector((state: RootState) => state ).teams
+
+  const clickDeleteTeam = (team: ITeam) => {
+    deleteTeam(team.id)
+      .then(response => {
+        dispatch(removeTeam(team.id));
+      })
+      .catch(error => {
+        setError(error);
+      })
+      .finally(() => {
+        setIsLoaded(true)
+      });
+  }
   
   useEffect(() => {
     fetchTeams()
@@ -31,8 +46,14 @@ function TeamList() {
   const htmlTeams = ( listTeams.length > 0 ? (
     <ul>
       {listTeams.map((team: ITeam) => {
+        
         return (
-          <li key={`team-${team.id}`}>{team.name}</li>
+          <li key={`team-${team.id}`}>
+            <span className="label">{team.name}</span>
+            { is_admin ? (
+              <button onClick={() => clickDeleteTeam(team)}>Delete</button>
+            ) : '' }
+          </li>
         )
       })}
       
@@ -56,4 +77,4 @@ function TeamList() {
     </div>
   )
 }
-export default TeamList;
+export default ListTeams;

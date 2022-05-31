@@ -37,4 +37,16 @@ const createTeam = async (argName: string) => {
     })
 }
 
-export { fetchTeam, fetchTeams, createTeam }
+const deleteTeam = async (argId: number) => {
+  console.info("deleteTeam #", argId);
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team/${argId}`,{
+    
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+export { fetchTeam, fetchTeams, createTeam, deleteTeam }

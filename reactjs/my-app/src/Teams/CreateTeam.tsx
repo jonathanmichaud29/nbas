@@ -20,24 +20,26 @@ function CreateTeam() {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
-  const [newTeamId, setNewTeamId] = useState(0);
 
   const dispatch = useDispatch<AppDispatch>();
   const listTeams = useSelector((state: RootState) => state ).teams
-  console.info(listTeams);
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
+
     setRequestStatus(true);
     changeApiSuccess("");
+
     createTeam(data.name)
       .then((response) =>{
-        changeApiError("");
         reset()
+
+        changeApiError("");
         changeApiSuccess(response.message);
-        setNewTeamId(response.data.id)
+
+        dispatch(addTeam(response.data));
       })
       .catch(error => {
         changeApiError(error);
@@ -48,21 +50,9 @@ function CreateTeam() {
       
   }
 
-  useEffect(() => {
-    if( newTeamId !== 0 ){
-      fetchTeam(newTeamId)
-        .then(response => {
-          dispatch(addTeam(response.data));
-        })
-        .catch(error => {
-          changeApiError(error);
-        })
-        .finally(() => {
-          // something finally ended
-          setNewTeamId(0);
-        });
-    }
-  }, [dispatch, newTeamId])
+  /* useEffect(() => {
+    
+  }, []) */
 
   return (
     <div>

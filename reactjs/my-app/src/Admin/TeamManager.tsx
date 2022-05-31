@@ -1,4 +1,5 @@
-import CreateTeam from './CreateTeam';
+import CreateTeam from '../Teams/CreateTeam';
+import ListTeams from '../Teams/ListTeams';
 
 function TeamManager() {
 
@@ -6,6 +7,9 @@ function TeamManager() {
     <div>
       <h2>TeamManager</h2>
       <CreateTeam />
+      <ListTeams 
+        is_admin={true}
+      />
     </div>
   )
 }

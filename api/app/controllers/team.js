@@ -37,9 +37,10 @@ exports.getAllTeams = (req, res, next) => {
       }
       res.status(201).json({
         status: "success",
-        message: "team created!",
+        message: `team '${req.body.name}' created!`,
         data:{
-          id: data.insertId
+          id: data.insertId,
+          name: req.body.name
         }
       });
     }
@@ -95,6 +96,9 @@ exports.deleteTeam = (req, res, next) => {
       res.status(201).json({
         status: "success",
         message: "team deleted!",
+        data:{
+          id: req.params.id
+        }
       });
     }
   );
