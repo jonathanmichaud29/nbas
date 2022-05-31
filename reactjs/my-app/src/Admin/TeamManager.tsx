@@ -5,7 +5,7 @@ function TeamManager() {
 
   return (
     <div>
-      <h2>TeamManager</h2>
+      <h2>Team Manager</h2>
       <CreateTeam />
       <ListTeams 
         is_admin={true}

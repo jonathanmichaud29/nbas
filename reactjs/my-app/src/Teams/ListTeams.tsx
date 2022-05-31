@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-
-import { fetchTeams, deleteTeam } from '../ApiCall/teams'
-
-import { ITeam, ITeamProps } from '../Interfaces/Team';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
+
+import { Button } from "@mui/material";
+
 import { addTeams, removeTeam } from "../redux/teamSlice";
+import { fetchTeams, deleteTeam } from '../ApiCall/teams'
+import { ITeam, ITeamProps } from '../Interfaces/Team';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,7 +52,10 @@ function ListTeams(props: ITeamProps) {
           <li key={`team-${team.id}`}>
             <span className="label">{team.name}</span>
             { is_admin ? (
-              <button onClick={() => clickDeleteTeam(team)}>Delete</button>
+              <Button 
+                onClick={() => clickDeleteTeam(team)}
+                variant="outlined"
+                >Delete</Button>
             ) : '' }
           </li>
         )

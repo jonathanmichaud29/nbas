@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, logout } from "../Firebase/firebase";
-import TeamManager from "./TeamManager";
 
 function DashboardHome() {
   const [user, loading] = useAuthState(auth);
@@ -19,7 +18,6 @@ function DashboardHome() {
       <button className="dashboard__btn" onClick={logout}>
         Logout
       </button>
-      <TeamManager />
     </div>
   );
 }

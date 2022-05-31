@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-
-import { deletePlayer, fetchPlayers } from '../ApiCall/players'
-
-import { IPlayer, IPlayerProps } from '../Interfaces/Player';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
+
+import { Button } from "@mui/material";
+
 import { addPlayers, removePlayer } from "../redux/playerSlice";
+import { deletePlayer, fetchPlayers } from '../ApiCall/players'
+import { IPlayer, IPlayerProps } from '../Interfaces/Player';
 
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -50,7 +51,10 @@ function ListPlayers(props: IPlayerProps) {
           <li key={`player-${player.id}`}>
             <span className="label">{player.name}</span>
             { is_admin ? (
-              <button onClick={() => clickDeletePlayer(player)}>Delete</button>
+              <Button 
+                onClick={() => clickDeletePlayer(player)}
+                variant="outlined"
+                >Delete</Button>
             ) : '' }
           </li>
         )

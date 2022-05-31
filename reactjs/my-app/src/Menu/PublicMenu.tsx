@@ -24,6 +24,7 @@ function PublicMenu() {
       return (
         <>
           <li><Link to="/admin/dashboard">Dashboard</Link></li>
+          <li><Link to="/admin/teams">Teams</Link></li>
           <li><Link to="/admin/players">Players</Link></li>
         </>
       )

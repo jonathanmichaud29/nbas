@@ -20,6 +20,7 @@ import AdminApp from './Admin/AdminApp';
 import DashboardHome from './Admin/DashboardHome';
 import PlayerManager from './Admin/PlayerManager';
 import Login from './Firebase/Login';
+import TeamManager from './Admin/TeamManager';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/admin/" element={<AdminApp />}>
             <Route path="login" element={<Login />} />
             <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="teams" element={<TeamManager />} />
             <Route path="players" element={<PlayerManager />} />
           </Route>
 
