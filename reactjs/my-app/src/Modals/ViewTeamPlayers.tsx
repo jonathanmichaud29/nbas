@@ -21,7 +21,7 @@ const styleModal = {
 
 function ViewTeamPlayers(props: ITeamPlayersProps) {
 
-  const {is_open, selected_team} = props;
+  const {is_open, selected_team, callback_close_modal} = props;
   
   const [isModalOpen, setModalOpen] = useState(false);
   const [listTeamPlayers, setListTeamPlayers] = useState<ITeamPlayers[]>([]);
@@ -30,6 +30,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   const handleModalClose = () => {
     setListTeamPlayers([]);
     setModalOpen(false);
+    callback_close_modal();
   }
 
   useEffect(() => {

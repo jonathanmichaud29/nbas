@@ -52,6 +52,13 @@ function ListTeams(props: ITeamProps) {
     setCurrentTeamView(team);
   }
 
+  const cbCloseTeamPlayers = () => {
+    setOpenViewTeamPlayers(false);
+  }
+  const cbCloseAddTeamPlayer = () => {
+    setOpenAddPlayerToTeam(false);
+  }
+
   useEffect(() => {
     fetchTeams()
       .then(response => {
@@ -109,12 +116,14 @@ function ListTeams(props: ITeamProps) {
         <ViewTeamPlayers
           is_open={isModalOpenViewTeamPlayers}
           selected_team={currentTeamView}
+          callback_close_modal={cbCloseTeamPlayers}
           />
       ) : '' }
       { is_add_players ? (
         <AddTeamPlayer
           is_open={isModalOpenAddPlayerToTeam}
           selected_team={currentTeamView}
+          callback_close_modal={cbCloseAddTeamPlayer}
           />
       ) : '' }
     </div>

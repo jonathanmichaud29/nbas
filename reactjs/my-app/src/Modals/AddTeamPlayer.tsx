@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Box, Modal, Typography, List, ListItem } from "@mui/material";
 
-import { ITeam, ITeamPlayers } from "../Interfaces/Team";
+import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/Team";
 import { fetchTeamPlayers } from "../ApiCall/teams";
 
 
@@ -17,24 +17,18 @@ const styleModal = {
   p: 4,
 };
 
-interface IViewPlayersProps {
-  is_open: boolean;
-  selected_team?: ITeam;
-}
+function AddTeamPlayer(props: ITeamPlayersProps) {
 
-function AddTeamPlayer(props: IViewPlayersProps) {
-
-  const {is_open, selected_team} = props;
+  const {is_open, selected_team, callback_close_modal} = props;
   
   const [isModalOpen, setModalOpen] = useState(false);
   const [listTeamPlayers, setListTeamPlayers] = useState<ITeamPlayers[]>([]);
-  const [nameCurrentTeam, setNameCurrentTeam] = useState("");
-  
+  const [error, setError] = useState("");
 
   const handleModalClose = () => {
     setListTeamPlayers([]);
     setModalOpen(false);
-    setNameCurrentTeam('');
+    callback_close_modal();
   }
 
   useEffect(() => {
@@ -42,12 +36,9 @@ function AddTeamPlayer(props: IViewPlayersProps) {
       fetchTeamPlayers(selected_team.id)
         .then(response => {
           setListTeamPlayers(response.data);
-          setNameCurrentTeam(selected_team.name);
-          // dispatch(removeTeam(team.id));
         })
         .catch(error => {
-          console.error("Error fetching team players", error)
-          // setError(error);
+          setError(error);
         })
         .finally(() => {
           setModalOpen(true);
@@ -67,6 +58,9 @@ function AddTeamPlayer(props: IViewPlayersProps) {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Add player to team <b>{selected_team?.name}</b>
           </Typography>
+          { error ? (
+            <p className="msg error">{error}</p>
+          ) : ''}
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </Typography>

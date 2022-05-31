@@ -19,4 +19,5 @@ export interface ITeamPlayers{
 export interface ITeamPlayersProps {
   is_open: boolean;
   selected_team?: ITeam;
+  callback_close_modal(): void;
 }
