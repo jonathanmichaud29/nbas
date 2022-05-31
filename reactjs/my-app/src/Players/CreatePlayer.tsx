@@ -4,8 +4,8 @@ import { Paper, Button, TextField } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { AppDispatch } from "../redux/store";
-import { addTeam } from "../redux/teamSlice";
-import { createTeam } from '../ApiCall/teams';
+import { addPlayer } from "../redux/playerSlice";
+import { createPlayer } from '../ApiCall/players';
 
 const defaultValues = {
   name: ""
@@ -15,7 +15,7 @@ interface IFormInput {
   name: string;
 }
 
-function CreateTeam() {
+function CreatePlayer() {
   
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -31,14 +31,14 @@ function CreateTeam() {
     setRequestStatus(true);
     changeApiSuccess("");
 
-    createTeam(data.name)
+    createPlayer(data.name)
       .then((response) =>{
         reset()
 
         changeApiError("");
         changeApiSuccess(response.message);
 
-        dispatch(addTeam(response.data));
+        dispatch(addPlayer(response.data));
       })
       .catch(error => {
         changeApiError(error);
@@ -55,7 +55,7 @@ function CreateTeam() {
 
   return (
     <div>
-      <h3>Create new Team</h3>
+      <h3>Create new Player</h3>
       <Paper>
         {apiSuccess &&
             <div className="success">{apiSuccess}</div>
@@ -70,7 +70,7 @@ function CreateTeam() {
               <TextField 
                 onChange={onChange} 
                 value={value} 
-                label={"Team Name"} 
+                label={"Player Name"} 
                 error={errors.name ? true : false}
               />
             )}
@@ -89,4 +89,4 @@ function CreateTeam() {
   );
 }
 
-export default CreateTeam;
+export default CreatePlayer;

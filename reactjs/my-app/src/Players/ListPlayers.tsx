@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 
-import { fetchPlayers } from '../ApiCall/players'
+import { deletePlayer, fetchPlayers } from '../ApiCall/players'
 
-import { IPlayer } from '../Interfaces/Player';
+import { IPlayer, IPlayerProps } from '../Interfaces/Player';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { addPlayers } from "../redux/playerSlice";
+import { addPlayers, removePlayer } from "../redux/playerSlice";
 
-function ListPlayers(props: any) {
+function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState(null);
@@ -16,6 +16,19 @@ function ListPlayers(props: any) {
   const { is_admin } = props;
 
   const listPlayers = useSelector((state: RootState) => state )
+
+  const clickDeletePlayer = (player: IPlayer) => {
+    deletePlayer(player.id)
+      .then(response => {
+        dispatch(removePlayer(player.id));
+      })
+      .catch(error => {
+        setError(error);
+      })
+      .finally(() => {
+        setIsLoaded(true)
+      });
+  }
   
   useEffect(() => {
     fetchPlayers()
@@ -32,9 +45,14 @@ function ListPlayers(props: any) {
 
   const htmlPlayers = ( listPlayers.players.length > 0 ? (
     <ul>
-      {listPlayers.players.map((team: IPlayer) => {
+      {listPlayers.players.map((player: IPlayer) => {
         return (
-          <li key={`team-${team.id}`}>{team.name}</li>
+          <li key={`player-${player.id}`}>
+            <span className="label">{player.name}</span>
+            { is_admin ? (
+              <button onClick={() => clickDeletePlayer(player)}>Delete</button>
+            ) : '' }
+          </li>
         )
       })}
       

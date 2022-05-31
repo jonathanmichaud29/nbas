@@ -1,7 +1,7 @@
-import axios from 'axios';
+import { axiosPublic, axiosProtected } from '../utils/Axios'
 
 const fetchPlayers = async () => {
-  return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -10,4 +10,29 @@ const fetchPlayers = async () => {
     })
 }
 
-export { fetchPlayers }
+const createPlayer = async (argName: string) => {
+  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/player/`,{
+    name: argName
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+const deletePlayer = async (argId: number) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/player/${argId}`,{
+    
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export { createPlayer, deletePlayer, fetchPlayers }

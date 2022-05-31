@@ -22,7 +22,10 @@ function PublicMenu() {
   const renderAdminLinks = () => {
     if( ! loading && user ) {
       return (
-        <li><Link to="/admin/players">Players</Link></li>
+        <>
+          <li><Link to="/admin/dashboard">Dashboard</Link></li>
+          <li><Link to="/admin/players">Players</Link></li>
+        </>
       )
     }
   }

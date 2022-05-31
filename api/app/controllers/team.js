@@ -1,17 +1,6 @@
 const AppError = require("../utils/appError");
 const conn = require("../services/db");
-
-transformMysqlErrorCode = (err_code) => {
-  let error_return = 'Unknown error occured when adding a new team';
-  switch(err_code){
-    case "ER_DUP_ENTRY":
-      error_return = "The team already exists";
-      break;
-    default:
-      break;
-  }
-  return error_return;
-}
+const transformMysqlErrorCode = require("../utils/dbErrorTranslator");
 
 exports.getAllTeams = (req, res, next) => {
   conn.query("SELECT * FROM teams", function (err, data, fields) {
@@ -32,7 +21,7 @@ exports.getAllTeams = (req, res, next) => {
     [values],
     function (err, data, fields) {
       if (err) {
-        const err_message = transformMysqlErrorCode(err.code);
+        const err_message = transformMysqlErrorCode(err.code, "team");
         return next(new AppError(err_message, 500));
       }
       res.status(201).json({

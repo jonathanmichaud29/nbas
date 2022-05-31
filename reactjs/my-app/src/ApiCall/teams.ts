@@ -1,11 +1,7 @@
-import axios from 'axios';
-
-const userToken = window.localStorage.getItem("userToken");
-const axiosProtected = axios.create();
-axiosProtected.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+import { axiosPublic, axiosProtected } from '../utils/Axios'
 
 const fetchTeam = async (id_team: number) => {
-  return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/team/${id_team}`)
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/${id_team}`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -15,7 +11,7 @@ const fetchTeam = async (id_team: number) => {
 }
 
 const fetchTeams = async () => {
-  return await axios.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -38,7 +34,6 @@ const createTeam = async (argName: string) => {
 }
 
 const deleteTeam = async (argId: number) => {
-  console.info("deleteTeam #", argId);
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team/${argId}`,{
     
   })
