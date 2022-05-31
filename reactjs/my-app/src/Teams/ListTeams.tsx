@@ -5,8 +5,11 @@ import { AppDispatch, RootState } from "../redux/store";
 import { Button } from "@mui/material";
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
-import { fetchTeams, deleteTeam } from '../ApiCall/teams'
-import { ITeam, ITeamProps } from '../Interfaces/Team';
+import { fetchTeams, deleteTeam } from "../ApiCall/teams";
+import { ITeam, ITeamProps } from "../Interfaces/Team";
+
+import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
+import AddTeamPlayer from "../Modals/AddTeamPlayer";
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -14,7 +17,7 @@ function ListTeams(props: ITeamProps) {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const {is_admin} = props;
+  const {is_admin, is_add_players, is_view_players } = props;
 
   const listTeams = useSelector((state: RootState) => state ).teams
 
@@ -30,7 +33,25 @@ function ListTeams(props: ITeamProps) {
         setIsLoaded(true)
       });
   }
-  
+
+  /**
+   * Handle multiples modals
+   */
+  const [currentTeamView, setCurrentTeamView] = useState<ITeam>();
+  const [isModalOpenAddPlayerToTeam, setOpenAddPlayerToTeam] = useState(false);
+  const [isModalOpenViewTeamPlayers, setOpenViewTeamPlayers] = useState(false);
+
+  const handleOpenListPlayers = (team: ITeam) => {
+    setOpenAddPlayerToTeam(false);
+    setOpenViewTeamPlayers(true);
+    setCurrentTeamView(team);
+  }
+  const handleOpenAddPlayerToTeam = (team: ITeam) => {
+    setOpenViewTeamPlayers(false);
+    setOpenAddPlayerToTeam(true);
+    setCurrentTeamView(team);
+  }
+
   useEffect(() => {
     fetchTeams()
       .then(response => {
@@ -57,6 +78,12 @@ function ListTeams(props: ITeamProps) {
                 variant="outlined"
                 >Delete</Button>
             ) : '' }
+            { is_view_players ? (
+              <Button onClick={() => handleOpenListPlayers(team)}>View Players</Button>
+            ) : '' }
+            { is_add_players ? (
+              <Button onClick={() => handleOpenAddPlayerToTeam(team)}>Add Player to team</Button>
+            ) : '' }
           </li>
         )
       })}
@@ -78,6 +105,18 @@ function ListTeams(props: ITeamProps) {
       { htmlLoading }
       { htmlError }
       { htmlTeams }
+      { is_view_players ? (
+        <ViewTeamPlayers
+          is_open={isModalOpenViewTeamPlayers}
+          selected_team={currentTeamView}
+          />
+      ) : '' }
+      { is_add_players ? (
+        <AddTeamPlayer
+          is_open={isModalOpenAddPlayerToTeam}
+          selected_team={currentTeamView}
+          />
+      ) : '' }
     </div>
   )
 }

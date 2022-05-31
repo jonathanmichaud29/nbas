@@ -38,7 +38,6 @@ exports.getAllTeams = (req, res, next) => {
  };
 
  exports.getTeam = (req, res, next) => {
-  console.info(req.params)
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
   }
@@ -88,6 +87,32 @@ exports.deleteTeam = (req, res, next) => {
         data:{
           id: req.params.id
         }
+      });
+    }
+  );
+ };
+
+
+ exports.getTeamPlayers = (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No team id found", 404));
+  }
+  conn.query(
+    "SELECT t.id as team_id, t.name as team_name, p.id as player_id, p.name as player_name "+
+    "FROM team_player as tp " +
+    "INNER JOIN teams as t ON (tp.id_team=t.id) " +
+    "LEFT JOIN players AS p ON (tp.id_player=p.id) " +
+    "WHERE tp.id_team = ?",
+    [req.params.id],
+    function (err, data, fields) {
+      if (err) {
+        const err_message = transformMysqlErrorCode(err.code, "team");
+        return next(new AppError(err_message, 500));
+      }
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data,
       });
     }
   );

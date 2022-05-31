@@ -17,6 +17,10 @@ router
  .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
 
 router
+ .route("/team-players/:id")
+ .get(teamControllers.getTeamPlayers)
+
+router
   .route("/player/")
   .get(playerControllers.getAllPlayers)
   .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);

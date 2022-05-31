@@ -4,7 +4,9 @@ function HomePage() {
   return (
     <div className="public-layout">
       <h1>Home Page</h1>
-      <ListTeams />
+      <ListTeams 
+        is_view_players={true}
+      />
       <ListPlayers />
     </div>
   )

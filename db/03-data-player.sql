@@ -1,2 +1,1 @@
-INSERT INTO `nbas`.`players` (`name`) VALUES ('Player Name Alpha');
-INSERT INTO `nbas`.`players` (`name`) VALUES ('Player Name Beta');
+INSERT INTO `nbas`.`players` (`name`) VALUES ('Player Alpha'), ('Player Beta'), ('Player Charlie'), ('Player Delta');

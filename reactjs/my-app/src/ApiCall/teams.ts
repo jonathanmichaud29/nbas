@@ -44,4 +44,16 @@ const deleteTeam = async (argId: number) => {
       return Promise.reject(error.response.data.message);
     })
 }
-export { fetchTeam, fetchTeams, createTeam, deleteTeam }
+
+const fetchTeamPlayers = async (argId: number) => {
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argId}`,{
+    
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers }

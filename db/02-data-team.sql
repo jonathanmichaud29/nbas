@@ -1,1 +1,1 @@
-INSERT INTO `nbas`.`teams` (`name`) VALUES ('Blue Bangers');
+INSERT INTO `nbas`.`teams` (`name`) VALUES ('Team Alpha'), ('Team Beta');

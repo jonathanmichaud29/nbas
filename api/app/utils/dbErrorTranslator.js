@@ -4,6 +4,9 @@ const transformMysqlErrorCode = (err_code, context) => {
     case "ER_DUP_ENTRY":
       error_return = `The ${context} already exists`;
       break;
+    case "ER_BAD_FIELD_ERROR":
+      error_return = `An unexpected error caused by a wrong field.`
+      break;
     default:
       break;
   }
