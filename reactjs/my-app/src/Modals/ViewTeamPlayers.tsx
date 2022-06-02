@@ -66,7 +66,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
           { is_open && listTeamPlayers ? (
             <List>
               { listTeamPlayers.map((team_player: ITeamPlayers) => (
-                <ListItem key={`team-player-${team_player.team_id}-${team_player.team_id}`}>{team_player.player_name}</ListItem>
+                <ListItem key={`team-player-${team_player.team_id}-${team_player.player_id}`}>{team_player.player_name}</ListItem>
               ))}
             </List>
           ) : (

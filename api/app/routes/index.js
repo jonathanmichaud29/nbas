@@ -13,12 +13,17 @@ router
 router
  .route("/team/:id")
  .get(teamControllers.getTeam)
- .put(teamControllers.updateTeam, firebaseAuthMiddleware.decodeToken)
+ /* .put(teamControllers.updateTeam, firebaseAuthMiddleware.decodeToken) */
  .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
 
 router
  .route("/team-players/:id")
  .get(teamControllers.getTeamPlayers)
+ .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken)
+
+router
+ .route("/unassigned-players/")
+ .get(teamControllers.getUnassignedPlayers)
 
 router
   .route("/player/")
@@ -28,7 +33,7 @@ router
 router
  .route("/player/:id")
  .get(playerControllers.getPlayer)
- .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken)
+ /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
 
 module.exports = router;

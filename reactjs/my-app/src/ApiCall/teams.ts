@@ -56,4 +56,28 @@ const fetchTeamPlayers = async (argId: number) => {
       return Promise.reject(error.response.data.message);
     })
 }
-export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers }
+
+const fetchUnassignedPlayers = async () => {
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/unassigned-players/`,{
+    
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argTeamId}`,{
+    id_player: argPlayerId
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers, addTeamPlayer, fetchUnassignedPlayers }

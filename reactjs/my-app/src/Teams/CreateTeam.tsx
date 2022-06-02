@@ -1,6 +1,6 @@
 import { useState }  from 'react';
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Paper, Button, TextField } from "@mui/material";
+import { Alert, Paper, Button, TextField } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { AppDispatch } from "../redux/store";
@@ -57,9 +57,7 @@ function CreateTeam() {
     <div>
       <h3>Create new Team</h3>
       <Paper>
-        {apiSuccess &&
-            <div className="success">{apiSuccess}</div>
-          }
+        { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
         <Controller
             name={"name"}
             control={control}
@@ -72,18 +70,16 @@ function CreateTeam() {
                 value={value} 
                 label={"Team Name"} 
                 error={errors.name ? true : false}
+                helperText={errors.name ? errors.name.message : '' }
               />
             )}
           />
-          {errors.name && <span role="alert">{errors.name.message}</span>}
 
           <Button 
             onClick={handleSubmit(onSubmit)}
             variant="contained"
             >Submit</Button>
-          {apiError &&
-            <div className="alert alert-danger mt-3 mb-0">{apiError}</div>
-          }
+          { apiError && <Alert severity="error">{apiError}</Alert> }
       </Paper>
     </div>
   );

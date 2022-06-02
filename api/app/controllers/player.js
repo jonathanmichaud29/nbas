@@ -1,8 +1,8 @@
 const AppError = require("../utils/appError");
-const conn = require("../services/db");
+const { conn } = require("../services/db");
 const transformMysqlErrorCode = require("../utils/dbErrorTranslator");
 
-exports.getAllPlayers = (req, res, next) => {
+exports.getAllPlayers = async (req, res, next) => {
   conn.query("SELECT * FROM players", function (err, data, fields) {
     if(err) return next(new AppError(err))
     res.status(200).json({
@@ -13,7 +13,7 @@ exports.getAllPlayers = (req, res, next) => {
   });
  };
 
- exports.createPlayer = (req, res, next) => {
+ exports.createPlayer = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const values = [req.body.name];
   conn.query(
@@ -54,7 +54,7 @@ exports.getAllPlayers = (req, res, next) => {
   );
  };
 
- exports.updatePlayer = (req, res, next) => {
+ /* exports.updatePlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No player id found", 404));
   }
@@ -69,9 +69,9 @@ exports.getAllPlayers = (req, res, next) => {
       });
     }
   );
-};
+}; */
 
-exports.deletePlayer = (req, res, next) => {
+exports.deletePlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No player id found", 404));
   }
