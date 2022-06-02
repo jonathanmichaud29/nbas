@@ -1,58 +1,38 @@
 const AppError = require("../utils/appError");
-const { conn } = require("../services/db");
-const transformMysqlErrorCode = require("../utils/dbErrorTranslator");
+const appResponse = require("../utils/appResponse");
+const { mysqlQuery } = require("../services/db");
 
 exports.getAllPlayers = async (req, res, next) => {
-  conn.query("SELECT * FROM players", function (err, data, fields) {
-    if(err) return next(new AppError(err))
-    res.status(200).json({
-      status: "success",
-      length: data?.length,
-      data: data,
-    });
-  });
- };
+  const resultMainQuery = await mysqlQuery("SELECT * FROM players", [])
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
 
- exports.createPlayer = async (req, res, next) => {
+exports.createPlayer = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const values = [req.body.name];
-  conn.query(
-    "INSERT INTO players (name) VALUES(?)",
-    [values],
-    function (err, data, fields) {
-      if (err) {
-        const err_message = transformMysqlErrorCode(err.code, "player");
-        return next(new AppError(err_message, 500));
-      }
-      res.status(201).json({
-        status: "success",
-        message: `player '${req.body.name}' created!`,
-        data:{
-          id: data.insertId,
-          name: req.body.name
-        }
-      });
-    }
-  );
- };
+  const resultMainQuery = await mysqlQuery("INSERT INTO players (name) VALUES(?)", values)
 
- exports.getPlayer = (req, res, next) => {
+  let customMessage = ''
+  let customData = {}
+  if( resultMainQuery.status ) {
+    customData = {
+      id: resultMainQuery.data.insertId,
+      name: req.body.name
+    }
+    customMessage = `player '${req.body.name}' created!`
+  }
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+};
+
+exports.getPlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No player id found", 404));
   }
-  conn.query(
-    "SELECT * FROM players WHERE id = ?",
-    [req.params.id],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-      res.status(200).json({
-        status: "success",
-        length: data?.length,
-        data: data,
-      });
-    }
-  );
- };
+  const values = [req.params.id]
+  const resultMainQuery = await mysqlQuery("SELECT * FROM players WHERE id=?", values)
+
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
 
  /* exports.updatePlayer = async (req, res, next) => {
   if (!req.params.id) {
@@ -75,18 +55,15 @@ exports.deletePlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No player id found", 404));
   }
-  conn.execute(
-    "DELETE from players WHERE id=?",
-    [req.params.id],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-      res.status(201).json({
-        status: "success",
-        message: "player deleted!",
-        data:{
-          id: req.params.id
-        }
-      });
-    }
-  );
- };
+  const values = [req.params.id];
+  const resultMainQuery = await mysqlQuery("DELETE FROM players WHERE id=?", values);
+  let customData = {}
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customData = {
+      id: req.params.id
+    };
+    customMessage = `player deleted!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+};
