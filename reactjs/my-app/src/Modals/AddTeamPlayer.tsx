@@ -2,24 +2,11 @@ import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
 
-import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/Team";
+import { ITeamPlayersProps } from "../Interfaces/Team";
 import { IPlayer } from "../Interfaces/Player";
-import { fetchTeamPlayers, addTeamPlayer, fetchUnassignedPlayers } from "../ApiCall/teams";
-import { AirlineSeatIndividualSuiteSharp } from "@mui/icons-material";
-import { increment } from "firebase/firestore";
+import { addTeamPlayer, fetchUnassignedPlayers } from "../ApiCall/teams";
 
-
-const styleModal = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+import styleModal from './styleModal'
 
 const defaultValues = {
   player: {},

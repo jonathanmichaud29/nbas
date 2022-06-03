@@ -13,6 +13,7 @@ import { ITeam, ITeamProps } from "../Interfaces/Team";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
+import ConfirmDelete from "../Modals/ConfirmDelete";
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,8 +31,9 @@ function ListTeams(props: ITeamProps) {
     changeApiSuccess('');
   }
 
-  const clickDeleteTeam = (team: ITeam) => {
+  const confirmDeleteTeam = (team: ITeam) => {
     reinitializeApiMessages();
+
     deleteTeam(team.id)
       .then(response => {
         dispatch(removeTeam(team.id));
@@ -51,16 +53,26 @@ function ListTeams(props: ITeamProps) {
   const [currentTeamView, setCurrentTeamView] = useState<ITeam>();
   const [isModalOpenAddPlayerToTeam, setOpenAddPlayerToTeam] = useState(false);
   const [isModalOpenViewTeamPlayers, setOpenViewTeamPlayers] = useState(false);
+  const [isModalOpenConfirmDeleteTeam, setOpenConfirmDeleteTeam] = useState(false);
 
   const handleOpenListPlayers = (team: ITeam) => {
+    setCurrentTeamView(team);
     setOpenAddPlayerToTeam(false);
     setOpenViewTeamPlayers(true);
-    setCurrentTeamView(team);
+    setOpenConfirmDeleteTeam(false);
   }
   const handleOpenAddPlayerToTeam = (team: ITeam) => {
+    setCurrentTeamView(team);
     setOpenViewTeamPlayers(false);
     setOpenAddPlayerToTeam(true);
+    setOpenConfirmDeleteTeam(false);
+  }
+
+  const handleOpenConfirmDeleteTeam = (team: ITeam) => {
     setCurrentTeamView(team);
+    setOpenViewTeamPlayers(false);
+    setOpenAddPlayerToTeam(false);
+    setOpenConfirmDeleteTeam(true);
   }
 
   const cbCloseTeamPlayers = () => {
@@ -68,6 +80,13 @@ function ListTeams(props: ITeamProps) {
   }
   const cbCloseAddTeamPlayer = () => {
     setOpenAddPlayerToTeam(false);
+  }
+  const cbCloseConfirmDelete = (team?: ITeam) => {
+    if( team ) {
+      confirmDeleteTeam(team);
+    }
+    setOpenConfirmDeleteTeam(false);
+    
   }
 
   useEffect(() => {
@@ -93,7 +112,8 @@ function ListTeams(props: ITeamProps) {
               key={`action-delete-team-${team.id}`}
               aria-label={`Delete Team ${team.name}`}
               title={`Delete Team ${team.name}`}
-              onClick={ () => clickDeleteTeam(team)}
+              /* onClick={ () => clickDeleteTeam(team)} */
+              onClick={ () => handleOpenConfirmDeleteTeam(team) }
               >
               <Delete />
             </IconButton>
@@ -144,6 +164,7 @@ function ListTeams(props: ITeamProps) {
       { is_view_players ? (
         <ViewTeamPlayers
           is_open={isModalOpenViewTeamPlayers}
+          is_admin={is_admin || false}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseTeamPlayers}
           />
@@ -153,6 +174,14 @@ function ListTeams(props: ITeamProps) {
           is_open={isModalOpenAddPlayerToTeam}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseAddTeamPlayer}
+          />
+      ) : '' }
+      { is_admin ? (
+        <ConfirmDelete
+          is_open={isModalOpenConfirmDeleteTeam}
+          callback_close_modal={cbCloseConfirmDelete}
+          selected_team={currentTeamView}
+          context="team"
           />
       ) : '' }
     </div>

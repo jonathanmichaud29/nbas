@@ -5,24 +5,13 @@ import { Delete } from '@mui/icons-material';
 import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/Team";
 import { fetchTeamPlayers, removeTeamPlayer } from "../ApiCall/teams";
 
-
-const styleModal = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+import styleModal from './styleModal'
 
 
 
 function ViewTeamPlayers(props: ITeamPlayersProps) {
 
-  const {is_open, selected_team, callback_close_modal} = props;
+  const {is_admin, is_open, selected_team, callback_close_modal} = props;
   
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -87,19 +76,26 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
           
           { is_open && listTeamPlayers ? (
             <List>
-              { listTeamPlayers.map((team_player: ITeamPlayers) => (
-                <ListItem 
-                  key={`team-player-${team_player.team_id}-${team_player.player_id}`}
-                  secondaryAction={
+              { listTeamPlayers.map((team_player: ITeamPlayers) => {
+                let listActions = [];
+                if( is_admin ) {
+                  listActions.push(
                     <IconButton 
-                      aria-label="comment"
+                      aria-label={`Remove ${team_player.player_name} from team`}
+                      title={`Remove ${team_player.player_name} from team`}
                       onClick={ () => clickRemoveTeamPlayer(team_player)}
                       >
                       <Delete />
                     </IconButton>
-                  }
-                  >{team_player.player_name}</ListItem>
-              ))}
+                  )
+                }
+                return (
+                  <ListItem 
+                    key={`team-player-${team_player.team_id}-${team_player.player_id}`}
+                    secondaryAction={ listActions.map((action) => action) }
+                    >{team_player.player_name}</ListItem>
+                )
+                  })}
             </List>
           ) : (
             <Alert severity="info">There is no rooster for this team</Alert>
@@ -107,7 +103,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
 
           { apiError && <Alert severity="error">{apiError}</Alert> }
           { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
-          
+
         </Box>
       </Modal>
     </>

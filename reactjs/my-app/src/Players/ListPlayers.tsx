@@ -9,6 +9,8 @@ import { addPlayers, removePlayer } from "../redux/playerSlice";
 import { deletePlayer, fetchPlayers } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/Player';
 
+import ConfirmDelete from "../Modals/ConfirmDelete";
+
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -25,7 +27,7 @@ function ListPlayers(props: IPlayerProps) {
     changeApiSuccess('');
   }
 
-  const clickDeletePlayer = (player: IPlayer) => {
+  const confirmDeletePlayer = (player: IPlayer) => {
     reinitializeApiMessages()
     deletePlayer(player.id)
       .then(response => {
@@ -53,6 +55,24 @@ function ListPlayers(props: IPlayerProps) {
       });
   }, [dispatch])
 
+  /**
+   * Handle multiples modals
+   */
+  const [currentPlayerView, setCurrentPlayerView] = useState<IPlayer>();
+  const [isModalOpenConfirmDelete, setOpenConfirmDelete] = useState(false);
+
+  const handleOpenConfirmDelete = (player: IPlayer) => {
+    setCurrentPlayerView(player);
+    setOpenConfirmDelete(true);
+  }
+  
+  const cbCloseConfirmDelete = (player?: IPlayer) => {
+    if( player ) {
+      confirmDeletePlayer(player);
+    }
+    setOpenConfirmDelete(false);
+  }
+
   const htmlPlayers = ( listPlayers.length > 0 ? (
     <List>
       {listPlayers.map((player: IPlayer) => {
@@ -63,7 +83,7 @@ function ListPlayers(props: IPlayerProps) {
               key={`action-delete-player-${player.id}`}
               aria-label={`Delete Player ${player.name}`}
               title={`Delete Player ${player.name}`}
-              onClick={ () => clickDeletePlayer(player)}
+              onClick={ () => handleOpenConfirmDelete(player) }
               >
               <Delete />
             </IconButton>
@@ -86,8 +106,15 @@ function ListPlayers(props: IPlayerProps) {
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
-
       { htmlPlayers }
+      { is_admin ? (
+        <ConfirmDelete
+          is_open={isModalOpenConfirmDelete}
+          callback_close_modal={cbCloseConfirmDelete}
+          selected_player={currentPlayerView}
+          context="player"
+          />
+      ) : '' }
     </div>
   )
 }
