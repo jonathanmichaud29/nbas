@@ -1,7 +1,6 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
-const transformMysqlErrorCode = require("../utils/dbErrorTranslator");
 const { getPlayerData, getTeamData } = require("../utils/simpleQueries");
 
 exports.getAllTeams = async (req, res, next) => {
