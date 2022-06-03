@@ -57,20 +57,18 @@ exports.getTeam = async (req, res, next) => {
 }; */
 
 exports.deleteTeam = async (req, res, next) => {
-  /**
-   * Validate Required Parameters
-   */
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
   }
-  
-  /**
-   * Prepare and execute query
-   */
+
   const values = [req.params.id]
   const resultMainQuery = await mysqlQuery("DELETE from teams WHERE id=?", values);
 
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customMessage = `The team is deleted`;
+  }
+  return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };
 
 exports.getTeamPlayers = async (req, res, next) => {
@@ -134,4 +132,31 @@ exports.createTeamPlayer = async (req, res, next) => {
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
   
+};
+
+const is_missing_keys = (required_keys, compare_object) => {
+  let is_missing = false;
+  required_keys.forEach((key) => {
+    if( ! (key in compare_object) ){
+      is_missing = true;
+    }
+  })
+  return is_missing;
+}
+exports.deleteTeamPlayer = async (req, res, next) => {
+  if (!req.body) return next(new AppError("No form data found", 404));
+  
+  const bodyRequiredKeys = ["team_id", "team_name", "player_id", "player_name"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
+  }
+  
+  const values = [req.body.team_id, req.body.player_id]
+  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE id_team=? AND id_player=?", values);
+
+  let customMessage = '';
+  if( resultMainQuery.status ) {
+    customMessage = `'${req.body.player_name}' has been removed from team '${req.body.team_name}'`;
+  }
+  return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };

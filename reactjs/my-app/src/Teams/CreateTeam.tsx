@@ -23,21 +23,23 @@ function CreateTeam() {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  const reinitializeApiMessages = () => {
+    changeApiError('');
+    changeApiSuccess('');
+  }
+
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
 
     setRequestStatus(true);
-    changeApiSuccess("");
+    reinitializeApiMessages();
 
     createTeam(data.name)
       .then((response) =>{
         reset()
-
-        changeApiError("");
         changeApiSuccess(response.message);
-
         dispatch(addTeam(response.data));
       })
       .catch(error => {
@@ -49,15 +51,13 @@ function CreateTeam() {
       
   }
 
-  /* useEffect(() => {
-    
-  }, []) */
 
   return (
     <div>
       <h3>Create new Team</h3>
       <Paper>
         { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
+        { apiError && <Alert severity="error">{apiError}</Alert> }
         <Controller
             name={"name"}
             control={control}
@@ -79,7 +79,6 @@ function CreateTeam() {
             onClick={handleSubmit(onSubmit)}
             variant="contained"
             >Submit</Button>
-          { apiError && <Alert severity="error">{apiError}</Alert> }
       </Paper>
     </div>
   );

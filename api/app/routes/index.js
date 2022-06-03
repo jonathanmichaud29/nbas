@@ -22,6 +22,10 @@ router
  .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken)
 
 router
+  .route('/team-player/')
+  .delete(teamControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken)
+
+router
  .route("/unassigned-players/")
  .get(teamControllers.getUnassignedPlayers)
 

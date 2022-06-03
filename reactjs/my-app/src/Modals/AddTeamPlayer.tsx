@@ -33,24 +33,35 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
 
   const {is_open, selected_team, callback_close_modal} = props;
   
+  /**
+   * Set States
+   */
   const [isModalOpen, setModalOpen] = useState(false);
   const [listUnassignedPlayers, setUnassignedPlayers] = useState<IPlayer[]>([]);
-  const [error, setError] = useState("");
+  const [apiError, changeApiError] = useState("");
+  const [apiSuccess, changeApiSuccess] = useState("");
+  const [requestStatus, setRequestStatus] = useState(false);
+  const [incrementAcIndex, setIncrementAcIndex] = useState(1);
+
+  const reinitializeApiMessages = () => {
+    changeApiSuccess("")
+    changeApiError("")
+  }
 
   const handleModalClose = () => {
     setModalOpen(false);
     callback_close_modal();
+    reinitializeApiMessages();
   }
 
   useEffect(() => {
     if ( is_open ) {
       fetchUnassignedPlayers()
         .then(response => {
-          console.log(response.data);
           setUnassignedPlayers(response.data);
         })
         .catch(error => {
-          setError(error);
+          changeApiError(error);
         })
         .finally(() => {
           setModalOpen(true);
@@ -58,24 +69,21 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
       }
   }, [selected_team, is_open]);
 
-  const [apiError, changeApiError] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
-  const [requestStatus, setRequestStatus] = useState(false);
-  const [incrementAcIndex, setIncrementAcIndex] = useState(1);
   
+  /**
+   * Form behaviors
+   */
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
-  console.log("errors", errors);
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus || ! selected_team ) return;
 
     setRequestStatus(true);
-    changeApiSuccess("");
+    reinitializeApiMessages();
 
     addTeamPlayer(selected_team?.id, data.player.id)
       .then((response) =>{
         reset()
-        changeApiError("");
         setIncrementAcIndex(incrementAcIndex+1);
         changeApiSuccess(response.message);
         setUnassignedPlayers(listUnassignedPlayers.filter((player: IPlayer) => player.id !== response.data.id_player));
@@ -95,7 +103,6 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
         open={isModalOpen}
         onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
       >
         <Box sx={styleModal}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -103,7 +110,6 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
           </Typography>
           
           <Paper>
-            { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
             <Controller
               name={"player"}
               control={control}
@@ -137,8 +143,10 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
               onClick={handleSubmit(onSubmit)}
               variant="contained"
               >Add player to team</Button>
-            { error && <Alert severity="error">{error}</Alert> }
+
+            { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
             { apiError && <Alert severity="error">{apiError}</Alert> }
+
           </Paper>
         </Box>
       </Modal>

@@ -1,3 +1,4 @@
+import { ITeamPlayers } from '../Interfaces/Team';
 import { axiosPublic, axiosProtected } from '../utils/Axios'
 
 const fetchTeam = async (id_team: number) => {
@@ -80,4 +81,21 @@ const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
       return Promise.reject(error.response.data.message);
     })
 }
-export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers, addTeamPlayer, fetchUnassignedPlayers }
+
+const removeTeamPlayer = async(argTeamPlayer: ITeamPlayers) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team-player/`,{
+    data:{
+      team_id: argTeamPlayer.team_id,
+      team_name: argTeamPlayer.team_name,
+      player_id: argTeamPlayer.player_id,
+      player_name: argTeamPlayer.player_name,
+    }
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers, addTeamPlayer, fetchUnassignedPlayers, removeTeamPlayer }

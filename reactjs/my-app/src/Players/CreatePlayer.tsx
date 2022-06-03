@@ -23,21 +23,23 @@ function CreatePlayer() {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  const reinitializeApiMessages = () => {
+    changeApiError('');
+    changeApiSuccess('');
+  }
+
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
 
     setRequestStatus(true);
-    changeApiSuccess("");
+    reinitializeApiMessages();
 
     createPlayer(data.name)
       .then((response) =>{
         reset()
-
-        changeApiError("");
         changeApiSuccess(response.message);
-
         dispatch(addPlayer(response.data));
       })
       .catch(error => {
@@ -49,14 +51,11 @@ function CreatePlayer() {
       
   }
 
-  /* useEffect(() => {
-    
-  }, []) */
-
   return (
     <div>
       <h3>Create new Player</h3>
       <Paper>
+        { apiError && <Alert severity="error">{apiError}</Alert> }
         { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
         <Controller
             name={"name"}
@@ -79,7 +78,6 @@ function CreatePlayer() {
             onClick={handleSubmit(onSubmit)}
             variant="contained"
             >Submit</Button>
-          { apiError && <Alert severity="error">{apiError}</Alert> }
       </Paper>
     </div>
   );

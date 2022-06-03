@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
-import { Button } from "@mui/material";
+import { Alert, Box, CircularProgress, IconButton, List, ListItem } from "@mui/material";
+import { Delete } from '@mui/icons-material';
+import PeopleIcon from '@mui/icons-material/People';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
 import { fetchTeams, deleteTeam } from "../ApiCall/teams";
@@ -14,23 +17,31 @@ import AddTeamPlayer from "../Modals/AddTeamPlayer";
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [error, setError] = useState(null);
+  const [apiError, changeApiError] = useState("");
+  const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
   const {is_admin, is_add_players, is_view_players } = props;
 
   const listTeams = useSelector((state: RootState) => state ).teams
 
+  const reinitializeApiMessages = () => {
+    changeApiError('');
+    changeApiSuccess('');
+  }
+
   const clickDeleteTeam = (team: ITeam) => {
+    reinitializeApiMessages();
     deleteTeam(team.id)
       .then(response => {
         dispatch(removeTeam(team.id));
+        changeApiSuccess(response.message);
       })
       .catch(error => {
-        setError(error);
+        changeApiError(error);
       })
       .finally(() => {
-        setIsLoaded(true)
+        
       });
   }
 
@@ -65,7 +76,7 @@ function ListTeams(props: ITeamProps) {
         dispatch(addTeams(response.data));
       })
       .catch(error => {
-        setError(error);
+        changeApiError(error);
       })
       .finally(() => {
         setIsLoaded(true)
@@ -73,44 +84,62 @@ function ListTeams(props: ITeamProps) {
   }, [dispatch])
 
   const htmlTeams = ( listTeams.length > 0 ? (
-    <ul>
+    <List>
       {listTeams.map((team: ITeam) => {
-        
+        let listActions = [];
+        if( is_admin ) {
+          listActions.push(
+            <IconButton 
+              key={`action-delete-team-${team.id}`}
+              aria-label={`Delete Team ${team.name}`}
+              title={`Delete Team ${team.name}`}
+              onClick={ () => clickDeleteTeam(team)}
+              >
+              <Delete />
+            </IconButton>
+          )
+        }
+        if( is_view_players ) {
+          listActions.push(
+            <IconButton 
+              key={`action-view-players-${team.id}`}
+              aria-label={`View ${team.name} players`}
+              title={`View ${team.name} players`}
+              onClick={ () => handleOpenListPlayers(team)}
+              >
+              <PeopleIcon />
+            </IconButton>
+          );
+        }
+        if( is_add_players ) {
+          listActions.push(
+            <IconButton 
+              key={`action-add-player-${team.id}`}
+              aria-label={`Add Player to ${team.name}`}
+              title={`Add Player to ${team.name}`}
+              onClick={ () => handleOpenAddPlayerToTeam(team)}
+              >
+              <GroupAddIcon />
+            </IconButton>
+          )
+        }
         return (
-          <li key={`team-${team.id}`}>
-            <span className="label">{team.name}</span>
-            { is_admin ? (
-              <Button 
-                onClick={() => clickDeleteTeam(team)}
-                variant="outlined"
-                >Delete</Button>
-            ) : '' }
-            { is_view_players ? (
-              <Button onClick={() => handleOpenListPlayers(team)}>View Players</Button>
-            ) : '' }
-            { is_add_players ? (
-              <Button onClick={() => handleOpenAddPlayerToTeam(team)}>Add Player to team</Button>
-            ) : '' }
-          </li>
+          <ListItem 
+            key={`team-${team.id}`}
+            secondaryAction={ listActions.map((action) => action) }
+            >{team.name}</ListItem>
         )
       })}
-      
-    </ul>
+    </List>
   ) : '' );
-  const htmlError = ( error !== null ? (
-    <div>Error: {error}</div>
-  ) : '' );
-
-  const htmlLoading = ( ! isLoaded ? (
-    <div>Loading...</div>
-  ) : '' )
-
+  
 
   return (
     <div className="public-layout">
       <h2>Team List</h2>
-      { htmlLoading }
-      { htmlError }
+      { ! isLoaded && <Box><CircularProgress /></Box>}
+      { apiError && <Alert severity="error">{apiError}</Alert> }
+      { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlTeams }
       { is_view_players ? (
         <ViewTeamPlayers
