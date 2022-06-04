@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Firebase/firebase";
-
 import { Link } from 'react-router-dom';
+
+import { List, ListItem  } from "@mui/material";
 
 function PublicMenu() {
   const [user, loading] = useAuthState(auth);
@@ -14,7 +15,7 @@ function PublicMenu() {
   const renderPublicLinks = () => {
     if( ! loading && ! user ) {
       return (
-        <li><Link to="/admin/login">Login</Link></li>
+        <ListItem><Link to="/admin/login">Login</Link></ListItem>
       )
     }
   }
@@ -23,9 +24,10 @@ function PublicMenu() {
     if( ! loading && user ) {
       return (
         <>
-          <li><Link to="/admin/dashboard">Dashboard</Link></li>
-          <li><Link to="/admin/teams">Teams</Link></li>
-          <li><Link to="/admin/players">Players</Link></li>
+          <ListItem><Link to="/admin/dashboard">Dashboard</Link></ListItem>
+          <ListItem><Link to="/admin/teams">Teams</Link></ListItem>
+          <ListItem><Link to="/admin/players">Players</Link></ListItem>
+          <ListItem><Link to="/admin/calendar">Calendar</Link></ListItem>
         </>
       )
     }
@@ -33,13 +35,13 @@ function PublicMenu() {
 
   return (
     <div className="main-menu">
-      <ul>
-        <li><Link to="/">Home</Link></li>
+      <List dense={true}>
+        <ListItem><Link to="/">Home</Link></ListItem>
         { renderPublicLinks() }
         { renderAdminLinks() }
 
         
-      </ul>
+      </List>
     </div>
   )
 }

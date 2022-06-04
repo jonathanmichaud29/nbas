@@ -3,6 +3,7 @@ const router = express.Router();
 
 const teamControllers = require("../controllers/team");
 const playerControllers = require("../controllers/player");
+const matchControllers = require("../controllers/match");
 const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware");
 
 router
@@ -39,5 +40,11 @@ router
  .get(playerControllers.getPlayer)
  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
+
+
+router
+ .route("/match/")
+ .get(matchControllers.getAllMatches)
+ .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
 
 module.exports = router;

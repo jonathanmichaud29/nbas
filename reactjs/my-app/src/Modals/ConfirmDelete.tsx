@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField, ButtonGroup } from "@mui/material";
+import { Button, Box, Modal, Typography, ButtonGroup } from "@mui/material";
 
 import { IConfirmDeleteProps } from "../Interfaces/Generic";
 
@@ -15,8 +15,6 @@ function ConfirmDelete(props: IConfirmDeleteProps) {
   const [modalDescription, setModalDescription] = useState("");
 
   const handleModalClose = () => {
-    /* reinitializeApiMessages();
-    setListTeamPlayers([]); */
     setModalOpen(false);
     callback_close_modal();
   }

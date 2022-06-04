@@ -21,6 +21,7 @@ import DashboardHome from './Admin/DashboardHome';
 import PlayerManager from './Admin/PlayerManager';
 import Login from './Firebase/Login';
 import TeamManager from './Admin/TeamManager';
+import CalendarManager from './Admin/CalendarManager';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="dashboard" element={<DashboardHome />} />
             <Route path="teams" element={<TeamManager />} />
             <Route path="players" element={<PlayerManager />} />
+            <Route path="calendar" element={<CalendarManager />} />
           </Route>
 
         </Routes>
