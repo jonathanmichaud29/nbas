@@ -18,7 +18,7 @@ import { ITeam } from '../Interfaces/Team';
 const defaultValues = {
   team_home: 0,
   team_away: 0,
-  date: new Date()
+  date: new Date("YYYY-mm-dd 15:00:00")
 }
 
 interface IFormInput {
@@ -47,7 +47,7 @@ function CreateMatch() {
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
     console.log("data send", data);
-    /* setRequestStatus(true);
+    setRequestStatus(true);
     reinitializeApiMessages();
 
     createMatch(data.team_home, data.team_away, data.date)
@@ -61,7 +61,7 @@ function CreateMatch() {
       })
       .finally(() => {
         setRequestStatus(false);
-      }) */
+      })
       
   }
 

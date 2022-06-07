@@ -14,7 +14,7 @@ const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Da
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match/`,{
     id_team_home: argTeamHome,
-    id_team_away: argTeamHome,
+    id_team_away: argTeamAway,
     date: argDate,
   })
     .then(response => {
