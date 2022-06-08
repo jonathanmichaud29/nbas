@@ -18,7 +18,7 @@ interface IFormInput {
 
 function AddTeamPlayer(props: ITeamPlayersProps) {
 
-  const {isOpen, selected_team, callback_close_modal} = props;
+  const {isOpen, selectedTeam, callbackCloseModal} = props;
   
   /**
    * Set States
@@ -37,7 +37,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
 
   const handleModalClose = () => {
     setModalOpen(false);
-    callback_close_modal();
+    callbackCloseModal();
     reinitializeApiMessages();
   }
 
@@ -54,7 +54,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
           setModalOpen(true);
         });
       }
-  }, [selected_team, isOpen]);
+  }, [selectedTeam, isOpen]);
 
   
   /**
@@ -63,17 +63,17 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
-    if( requestStatus || ! selected_team ) return;
+    if( requestStatus || ! selectedTeam ) return;
 
     setRequestStatus(true);
     reinitializeApiMessages();
 
-    addTeamPlayer(selected_team?.id, data.player.id)
+    addTeamPlayer(selectedTeam?.id, data.player.id)
       .then((response) =>{
         reset()
         setIncrementAcIndex(incrementAcIndex+1);
         changeApiSuccess(response.message);
-        setUnassignedPlayers(listUnassignedPlayers.filter((player: IPlayer) => player.id !== response.data.id_player));
+        setUnassignedPlayers(listUnassignedPlayers.filter((player: IPlayer) => player.id !== response.data.idPlayer));
       })
       .catch(error => {
         changeApiError(error);
@@ -93,7 +93,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
       >
         <Box sx={styleModal}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add player to team <b>{selected_team?.name}</b>
+            Add player to team <b>{selectedTeam?.name}</b>
           </Typography>
           
           <Paper>

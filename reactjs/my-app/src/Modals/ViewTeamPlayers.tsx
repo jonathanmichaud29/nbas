@@ -11,7 +11,7 @@ import styleModal from './styleModal'
 
 function ViewTeamPlayers(props: ITeamPlayersProps) {
 
-  const {isAdmin, isOpen, selected_team, callback_close_modal} = props;
+  const {isAdmin, isOpen, selectedTeam, callbackCloseModal} = props;
   
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -26,7 +26,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
     reinitializeApiMessages();
     setListTeamPlayers([]);
     setModalOpen(false);
-    callback_close_modal();
+    callbackCloseModal();
     
   }
 
@@ -48,8 +48,8 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( isOpen && selected_team !== undefined ) {
-      fetchTeamPlayers(selected_team.id)
+    if ( isOpen && selectedTeam !== undefined ) {
+      fetchTeamPlayers(selectedTeam.id)
         .then(response => {
           setListTeamPlayers(response.data);
         })
@@ -60,7 +60,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
           setModalOpen(true);
         });
       }
-  }, [selected_team, isOpen]);
+  }, [selectedTeam, isOpen]);
 
   return (
     <>
@@ -71,7 +71,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
       >
         <Box sx={styleModal}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            <b>{selected_team?.name}</b> players
+            <b>{selectedTeam?.name}</b> players
           </Typography>
           
           { isOpen && listTeamPlayers ? (

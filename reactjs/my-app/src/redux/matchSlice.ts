@@ -28,8 +28,8 @@ const matchSlice = createSlice({
           idTeamAway: newMatch.idTeamAway,
           date: newMatch.date,
           isCompleted: newMatch.isCompleted,
-          team_home_points: newMatch.team_home_points,
-          team_away_points: newMatch.team_away_points,
+          teamHomePoints: newMatch.teamHomePoints,
+          teamAwayPoints: newMatch.teamAwayPoints,
           idTeamWon: newMatch.idTeamWon,
           idTeamLost: newMatch.idTeamLost,
         }

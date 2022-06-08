@@ -8,9 +8,9 @@ const playerSlice = createSlice({
   initialState,
   reducers: {
     addPlayers: (state, action: PayloadAction<[IPlayer]>) => {
-      action.payload.forEach((new_player: IPlayer) => {
-        if ( state.find(element => element.id === new_player.id) === undefined ){
-          state.push(new_player);
+      action.payload.forEach((newPlayer: IPlayer) => {
+        if ( state.find(element => element.id === newPlayer.id) === undefined ){
+          state.push(newPlayer);
         }
       });
     },
@@ -21,10 +21,10 @@ const playerSlice = createSlice({
           state.push(action.payload);
         }
       },
-      prepare: (new_player: IPlayer) => ({
+      prepare: (newPlayer: IPlayer) => ({
         payload: {
-          id: new_player.id,
-          name: new_player.name
+          id: newPlayer.id,
+          name: newPlayer.name
         },
       })
     },

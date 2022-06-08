@@ -4,8 +4,8 @@ export interface IMatch{
   idTeamAway: number;
   date: Date;
   isCompleted: number;
-  team_home_points: number;
-  team_away_points: number;
+  teamHomePoints: number;
+  teamAwayPoints: number;
   idTeamWon: number;
   idTeamLost: number;
 }

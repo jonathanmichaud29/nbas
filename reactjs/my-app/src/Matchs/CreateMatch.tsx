@@ -16,14 +16,14 @@ import { fetchTeams } from '../ApiCall/teams';
 import { ITeam } from '../Interfaces/Team';
 
 const defaultValues = {
-  team_home: 0,
-  team_away: 0,
+  teamHome: 0,
+  teamAway: 0,
   date: new Date("YYYY-mm-dd 15:00:00")
 }
 
 interface IFormInput {
-  team_home: number;
-  team_away: number;
+  teamHome: number;
+  teamAway: number;
   date: Date;
 }
 
@@ -50,7 +50,7 @@ function CreateMatch() {
     setRequestStatus(true);
     reinitializeApiMessages();
 
-    createMatch(data.team_home, data.team_away, data.date)
+    createMatch(data.teamHome, data.teamAway, data.date)
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);
@@ -86,7 +86,7 @@ function CreateMatch() {
         { apiError && <Alert severity="error">{apiError}</Alert> }
         { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
         <Controller
-          name={"team_home"}
+          name={"teamHome"}
           control={control}
           rules={{ 
             required: "This is required",
@@ -101,8 +101,8 @@ function CreateMatch() {
               onChange={onChange} 
               value={value} 
               label="Select Home Team"
-              error={errors.team_home ? true : false}
-              helperText={errors.team_home ? errors.team_home.message : '' }
+              error={errors.teamHome ? true : false}
+              helperText={errors.teamHome ? errors.teamHome.message : '' }
             >
               <MenuItem value="0">- Home Team -</MenuItem>
               { listTeams.length > 0 && listTeams.map((team: ITeam) => (
@@ -114,7 +114,7 @@ function CreateMatch() {
         />
 
         <Controller
-          name={"team_away"}
+          name={"teamAway"}
           control={control}
           rules={{ 
             required: "This is required",
@@ -122,8 +122,8 @@ function CreateMatch() {
               value: 1,
               message: "Select an away team"
             },
-            validate: (my_team: number) => {
-              if( watch('team_home') === my_team ) {
+            validate: (myTeam: number) => {
+              if( watch('teamHome') === myTeam ) {
                 return "Teams should not be the same";
               }
             }
@@ -134,8 +134,8 @@ function CreateMatch() {
               onChange={onChange} 
               value={value} 
               label="Select Away Team"
-              error={errors.team_away ? true : false}
-              helperText={errors.team_away ? errors.team_away.message : '' }
+              error={errors.teamAway ? true : false}
+              helperText={errors.teamAway ? errors.teamAway.message : '' }
             >
               <MenuItem value="0">- Away Team -</MenuItem>
               { listTeams.length > 0 && listTeams.map((team: ITeam) => (

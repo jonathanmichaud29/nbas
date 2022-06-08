@@ -6,47 +6,25 @@ import { IConfirmDeleteProps } from "../Interfaces/Generic";
 
 import styleModal from './styleModal'
 
-/**
- * TODO: 
- * - Title, Description should be set from the parent.
- * - Add a separate callback for Cancel and Confirm
- */
-
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
-  const { isOpen, title, description, callback_confirm_delete, callback_close_modal } = props;
+  const { isOpen, title, description, callbackConfirmDelete, callbackCloseModal } = props;
 
   const [isModalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
     setModalOpen(false);
-    callback_close_modal();
+    callbackCloseModal();
   }
 
   const handleModalConfirm = () => {
     setModalOpen(false);
-    callback_confirm_delete();
+    callbackConfirmDelete();
   }
 
   useEffect(() => {
     setModalOpen(isOpen);
-    /* if( isOpen ){
-      switch( context ){
-        case "team":
-          setModalTitle('Confirm team deletion');
-          setModalDescription(`Are-you sure you want to delete the team '${selected_team?.name}'?`);
-          break;
-        case "player":
-          setModalTitle('Confirm player deletion');
-          setModalDescription(`Are-you sure you want to delete the player '${selected_player?.name}'?`);
-          break;
-        case "match":
-          setModalTitle('Confirm match deletion');
-          setModalDescription(`Are-you sure you want to delete the match '${selected_match?.id}'?`);
-          break;
-      }
-    } */
-  }, [isOpen/* , context, selected_team, selected_player, selected_match */]);
+  }, [isOpen]);
   
   return (
     <Modal

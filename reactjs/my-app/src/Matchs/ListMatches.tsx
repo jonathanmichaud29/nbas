@@ -51,6 +51,7 @@ function ListMatches(props: IListMatchProps) {
   }
   
   useEffect(() => {
+    
     fetchTeams()
       .then(response => {
         dispatch(addTeams(response.data));
@@ -159,8 +160,8 @@ function ListMatches(props: IListMatchProps) {
       { isAdmin && currentMatchView && teamHome && teamAway && (
         <ConfirmDelete
           isOpen={isModalOpenConfirmDelete}
-          callback_close_modal={cbCloseModalDelete}
-          callback_confirm_delete={cbCloseConfirmDelete}
+          callbackCloseModal={cbCloseModalDelete}
+          callbackConfirmDelete={cbCloseConfirmDelete}
           title={`Confirm match deletion`}
           description={`Are-you sure you want to delete the match '${teamHome.name}' VS '${teamAway.name}', happening on day '${dateMatchReadable}'?`}
           />

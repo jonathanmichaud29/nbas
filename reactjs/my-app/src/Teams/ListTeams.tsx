@@ -168,22 +168,22 @@ function ListTeams(props: ITeamProps) {
         <ViewTeamPlayers
           isOpen={isModalOpenViewTeamPlayers}
           isAdmin={isAdmin}
-          selected_team={currentTeamView}
-          callback_close_modal={cbCloseTeamPlayers}
+          selectedTeam={currentTeamView}
+          callbackCloseModal={cbCloseTeamPlayers}
           />
       ) }
       { currentTeamView && isAddPlayers && (
         <AddTeamPlayer
           isOpen={isModalOpenAddPlayerToTeam}
-          selected_team={currentTeamView}
-          callback_close_modal={cbCloseAddTeamPlayer}
+          selectedTeam={currentTeamView}
+          callbackCloseModal={cbCloseAddTeamPlayer}
           />
       ) }
       { currentTeamView && isAdmin && (
         <ConfirmDelete
           isOpen={isModalOpenConfirmDeleteTeam}
-          callback_close_modal={cbCloseModalDelete}
-          callback_confirm_delete={cbCloseConfirmDelete}
+          callbackCloseModal={cbCloseModalDelete}
+          callbackConfirmDelete={cbCloseConfirmDelete}
           title={`Confirm team delete`}
           description={`Are-you sure you want to delete the team '${currentTeamView?.name}'?`}
           />

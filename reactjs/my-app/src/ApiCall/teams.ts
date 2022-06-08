@@ -72,7 +72,7 @@ const fetchUnassignedPlayers = async () => {
 
 const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argTeamId}`,{
-    id_player: argPlayerId
+    idPlayer: argPlayerId
   })
     .then(response => {
       return Promise.resolve(response.data);

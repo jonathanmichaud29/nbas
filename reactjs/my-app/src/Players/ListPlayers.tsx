@@ -114,8 +114,8 @@ function ListPlayers(props: IPlayerProps) {
       { currentPlayerView && isAdmin && (
         <ConfirmDelete
           isOpen={isModalOpenConfirmDelete}
-          callback_close_modal={cbCloseModalDelete}
-          callback_confirm_delete={cbCloseConfirmDelete}
+          callbackCloseModal={cbCloseModalDelete}
+          callbackConfirmDelete={cbCloseConfirmDelete}
           title={`Confirm player deletion`}
           description={`Are-you sure you want to delete the player '${currentPlayerView.name}'?`}
           />
