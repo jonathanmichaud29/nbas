@@ -6,7 +6,7 @@ import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 
-import { IMatch, IMatchProps } from '../Interfaces/Match';
+import { IMatch, IListMatchProps } from '../Interfaces/Match';
 import { ITeam } from '../Interfaces/Team';
 
 import { addMatches, removeMatch } from "../redux/matchSlice";
@@ -17,7 +17,7 @@ import { fetchTeams } from '../ApiCall/teams'
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import { Link } from 'react-router-dom';
 
-function ListMatches(props: IMatchProps) {
+function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [apiError, changeApiError] = useState("");
@@ -106,7 +106,7 @@ function ListMatches(props: IMatchProps) {
               </Link>
             </IconButton>
           )
-          
+
           listActions.push(
             <IconButton 
               key={`action-delete-match-${match.id}`}

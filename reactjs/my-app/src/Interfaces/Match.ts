@@ -11,5 +11,10 @@ export interface IMatch{
 }
 
 export interface IMatchProps{
+  id_match: number;
+  is_admin?: boolean;
+}
+
+export interface IListMatchProps{
   is_admin?: boolean;
 }

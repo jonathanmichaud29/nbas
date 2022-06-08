@@ -43,8 +43,8 @@ router
 
 
 router
- .route("/match/")
- .get(matchControllers.getAllMatches)
- .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
+  .route("/match/")
+  .get(matchControllers.getAllMatches)
+  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
 
 module.exports = router;

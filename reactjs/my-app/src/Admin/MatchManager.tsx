@@ -1,14 +1,19 @@
-/* import CreateMatch from '../Matchs/CreateMatch'; */
+import React from 'react';
+import ViewMatch from '../Matchs/ViewMatch';
 import{ useParams } from 'react-router-dom'
+
 function MatchManager() {
-  const { id } = useParams();
+  let { id } = useParams();
+  const id_match = id ? parseInt(id, 10) : null;
   return (
     <div>
       <h2>Match Manager</h2>
-      {/* <ViewMatch
-        id_match={id}
-        is_admin={true}
-      /> */}
+      { id_match && (
+        <ViewMatch
+          id_match={id_match}
+          is_admin={true}
+        />
+      ) }
     </div>
   )
 }

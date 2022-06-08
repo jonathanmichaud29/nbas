@@ -6,6 +6,12 @@ import { IConfirmDeleteProps } from "../Interfaces/Generic";
 
 import styleModal from './styleModal'
 
+/**
+ * TODO: 
+ * - Title, Description should be set from the parent.
+ * - Add a separate callback for Cancel and Confirm
+ */
+
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
   const { is_open, context, selected_team, selected_player, selected_match, callback_close_modal } = props;
