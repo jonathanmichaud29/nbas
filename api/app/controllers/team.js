@@ -76,7 +76,7 @@ exports.getTeamPlayers = async (req, res, next) => {
     return next(new AppError("No team id found", 404));
   }
 
-  const query = "SELECT t.id as team_id, t.name as team_name, p.id as player_id, p.name as player_name "+
+  const query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
     "FROM team_player as tp " +
     "INNER JOIN teams as t ON (tp.id_team=t.id) " +
     "LEFT JOIN players AS p ON (tp.id_player=p.id) " +

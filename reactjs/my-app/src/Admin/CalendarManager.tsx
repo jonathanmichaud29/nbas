@@ -8,7 +8,7 @@ function CalendarManager() {
       <h2>Calendar Manager</h2>
       <CreateMatch />
       <ListMatches 
-        is_admin={true}
+        isAdmin={true}
       />
     </div>
   )

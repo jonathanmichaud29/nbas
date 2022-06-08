@@ -22,7 +22,7 @@ function ListTeams(props: ITeamProps) {
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const {is_admin, is_add_players, is_view_players } = props;
+  const {isAdmin, isAddPlayers, isViewPlayers } = props;
 
   const listTeams = useSelector((state: RootState) => state ).teams
 
@@ -109,7 +109,7 @@ function ListTeams(props: ITeamProps) {
     <List>
       {listTeams.map((team: ITeam) => {
         let listActions = [];
-        if( is_admin ) {
+        if( isAdmin ) {
           listActions.push(
             <IconButton 
               key={`action-delete-team-${team.id}`}
@@ -122,7 +122,7 @@ function ListTeams(props: ITeamProps) {
             </IconButton>
           )
         }
-        if( is_view_players ) {
+        if( isViewPlayers ) {
           listActions.push(
             <IconButton 
               key={`action-view-players-${team.id}`}
@@ -134,7 +134,7 @@ function ListTeams(props: ITeamProps) {
             </IconButton>
           );
         }
-        if( is_add_players ) {
+        if( isAddPlayers ) {
           listActions.push(
             <IconButton 
               key={`action-add-player-${team.id}`}
@@ -164,24 +164,24 @@ function ListTeams(props: ITeamProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlTeams }
-      { currentTeamView && is_view_players && (
+      { currentTeamView && isViewPlayers && (
         <ViewTeamPlayers
-          is_open={isModalOpenViewTeamPlayers}
-          is_admin={is_admin}
+          isOpen={isModalOpenViewTeamPlayers}
+          isAdmin={isAdmin}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseTeamPlayers}
           />
       ) }
-      { currentTeamView && is_add_players && (
+      { currentTeamView && isAddPlayers && (
         <AddTeamPlayer
-          is_open={isModalOpenAddPlayerToTeam}
+          isOpen={isModalOpenAddPlayerToTeam}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseAddTeamPlayer}
           />
       ) }
-      { currentTeamView && is_admin && (
+      { currentTeamView && isAdmin && (
         <ConfirmDelete
-          is_open={isModalOpenConfirmDeleteTeam}
+          isOpen={isModalOpenConfirmDeleteTeam}
           callback_close_modal={cbCloseModalDelete}
           callback_confirm_delete={cbCloseConfirmDelete}
           title={`Confirm team delete`}

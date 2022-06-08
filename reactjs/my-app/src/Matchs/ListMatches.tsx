@@ -25,7 +25,7 @@ function ListMatches(props: IListMatchProps) {
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const { is_admin } = props;
+  const { isAdmin } = props;
 
   const listMatches = useSelector((state: RootState) => state ).matches
   const listTeams = useSelector((state: RootState) => state ).teams
@@ -83,8 +83,8 @@ function ListMatches(props: IListMatchProps) {
   const [dateMatchReadable, setDateMatchReadable] = useState<string | null>(null);
 
   const handleOpenConfirmDelete = (match: IMatch) => {
-    const newTeamHome = listTeams.find((team) => team.id === match.id_team_home);
-    const newTeamAway = listTeams.find((team) => team.id === match.id_team_away);
+    const newTeamHome = listTeams.find((team) => team.id === match.idTeamHome);
+    const newTeamAway = listTeams.find((team) => team.id === match.idTeamAway);
     if( newTeamHome === undefined || newTeamAway === undefined ) {
       return;
     }
@@ -110,7 +110,7 @@ function ListMatches(props: IListMatchProps) {
     <List>
       {listMatches.map((match: IMatch) => {
         let listActions = [];
-        if( is_admin ) {
+        if( isAdmin ) {
           listActions.push(
             <IconButton 
               key={`action-edit-match-${match.id}`}
@@ -135,8 +135,8 @@ function ListMatches(props: IListMatchProps) {
           )
           
         }
-        const teamHome = listTeams.find((team: ITeam) => team.id === match.id_team_home);
-        const teamAway = listTeams.find((team: ITeam) => team.id === match.id_team_away);
+        const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
+        const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
         const dateReadable = createDateReadable(match.date);
         return (
           <ListItem 
@@ -156,9 +156,9 @@ function ListMatches(props: IListMatchProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlMatches }
-      { is_admin && currentMatchView && teamHome && teamAway && (
+      { isAdmin && currentMatchView && teamHome && teamAway && (
         <ConfirmDelete
-          is_open={isModalOpenConfirmDelete}
+          isOpen={isModalOpenConfirmDelete}
           callback_close_modal={cbCloseModalDelete}
           callback_confirm_delete={cbCloseConfirmDelete}
           title={`Confirm match deletion`}

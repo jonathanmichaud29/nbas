@@ -14,7 +14,7 @@ import { fetchMatch } from '../ApiCall/matches';
 function ViewMatch(props: IMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const {id_match, is_admin} = props;
+  const {idMatch, isAdmin} = props;
 
   const [match, setMatch] = useState<IMatch>();
   const [teamHome, setTeamHome] = useState<ITeam>();
@@ -23,7 +23,7 @@ function ViewMatch(props: IMatchProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   /* useEffect(() => {
-    fetchMatch(id_match)
+    fetchMatch(idMatch)
       .then(response => {
         dispatch(addMatches(response.data));
       })
@@ -37,7 +37,7 @@ function ViewMatch(props: IMatchProps) {
   }, [dispatch]) */
 
   return (
-    <h1>View Match #{id_match}</h1>
+    <h1>View Match #{idMatch}</h1>
   )
 }
 

@@ -4,14 +4,14 @@ import{ useParams } from 'react-router-dom'
 
 function MatchManager() {
   let { id } = useParams();
-  const id_match = id ? parseInt(id, 10) : null;
+  const idMatch = id ? parseInt(id, 10) : null;
   return (
     <div>
       <h2>Match Manager</h2>
-      { id_match && (
+      { idMatch && (
         <ViewMatch
-          id_match={id_match}
-          is_admin={true}
+          idMatch={idMatch}
+          isAdmin={true}
         />
       ) }
     </div>

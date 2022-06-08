@@ -8,7 +8,7 @@ function PlayerManager() {
       <h2>Player Manager</h2>
       <CreatePlayer />
       <ListPlayers 
-        is_admin={true}
+        isAdmin={true}
       />
     </div>
   )

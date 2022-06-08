@@ -8,9 +8,9 @@ const matchSlice = createSlice({
   initialState,
   reducers: {
     addMatches: (state, action: PayloadAction<[IMatch]>) => {
-      action.payload.forEach((new_match: IMatch) => {
-        if ( state.find(element => element.id === new_match.id) === undefined ){
-          state.push(new_match);
+      action.payload.forEach((newMatch: IMatch) => {
+        if ( state.find(element => element.id === newMatch.id) === undefined ){
+          state.push(newMatch);
         }
       });
     },
@@ -21,17 +21,17 @@ const matchSlice = createSlice({
           state.push(action.payload);
         }
       },
-      prepare: (new_match: IMatch) => ({
+      prepare: (newMatch: IMatch) => ({
         payload: {
-          id: new_match.id,
-          id_team_home: new_match.id_team_home,
-          id_team_away: new_match.id_team_away,
-          date: new_match.date,
-          is_completed: new_match.is_completed,
-          team_home_points: new_match.team_home_points,
-          team_away_points: new_match.team_away_points,
-          id_team_won: new_match.id_team_won,
-          id_team_lost: new_match.id_team_lost,
+          id: newMatch.id,
+          idTeamHome: newMatch.idTeamHome,
+          idTeamAway: newMatch.idTeamAway,
+          date: newMatch.date,
+          isCompleted: newMatch.isCompleted,
+          team_home_points: newMatch.team_home_points,
+          team_away_points: newMatch.team_away_points,
+          idTeamWon: newMatch.idTeamWon,
+          idTeamLost: newMatch.idTeamLost,
         }
       })
     },

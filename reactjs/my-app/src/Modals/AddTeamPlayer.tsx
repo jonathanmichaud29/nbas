@@ -18,7 +18,7 @@ interface IFormInput {
 
 function AddTeamPlayer(props: ITeamPlayersProps) {
 
-  const {is_open, selected_team, callback_close_modal} = props;
+  const {isOpen, selected_team, callback_close_modal} = props;
   
   /**
    * Set States
@@ -42,7 +42,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( is_open ) {
+    if ( isOpen ) {
       fetchUnassignedPlayers()
         .then(response => {
           setUnassignedPlayers(response.data);
@@ -54,7 +54,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
           setModalOpen(true);
         });
       }
-  }, [selected_team, is_open]);
+  }, [selected_team, isOpen]);
 
   
   /**

@@ -1,4 +1,4 @@
-import { axiosPublic, axiosProtected } from '../utils/Axios'
+import { axiosPublic, axiosProtected } from '../utils/axios'
 
 const fetchMatches = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/`)
@@ -23,8 +23,8 @@ const fetchMatch = async (id: number) => {
 const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match/`,{
-    id_team_home: argTeamHome,
-    id_team_away: argTeamAway,
+    idTeamHome: argTeamHome,
+    idTeamAway: argTeamAway,
     date: argDate,
   })
     .then(response => {

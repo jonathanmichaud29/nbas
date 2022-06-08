@@ -17,13 +17,12 @@ exports.createMatch = async (req, res, next) => {
     hourCycle:'h24', 
     hour: '2-digit', 
     minute: '2-digit', 
-    timeZone: 'America/Toronto' 
   };
   const finalDate = dateObject.toLocaleDateString("en-CA", options);
   const values = [
-    [[req.body.id_team_home, req.body.id_team_away, finalDate ]]
+    [[req.body.idTeamHome, req.body.idTeamAway, finalDate ]]
   ];
-  const resultMainQuery = await mysqlQuery("INSERT INTO matches (id_team_home, id_team_away, date) VALUES ?", values)
+  const resultMainQuery = await mysqlQuery("INSERT INTO matches (idTeamHome, idTeamAway, date) VALUES ?", values)
 
   let customMessage = ''
   let customData = {}
@@ -32,7 +31,7 @@ exports.createMatch = async (req, res, next) => {
       id: resultMainQuery.data.insertId,
       name: req.body.name
     }
-    customMessage = `match '${req.body.name}' created!`
+    customMessage = `match created!`
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };

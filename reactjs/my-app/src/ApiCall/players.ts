@@ -1,4 +1,4 @@
-import { axiosPublic, axiosProtected } from '../utils/Axios'
+import { axiosPublic, axiosProtected } from '../utils/axios'
 
 const fetchPlayers = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)

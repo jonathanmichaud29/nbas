@@ -11,7 +11,7 @@ import styleModal from './styleModal'
 
 function ViewTeamPlayers(props: ITeamPlayersProps) {
 
-  const {is_admin, is_open, selected_team, callback_close_modal} = props;
+  const {isAdmin, isOpen, selected_team, callback_close_modal} = props;
   
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -30,12 +30,12 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
     
   }
 
-  const clickRemoveTeamPlayer = (team_player: ITeamPlayers) => {
+  const clickRemoveTeamPlayer = (teamPlayer: ITeamPlayers) => {
     reinitializeApiMessages();
 
-    removeTeamPlayer(team_player)
+    removeTeamPlayer(teamPlayer)
       .then((response) =>{
-        const newList = listTeamPlayers.filter((tp) => { return tp.player_id !== team_player.player_id && tp.team_id === team_player.team_id; })
+        const newList = listTeamPlayers.filter((tp) => { return tp.playerId !== teamPlayer.playerId && tp.teamId === teamPlayer.teamId; })
         setListTeamPlayers(newList);
         changeApiSuccess(response.message)
       })
@@ -48,7 +48,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( is_open && selected_team !== undefined ) {
+    if ( isOpen && selected_team !== undefined ) {
       fetchTeamPlayers(selected_team.id)
         .then(response => {
           setListTeamPlayers(response.data);
@@ -60,7 +60,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
           setModalOpen(true);
         });
       }
-  }, [selected_team, is_open]);
+  }, [selected_team, isOpen]);
 
   return (
     <>
@@ -74,16 +74,17 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
             <b>{selected_team?.name}</b> players
           </Typography>
           
-          { is_open && listTeamPlayers ? (
+          { isOpen && listTeamPlayers ? (
             <List>
-              { listTeamPlayers.map((team_player: ITeamPlayers) => {
+              { listTeamPlayers.map((teamPlayer: ITeamPlayers) => {
                 let listActions = [];
-                if( is_admin ) {
+                if( isAdmin ) {
                   listActions.push(
                     <IconButton 
-                      aria-label={`Remove ${team_player.player_name} from team`}
-                      title={`Remove ${team_player.player_name} from team`}
-                      onClick={ () => clickRemoveTeamPlayer(team_player)}
+                      key={`remove-team-player-${teamPlayer.teamId}-${teamPlayer.playerId}`}
+                      aria-label={`Remove ${teamPlayer.playerName} from team`}
+                      title={`Remove ${teamPlayer.playerName} from team`}
+                      onClick={ () => clickRemoveTeamPlayer(teamPlayer)}
                       >
                       <Delete />
                     </IconButton>
@@ -91,9 +92,9 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
                 }
                 return (
                   <ListItem 
-                    key={`team-player-${team_player.team_id}-${team_player.player_id}`}
+                    key={`team-player-${teamPlayer.teamId}-${teamPlayer.playerId}`}
                     secondaryAction={ listActions.map((action) => action) }
-                    >{team_player.player_name}</ListItem>
+                    >{teamPlayer.playerName}</ListItem>
                 )
                   })}
             </List>

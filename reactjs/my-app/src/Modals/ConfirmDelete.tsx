@@ -14,7 +14,7 @@ import styleModal from './styleModal'
 
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
-  const { is_open, title, description, callback_confirm_delete, callback_close_modal } = props;
+  const { isOpen, title, description, callback_confirm_delete, callback_close_modal } = props;
 
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -29,8 +29,24 @@ function ConfirmDelete(props: IConfirmDeleteProps) {
   }
 
   useEffect(() => {
-    setModalOpen(is_open);
-  }, [is_open]);
+    setModalOpen(isOpen);
+    /* if( isOpen ){
+      switch( context ){
+        case "team":
+          setModalTitle('Confirm team deletion');
+          setModalDescription(`Are-you sure you want to delete the team '${selected_team?.name}'?`);
+          break;
+        case "player":
+          setModalTitle('Confirm player deletion');
+          setModalDescription(`Are-you sure you want to delete the player '${selected_player?.name}'?`);
+          break;
+        case "match":
+          setModalTitle('Confirm match deletion');
+          setModalDescription(`Are-you sure you want to delete the match '${selected_match?.id}'?`);
+          break;
+      }
+    } */
+  }, [isOpen/* , context, selected_team, selected_player, selected_match */]);
   
   return (
     <Modal

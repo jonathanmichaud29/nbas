@@ -9,9 +9,9 @@ const teamSlice = createSlice({
   reducers: {
     
     addTeams: (state, action: PayloadAction<[ITeam]>) => {
-      action.payload.forEach((new_team: ITeam) => {
-        if ( state.find(element => element.id === new_team.id) === undefined ){
-          state.push(new_team);
+      action.payload.forEach((newTeam: ITeam) => {
+        if ( state.find(element => element.id === newTeam.id) === undefined ){
+          state.push(newTeam);
         }
       });
     },
@@ -22,10 +22,10 @@ const teamSlice = createSlice({
           state.push(action.payload);
         }
       },
-      prepare: (new_team: ITeam) => ({
+      prepare: (newTeam: ITeam) => ({
         payload: {
-          id: new_team.id,
-          name: new_team.name
+          id: newTeam.id,
+          name: newTeam.name
         },
       })
     },

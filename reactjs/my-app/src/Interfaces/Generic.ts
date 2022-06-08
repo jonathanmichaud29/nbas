@@ -7,7 +7,7 @@ import { IMatch } from './Match'
  */
 
 export interface IConfirmDeleteProps{
-  is_open: boolean;
+  isOpen: boolean;
   title: string;
   description: string;
   callback_confirm_delete(): void;

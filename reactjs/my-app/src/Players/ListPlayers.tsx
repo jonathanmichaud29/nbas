@@ -18,7 +18,7 @@ function ListPlayers(props: IPlayerProps) {
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const { is_admin } = props;
+  const { isAdmin } = props;
 
   const listPlayers = useSelector((state: RootState) => state ).players
 
@@ -81,7 +81,7 @@ function ListPlayers(props: IPlayerProps) {
     <List>
       {listPlayers.map((player: IPlayer) => {
         let listActions = [];
-        if( is_admin ) {
+        if( isAdmin ) {
           listActions.push(
             <IconButton 
               key={`action-delete-player-${player.id}`}
@@ -111,9 +111,9 @@ function ListPlayers(props: IPlayerProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlPlayers }
-      { currentPlayerView && is_admin && (
+      { currentPlayerView && isAdmin && (
         <ConfirmDelete
-          is_open={isModalOpenConfirmDelete}
+          isOpen={isModalOpenConfirmDelete}
           callback_close_modal={cbCloseModalDelete}
           callback_confirm_delete={cbCloseConfirmDelete}
           title={`Confirm player deletion`}

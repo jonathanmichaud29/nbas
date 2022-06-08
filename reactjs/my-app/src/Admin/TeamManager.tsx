@@ -8,9 +8,9 @@ function TeamManager() {
       <h2>Team Manager</h2>
       <CreateTeam />
       <ListTeams 
-        is_admin={true}
-        is_add_players={true}
-        is_view_players={true}
+        isAdmin={true}
+        isAddPlayers={true}
+        isViewPlayers={true}
       />
     </div>
   )

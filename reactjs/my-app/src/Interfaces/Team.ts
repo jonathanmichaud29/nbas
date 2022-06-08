@@ -4,21 +4,21 @@ export interface ITeam{
 }
 
 export interface ITeamProps{
-  is_admin?: boolean;
-  is_add_players?: boolean;
-  is_view_players?: boolean;
+  isAdmin?: boolean;
+  isAddPlayers?: boolean;
+  isViewPlayers?: boolean;
 }
 
 export interface ITeamPlayers{
-  player_id:number;
-  player_name:string;
-  team_id:number;
-  team_name:string;
+  playerId:number;
+  playerName:string;
+  teamId:number;
+  teamName:string;
 }
 
 export interface ITeamPlayersProps {
-  is_open: boolean;
+  isOpen: boolean;
   selected_team?: ITeam;
-  is_admin?: boolean;
+  isAdmin?: boolean;
   callback_close_modal(): void;
 }

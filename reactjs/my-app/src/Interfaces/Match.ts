@@ -1,20 +1,20 @@
 export interface IMatch{
   id: number;
-  id_team_home: number;
-  id_team_away: number;
+  idTeamHome: number;
+  idTeamAway: number;
   date: Date;
-  is_completed: number;
+  isCompleted: number;
   team_home_points: number;
   team_away_points: number;
-  id_team_won: number;
-  id_team_lost: number;
+  idTeamWon: number;
+  idTeamLost: number;
 }
 
 export interface IMatchProps{
-  id_match: number;
-  is_admin?: boolean;
+  idMatch: number;
+  isAdmin?: boolean;
 }
 
 export interface IListMatchProps{
-  is_admin?: boolean;
+  isAdmin?: boolean;
 }

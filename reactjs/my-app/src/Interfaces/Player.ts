@@ -4,5 +4,5 @@ export interface IPlayer{
 }
 
 export interface IPlayerProps{
-  is_admin?: boolean;
+  isAdmin?: boolean;
 }
