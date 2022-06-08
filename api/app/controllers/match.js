@@ -46,3 +46,20 @@ exports.getMatch = async (req, res, next) => {
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
+
+
+exports.deleteMatch = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No match id found", 404));
+  }
+  const values = [req.params.id];
+  const resultMainQuery = await mysqlQuery("DELETE FROM matches WHERE id=?", values);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customData = {
+      id: req.params.id
+    };
+    customMessage = `match deleted!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
+};

@@ -14,50 +14,23 @@ import styleModal from './styleModal'
 
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
-  const { is_open, context, selected_team, selected_player, selected_match, callback_close_modal } = props;
+  const { is_open, title, description, callback_confirm_delete, callback_close_modal } = props;
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalDescription, setModalDescription] = useState("");
 
   const handleModalClose = () => {
     setModalOpen(false);
     callback_close_modal();
   }
 
-  const clickConfirm = () => {
-    switch( context ){
-      case "team":
-        callback_close_modal(selected_team);
-        break;
-      case "player":
-        callback_close_modal(selected_player);
-        break;
-      /* case "match":
-        callback_close_modal(selected_match);
-        break; */
-    }
+  const handleModalConfirm = () => {
+    setModalOpen(false);
+    callback_confirm_delete();
   }
 
   useEffect(() => {
     setModalOpen(is_open);
-    if( is_open ){
-      switch( context ){
-        case "team":
-          setModalTitle('Confirm team deletion');
-          setModalDescription(`Are-you sure you want to delete the team '${selected_team?.name}'?`);
-          break;
-        case "player":
-          setModalTitle('Confirm player deletion');
-          setModalDescription(`Are-you sure you want to delete the player '${selected_player?.name}'?`);
-          break;
-        case "match":
-          setModalTitle('Confirm match deletion');
-          setModalDescription(`Are-you sure you want to delete the match '${selected_match?.id}'?`);
-          break;
-      }
-    }
-  }, [is_open, context, selected_team, selected_player, selected_match]);
+  }, [is_open]);
   
   return (
     <Modal
@@ -68,18 +41,18 @@ function ConfirmDelete(props: IConfirmDeleteProps) {
     >
       <Box sx={styleModal}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          {modalTitle}
+          {title}
         </Typography>
         <Typography id="modal-modal-description" paragraph={true}>
-          {modalDescription}
+          {description}
         </Typography>
         <ButtonGroup variant="contained" aria-label="Confirmation choices">
           <Button
             variant="outlined"
-            onClick={ () => handleModalClose()}
+            onClick={ handleModalClose }
           >Cancel</Button>
           <Button
-             onClick={ () => clickConfirm()}
+             onClick={ handleModalConfirm }
           >Delete</Button>
         </ButtonGroup>
       </Box>

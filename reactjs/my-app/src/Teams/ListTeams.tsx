@@ -50,7 +50,7 @@ function ListTeams(props: ITeamProps) {
   /**
    * Handle multiples modals
    */
-  const [currentTeamView, setCurrentTeamView] = useState<ITeam>();
+  const [currentTeamView, setCurrentTeamView] = useState<ITeam | null>(null);
   const [isModalOpenAddPlayerToTeam, setOpenAddPlayerToTeam] = useState(false);
   const [isModalOpenViewTeamPlayers, setOpenViewTeamPlayers] = useState(false);
   const [isModalOpenConfirmDeleteTeam, setOpenConfirmDeleteTeam] = useState(false);
@@ -81,12 +81,15 @@ function ListTeams(props: ITeamProps) {
   const cbCloseAddTeamPlayer = () => {
     setOpenAddPlayerToTeam(false);
   }
-  const cbCloseConfirmDelete = (team?: ITeam) => {
-    if( team ) {
-      confirmDeleteTeam(team);
+  const cbCloseModalDelete = () => {
+    setOpenConfirmDeleteTeam(false);
+  }
+  const cbCloseConfirmDelete = () => {
+    if( currentTeamView ){
+      confirmDeleteTeam(currentTeamView);
+      setCurrentTeamView(null);
     }
     setOpenConfirmDeleteTeam(false);
-    
   }
 
   useEffect(() => {
@@ -161,29 +164,30 @@ function ListTeams(props: ITeamProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlTeams }
-      { is_view_players ? (
+      { currentTeamView && is_view_players && (
         <ViewTeamPlayers
           is_open={isModalOpenViewTeamPlayers}
-          is_admin={is_admin || false}
+          is_admin={is_admin}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseTeamPlayers}
           />
-      ) : '' }
-      { is_add_players ? (
+      ) }
+      { currentTeamView && is_add_players && (
         <AddTeamPlayer
           is_open={isModalOpenAddPlayerToTeam}
           selected_team={currentTeamView}
           callback_close_modal={cbCloseAddTeamPlayer}
           />
-      ) : '' }
-      { is_admin ? (
+      ) }
+      { currentTeamView && is_admin && (
         <ConfirmDelete
           is_open={isModalOpenConfirmDeleteTeam}
-          callback_close_modal={cbCloseConfirmDelete}
-          selected_team={currentTeamView}
-          context="team"
+          callback_close_modal={cbCloseModalDelete}
+          callback_confirm_delete={cbCloseConfirmDelete}
+          title={`Confirm team delete`}
+          description={`Are-you sure you want to delete the team '${currentTeamView?.name}'?`}
           />
-      ) : '' }
+      ) }
     </div>
   )
 }

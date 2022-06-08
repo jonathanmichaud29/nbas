@@ -58,7 +58,7 @@ function ListPlayers(props: IPlayerProps) {
   /**
    * Handle multiples modals
    */
-  const [currentPlayerView, setCurrentPlayerView] = useState<IPlayer>();
+  const [currentPlayerView, setCurrentPlayerView] = useState<IPlayer | null>(null);
   const [isModalOpenConfirmDelete, setOpenConfirmDelete] = useState(false);
 
   const handleOpenConfirmDelete = (player: IPlayer) => {
@@ -66,9 +66,13 @@ function ListPlayers(props: IPlayerProps) {
     setOpenConfirmDelete(true);
   }
   
-  const cbCloseConfirmDelete = (player?: IPlayer) => {
-    if( player ) {
-      confirmDeletePlayer(player);
+  const cbCloseModalDelete = () => {
+    setOpenConfirmDelete(false);
+  }
+  const cbCloseConfirmDelete = () => {
+    if( currentPlayerView ){
+      confirmDeletePlayer(currentPlayerView);
+      setCurrentPlayerView(null);
     }
     setOpenConfirmDelete(false);
   }
@@ -107,14 +111,15 @@ function ListPlayers(props: IPlayerProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlPlayers }
-      { is_admin ? (
+      { currentPlayerView && is_admin && (
         <ConfirmDelete
           is_open={isModalOpenConfirmDelete}
-          callback_close_modal={cbCloseConfirmDelete}
-          selected_player={currentPlayerView}
-          context="player"
+          callback_close_modal={cbCloseModalDelete}
+          callback_confirm_delete={cbCloseConfirmDelete}
+          title={`Confirm player deletion`}
+          description={`Are-you sure you want to delete the player '${currentPlayerView.name}'?`}
           />
-      ) : '' }
+      ) }
     </div>
   )
 }

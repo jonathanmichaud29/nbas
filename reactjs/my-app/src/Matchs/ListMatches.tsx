@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
@@ -15,7 +16,7 @@ import { deleteMatch, fetchMatches } from '../ApiCall/matches'
 import { fetchTeams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
-import { Link } from 'react-router-dom';
+import { createDateReadable } from '../utils/dateFormatter';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -75,17 +76,32 @@ function ListMatches(props: IListMatchProps) {
   /**
    * Handle multiples modals
    */
-  const [currentMatchView, setCurrentMatchView] = useState<IMatch>();
+  const [currentMatchView, setCurrentMatchView] = useState<IMatch | null>(null);
   const [isModalOpenConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [teamHome, setTeamHome] = useState<ITeam | null>(null);
+  const [teamAway, setTeamAway] = useState<ITeam | null>(null);
+  const [dateMatchReadable, setDateMatchReadable] = useState<string | null>(null);
 
   const handleOpenConfirmDelete = (match: IMatch) => {
+    const newTeamHome = listTeams.find((team) => team.id === match.id_team_home);
+    const newTeamAway = listTeams.find((team) => team.id === match.id_team_away);
+    if( newTeamHome === undefined || newTeamAway === undefined ) {
+      return;
+    }
+    setDateMatchReadable(createDateReadable(match.date));
+    setTeamHome(newTeamHome);
+    setTeamAway(newTeamAway);
     setCurrentMatchView(match);
     setOpenConfirmDelete(true);
   }
   
-  const cbCloseConfirmDelete = (match?: IMatch) => {
-    if( match ) {
-      confirmDeleteMatch(match);
+  const cbCloseModalDelete = () => {
+    setOpenConfirmDelete(false);
+  }
+  const cbCloseConfirmDelete = () => {
+    if( currentMatchView ){
+      confirmDeleteMatch(currentMatchView);
+      setCurrentMatchView(null);
     }
     setOpenConfirmDelete(false);
   }
@@ -121,21 +137,12 @@ function ListMatches(props: IListMatchProps) {
         }
         const teamHome = listTeams.find((team: ITeam) => team.id === match.id_team_home);
         const teamAway = listTeams.find((team: ITeam) => team.id === match.id_team_away);
-        const dateObject = new Date(match.date)
-        const dateHuman = dateObject.toLocaleDateString("en-CA",{ 
-          year: 'numeric', 
-          month: '2-digit', 
-          day: '2-digit', 
-          hourCycle:'h24', 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          timeZone: 'UTC' 
-        });
+        const dateReadable = createDateReadable(match.date);
         return (
           <ListItem 
             key={`match-${match.id}`}
             secondaryAction={ listActions.map((action) => action) }
-            >{teamHome?.name} VS {teamAway?.name} {dateHuman}</ListItem>
+            >{teamHome?.name} VS {teamAway?.name} {dateReadable}</ListItem>
         )
       })}
       
@@ -149,14 +156,15 @@ function ListMatches(props: IListMatchProps) {
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
       { htmlMatches }
-      {/* { is_admin && (
+      { is_admin && currentMatchView && teamHome && teamAway && (
         <ConfirmDelete
           is_open={isModalOpenConfirmDelete}
-          callback_close_modal={cbCloseConfirmDelete}
-          selected_match={currentMatchView}
-          context="match"
+          callback_close_modal={cbCloseModalDelete}
+          callback_confirm_delete={cbCloseConfirmDelete}
+          title={`Confirm match deletion`}
+          description={`Are-you sure you want to delete the match '${teamHome.name}' VS '${teamAway.name}', happening on day '${dateMatchReadable}'?`}
           />
-      )} */}
+      ) }
     </div>
   )
 }

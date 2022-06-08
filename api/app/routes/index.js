@@ -47,4 +47,8 @@ router
   .get(matchControllers.getAllMatches)
   .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
 
+router
+  .route("/match/:id")
+  .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
+
 module.exports = router;
