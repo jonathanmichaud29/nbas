@@ -62,3 +62,15 @@ exports.deleteMatch = async (req, res, next) => {
   }
   return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
 };
+
+exports.getMatchLineups = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No match id found", 404));
+  }
+  const values = [req.params.id];
+  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE idMatch=?", values);
+  if( resultMainQuery.status ){
+    customMessage = `match deleted!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};

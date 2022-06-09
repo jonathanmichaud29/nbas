@@ -12,6 +12,10 @@ router
   .post(teamControllers.createTeam, firebaseAuthMiddleware.decodeToken);
 
 router
+  .route("/team/list/")
+  .post(teamControllers.getTeams)
+
+router
  .route("/team/:id")
  .get(teamControllers.getTeam)
  /* .put(teamControllers.updateTeam, firebaseAuthMiddleware.decodeToken) */
@@ -49,6 +53,11 @@ router
 
 router
   .route("/match/:id")
+  .get(matchControllers.getMatch)
   .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/match-lineup/:id")
+  .get(matchControllers.getMatchLineups)
 
 module.exports = router;

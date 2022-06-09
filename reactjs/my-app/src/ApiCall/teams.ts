@@ -11,14 +11,28 @@ const fetchTeam = async (idTeam: number) => {
     })
 }
 
-const fetchTeams = async () => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
-    .then(response => {
-      return Promise.resolve(response.data);
+const fetchTeams = async (argIds?: Array<number>) => {
+  if( argIds ){
+    return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/list/`, {
+      listIds: argIds
     })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
+      .then(response => {
+        return Promise.resolve(response.data);
+      })
+      .catch(error => {
+        return Promise.reject(error.response.data.message);
+      })
+  }
+  else {
+    return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
+      .then(response => {
+        return Promise.resolve(response.data);
+      })
+      .catch(error => {
+        return Promise.reject(error.response.data.message);
+      })
+  }
+  
 }
 
 const createTeam = async (argName: string) => {

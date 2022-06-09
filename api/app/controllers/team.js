@@ -10,6 +10,15 @@ exports.getAllTeams = async (req, res, next) => {
 
 }; 
 
+exports.getTeams = async (req, res, next) => {
+  if (!req.body.listIds) return next(new AppError("No form data found", 404));
+  const values = [req.body.listIds]
+
+  const resultMainQuery = await mysqlQuery("SELECT * FROM teams WHERE id IN (?)", values)
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+
+}; 
+
 exports.createTeam = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
 

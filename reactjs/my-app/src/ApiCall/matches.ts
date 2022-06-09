@@ -47,4 +47,14 @@ const deleteMatch = async (argId: number) => {
     })
 }
 
-export { createMatch, deleteMatch, fetchMatches, fetchMatch }
+const fetchMatchLineups = async(argId: number) => {
+  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups }
