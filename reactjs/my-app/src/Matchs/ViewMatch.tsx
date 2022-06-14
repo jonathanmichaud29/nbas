@@ -1,107 +1,108 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+
 import { AppDispatch, RootState } from "../redux/store";
+import { addMatchPlayers } from "../redux/matchPlayerSlice";
+import { addPlayers } from "../redux/playerSlice";
 
-import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
-import { Delete } from '@mui/icons-material';
+import { Alert, Box, CircularProgress } from "@mui/material";
 
-import { IMatch, IMatchProps } from "../Interfaces/Match";
+import { IMatchProps } from "../Interfaces/Match";
 import { ITeam } from '../Interfaces/Team';
 
 import { fetchTeams } from '../ApiCall/teams';
-import { fetchMatch, fetchMatchLineups } from '../ApiCall/matches';
+import { fetchMatchLineups } from '../ApiCall/matches';
+import { fetchPlayers } from '../ApiCall/players';
+
+import TeamMatchLineup from '../Teams/TeamMatchLineup';
+
 
 function ViewMatch(props: IMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const {idMatch, isAdmin} = props;
+  const {match, isAdmin} = props;
 
   const [apiError, changeApiError] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
+  /* const [apiSuccess, changeApiSuccess] = useState(""); */
 
-  const [match, setMatch] = useState<IMatch | null>(null);
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
-  
-  useEffect( () => {
-    const getAllDatas = async() => {
-      const matchData: IMatch = await fetchMatch(idMatch)
-        .then(response => {
-          setMatch(response.data[0])
-          return response.data[0];
-        })
-        .catch(error => {
-          changeApiError(error);
-          return []
-        })
-        .finally(() => {
-          // setIsLoaded(true)
-        });
-      
-      console.log("Request Match data", match);
-      
-      await fetchTeams([matchData.idTeamHome, matchData.idTeamAway])
-        .then(response => {
-          console.log("receive Teams data", response.data);
-          response.data.forEach((team: ITeam) => {
-            console.log("Look for home/away team", team.id, matchData.idTeamHome);
-            if ( team.id === matchData.idTeamHome) {
-              setTeamHome(team);
-              console.warn("Home team found");
-            }
-            else {
-              setTeamAway(team);
-              console.warn("Away team found");
-            }
-          })
-        })
-        .catch(error => {
-          changeApiError(error);
-        })
-        .finally(() => {
-          // setIsLoaded(true)
-        });
-      
-      await fetchMatchLineups(idMatch)
-        .then(response => {
-          console.log("response Match Lineups", response.data);
-          /* response.data.forEach((team: ITeam) => {
-            if ( team.id === match?.idTeamHome) {
-              setTeamHome(team);
-            }
-            else {
-              setTeamAway(team);
-            }
-          }) */
-        })
-        .catch(error => {
-          changeApiError(error);
-        })
-        .finally(() => {
-          // setIsLoaded(true)
-        });
+  const [loadingPlayers, setLoadingPlayers] = useState(false);
 
-      setIsLoaded(true)
-      
-    }
-    getAllDatas();
-    
-    
-  }, [dispatch])
+  const listPlayers = useSelector((state: RootState) => state.players )
+
+  const isLoaded = teamHome && teamAway && loadingPlayers;
+
+  /**
+   * Fetch Teams details
+   */
+  useEffect( () => {
+    if( match === null ) return;
+    fetchTeams([match.idTeamHome, match.idTeamAway])
+      .then(response => {
+        response.data.forEach((team: ITeam) => {
+          if ( team.id === match.idTeamHome) {
+            setTeamHome(team);
+          }
+          else {
+            setTeamAway(team);
+          }
+        })
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+    fetchMatchLineups(match.id)
+      .then(response => {
+        dispatch(addMatchPlayers(match, response.data));
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+    fetchPlayers()
+      .then(response => {
+        dispatch(addPlayers(response.data));
+      })
+      .catch((error) => {
+        changeApiError(error);
+      })
+      .finally(() =>{
+        setLoadingPlayers(true);
+      })
+  }, [dispatch, match]);
+
 
   return (
     <>
-      <h1>View Match #{idMatch}</h1>
+      <h1>View Match #{match.id}</h1>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
-      { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
-      { isLoaded && match && teamHome && (
-        <h2>Home Team: {teamHome.name}</h2>
-        
+      {/* { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> } */}
+      { isLoaded && teamHome && (
+        <TeamMatchLineup 
+          key={`team-home-lineup-${match.id}`}
+          isAdmin={isAdmin}
+          isHomeTeam={true}
+          match={match}
+          team={teamHome}
+          allPlayers={listPlayers}
+        />
       )}
-      { isLoaded && match && teamAway && (
-        <h2>Away Team: {teamAway.name}</h2>
+      { isLoaded && teamAway && (
+        <TeamMatchLineup 
+          key={`team-away-lineup-${match.id}`}
+          isAdmin={isAdmin}
+          isHomeTeam={false}
+          match={match}
+          team={teamAway}
+          allPlayers={listPlayers}
+        />
       )}
     </>
   )

@@ -1,3 +1,5 @@
+import { IPlayer} from './Player';
+
 export interface ITeam{
   id: number;
   name: string;
@@ -22,3 +24,10 @@ export interface ITeamPlayersProps {
   isAdmin?: boolean;
   callbackCloseModal(): void;
 }
+
+export interface IOrderTeamPlayers {
+  currentTeamName:string;
+  priority: number;
+}
+
+export interface IOrderPlayers extends IPlayer, IOrderTeamPlayers {};

@@ -28,6 +28,7 @@ router
 
 router
   .route('/team-player/')
+  .get(teamControllers.getAllTeamPlayers)
   .delete(teamControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken)
 
 router
@@ -45,6 +46,9 @@ router
  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
 
+router
+  .route("/player/list/")
+  .post(playerControllers.getSpecificPlayers);
 
 router
   .route("/match/")
@@ -59,5 +63,10 @@ router
 router
   .route("/match-lineup/:id")
   .get(matchControllers.getMatchLineups)
+
+router
+  .route("/match-lineup/player/:id")
+  .post(matchControllers.createPlayerLineup, firebaseAuthMiddleware.decodeToken)
+  .delete(matchControllers.deletePlayerLineup, firebaseAuthMiddleware.decodeToken)
 
 module.exports = router;

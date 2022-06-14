@@ -7,6 +7,15 @@ exports.getAllPlayers = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 
+exports.getSpecificPlayers = async (req, res, next) => {
+  if (!req.body || !req.body.listIds ) return next(new AppError("No form data found", 404));
+  if( (req.body.listIds).length < 1 ){
+    return appResponse(res, next, true, {}, {});
+  }
+  const resultMainQuery = await mysqlQuery("SELECT * FROM players WHERE id IN ?", [[req.body.listIds]])
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
 exports.createPlayer = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const values = [req.body.name];

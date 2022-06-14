@@ -57,4 +57,28 @@ const fetchMatchLineups = async(argId: number) => {
     })
 }
 
-export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups }
+const addMatchLineup = async(argMatchId: number, argTeamId: number, argPlayerId: number) => {
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argMatchId}`, {
+    idTeam: argTeamId,
+    idPlayer: argPlayerId
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+const deletePlayerLineup = async(argLineupId: number) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argLineupId}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+
+export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups, addMatchLineup, deletePlayerLineup }

@@ -2,6 +2,7 @@ const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
 const { getPlayerData, getTeamData } = require("../utils/simpleQueries");
+const { is_missing_keys } = require("../utils/validation");
 
 exports.getAllTeams = async (req, res, next) => {
 
@@ -80,6 +81,18 @@ exports.deleteTeam = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };
 
+exports.getAllTeamPlayers = async (req, res, next) => {
+  
+  const query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
+    "FROM team_player as tp " +
+    "INNER JOIN teams as t ON (tp.idTeam=t.id) " +
+    "INNER JOIN players AS p ON (tp.idPlayer=p.id) ";
+  const values = [];
+  const resultMainQuery = await mysqlQuery(query, values)
+
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
 exports.getTeamPlayers = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
@@ -87,9 +100,9 @@ exports.getTeamPlayers = async (req, res, next) => {
 
   const query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
     "FROM team_player as tp " +
-    "INNER JOIN teams as t ON (tp.id_team=t.id) " +
-    "LEFT JOIN players AS p ON (tp.id_player=p.id) " +
-    "WHERE tp.id_team = ?";
+    "INNER JOIN teams as t ON (tp.idTeam=t.id) " +
+    "LEFT JOIN players AS p ON (tp.idPlayer=p.id) " +
+    "WHERE tp.idTeam = ?";
   const values = [req.params.id];
   const resultMainQuery = await mysqlQuery(query, values)
 
@@ -100,8 +113,8 @@ exports.getUnassignedPlayers = async (req, res, next) => {
 
   const query = "SELECT p.* "+
     "FROM players as p  " +
-    "LEFT JOIN team_player as tp ON (tp.id_player=p.id) " +
-    "WHERE tp.id_team IS NULL";
+    "LEFT JOIN team_player as tp ON (tp.idPlayer=p.id) " +
+    "WHERE tp.idTeam IS NULL";
   const resultMainQuery = await mysqlQuery(query, [])
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
@@ -112,24 +125,24 @@ exports.createTeamPlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
   }
-  if (!req.body.id_player) {
+  if (!req.body.idPlayer) {
     return next(new AppError("No player selected", 404));
   }
 
   const values = [
-    [[req.params.id, req.body.id_player]]
+    [[req.params.id, req.body.idPlayer]]
   ];
-  const resultMainQuery = await mysqlQuery("INSERT INTO team_player (id_team, id_player) VALUES ?", values)
+  const resultMainQuery = await mysqlQuery("INSERT INTO team_player (idTeam, idPlayer) VALUES ?", values)
   
 
   const customData={
-    id_team: req.params.id,
-    id_player: req.body.id_player
+    idTeam: req.params.id,
+    idPlayer: req.body.idPlayer
   }
   let customMessage=''
   if( resultMainQuery.status ) {
     customMessage = 'team player added!';
-    const resultPlayerData = await getPlayerData(req.body.id_player);
+    const resultPlayerData = await getPlayerData(req.body.idPlayer);
     const resultTeamData = await getTeamData(req.params.id);
     
     if( resultPlayerData.status && resultTeamData.status ){
@@ -143,15 +156,6 @@ exports.createTeamPlayer = async (req, res, next) => {
   
 };
 
-const is_missing_keys = (required_keys, compare_object) => {
-  let is_missing = false;
-  required_keys.forEach((key) => {
-    if( ! (key in compare_object) ){
-      is_missing = true;
-    }
-  })
-  return is_missing;
-}
 exports.deleteTeamPlayer = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   
@@ -161,7 +165,7 @@ exports.deleteTeamPlayer = async (req, res, next) => {
   }
   
   const values = [req.body.team_id, req.body.player_id]
-  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE id_team=? AND id_player=?", values);
+  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE idTeam=? AND idPlayer=?", values);
 
   let customMessage = '';
   if( resultMainQuery.status ) {

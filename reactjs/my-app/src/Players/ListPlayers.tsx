@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+
 import { AppDispatch, RootState } from "../redux/store";
+import { addPlayers, removePlayer } from "../redux/playerSlice";
 
 import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 
-import { addPlayers, removePlayer } from "../redux/playerSlice";
 import { deletePlayer, fetchPlayers } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/Player';
 
@@ -20,7 +21,7 @@ function ListPlayers(props: IPlayerProps) {
 
   const { isAdmin } = props;
 
-  const listPlayers = useSelector((state: RootState) => state ).players
+  const listPlayers = useSelector((state: RootState) => state.players )
 
   const reinitializeApiMessages = () => {
     changeApiError('');

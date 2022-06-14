@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
+const { is_missing_keys } = require("../utils/validation");
 
 exports.getAllMatches = async (req, res, next) => {
   const resultMainQuery = await mysqlQuery("SELECT * FROM matches", [])
@@ -73,4 +74,47 @@ exports.getMatchLineups = async (req, res, next) => {
     customMessage = `match deleted!`;
   }
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
+exports.createPlayerLineup = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No match id found", 404));
+  }
+
+  const bodyRequiredKeys = ["idPlayer", "idTeam"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
+  }
+
+  const values = [
+    [[req.params.id, req.body.idTeam, req.body.idPlayer]]
+  ];
+  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer) VALUES ?"
+  const resultMainQuery = await mysqlQuery(query, values);
+
+  let customMessage = '';
+  let customData = {}
+  if( resultMainQuery.status ){
+    customMessage = `added player to match lineup!`;
+    customData = {
+      id: resultMainQuery.data.insertId,
+      idMatch: req.params.id,
+      idTeam: req.body.idTeam,
+      idPlayer: req.body.idPlayer
+    }
+  }
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+};
+
+exports.deletePlayerLineup = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No lineup id found", 404));
+  }
+  const values = [req.params.id];
+  const resultMainQuery = await mysqlQuery("DELETE FROM match_lineup WHERE id=?", values);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customMessage = `lineup removed from match!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
 };

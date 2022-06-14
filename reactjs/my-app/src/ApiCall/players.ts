@@ -10,6 +10,18 @@ const fetchPlayers = async () => {
     })
 }
 
+const fetchSpecificPlayers = async(listIds: Array<number>) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/player/list/`, {
+    listIds: listIds
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
 const createPlayer = async (argName: string) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/player/`,{
@@ -35,4 +47,4 @@ const deletePlayer = async (argId: number) => {
     })
 }
 
-export { createPlayer, deletePlayer, fetchPlayers }
+export { createPlayer, deletePlayer, fetchPlayers, fetchSpecificPlayers }

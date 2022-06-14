@@ -24,7 +24,7 @@ function ListTeams(props: ITeamProps) {
 
   const {isAdmin, isAddPlayers, isViewPlayers } = props;
 
-  const listTeams = useSelector((state: RootState) => state ).teams
+  const listTeams = useSelector((state: RootState) => state.teams )
 
   const reinitializeApiMessages = () => {
     changeApiError('');

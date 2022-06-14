@@ -60,16 +60,29 @@ const deleteTeam = async (argId: number) => {
     })
 }
 
-const fetchTeamPlayers = async (argId: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argId}`,{
-    
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
+const fetchTeamPlayers = async (argId?: number) => {
+  if( argId ) {
+    return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argId}`,{
+      
     })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
+      .then(response => {
+        return Promise.resolve(response.data);
+      })
+      .catch(error => {
+        return Promise.reject(error.response.data.message);
+      })
+  }
+  else {
+    return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-player/`,{
+      
     })
+      .then(response => {
+        return Promise.resolve(response.data);
+      })
+      .catch(error => {
+        return Promise.reject(error.response.data.message);
+      })
+  }
 }
 
 const fetchUnassignedPlayers = async () => {
