@@ -10,8 +10,18 @@ const matchPlayerSlice = createSlice({
   reducers: {
     addMatchPlayers: {
       reducer: (state, action: PayloadAction<IMatchPlayers>) => {
-        if ( state.find(element => element.match.id === action.payload.match.id) === undefined ){
+        const indexState = state.findIndex(element => element.match.id === action.payload.match.id)
+        if ( indexState === -1 ){
           state.push(action.payload);
+        }
+        else {
+          let newMatchPlayers = state[indexState];
+          for( const newLineupPlayer of action.payload.lineupPlayers ){
+            if( state[indexState].lineupPlayers.find((lineupPlayer: IMatchLineup) => lineupPlayer.id === newLineupPlayer.id ) === undefined ) {
+              newMatchPlayers.lineupPlayers.push(newLineupPlayer);
+            }
+          }
+          state.splice(indexState, 1, newMatchPlayers);
         }
       },
       prepare: (match: IMatch, lineupPlayers: Array<IMatchLineup>) => ({
@@ -32,7 +42,7 @@ const matchPlayerSlice = createSlice({
           });
         }
         else {
-          const playerFound = state[indexState].lineupPlayers.find((lineupPlayer: IMatchLineup) => lineupPlayer.idPlayer === action.payload.lineupPlayer.id )
+          const playerFound = state[indexState].lineupPlayers.find((lineupPlayer: IMatchLineup) => lineupPlayer.idPlayer === action.payload.lineupPlayer.idPlayer )
           if( playerFound === undefined ) {
             let newMatchPlayers = state[indexState];
             newMatchPlayers.lineupPlayers.push(action.payload.lineupPlayer);

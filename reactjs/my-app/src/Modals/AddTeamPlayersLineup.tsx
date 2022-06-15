@@ -4,28 +4,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
 import { AppDispatch, RootState } from "../redux/store";
-import { addMatchPlayer } from "../redux/matchPlayerSlice";
+import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
-import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
+import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperText, Modal, Paper, Typography } from "@mui/material";
 
-import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/Match";
+import { IAddMatchLineupProps, IMatch, IMatchLineup } from "../Interfaces/Match";
 import { IPlayer } from "../Interfaces/Player";
 import { ITeamPlayers, IOrderPlayers } from '../Interfaces/Team'
 
 import { fetchTeamPlayers } from "../ApiCall/teams";
-import { addMatchLineup } from '../ApiCall/matches';
+import { addLineupPlayers } from '../ApiCall/matches';
 
 import styleModal from './styleModal'
 
 const defaultValues = {
-  player: {},
+  players: [] as ITeamPlayers[],
 }
 
 interface IFormInput {
-  player: IOrderPlayers;
+  players: ITeamPlayers[];
 }
 
-function AddMatchLineup(props: IAddMatchLineupProps) {
+function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
   const {isOpen, match, selectedTeam, callbackCloseModal, allPlayers} = props;
   
@@ -37,9 +37,6 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
-  const [incrementAcIndex, setIncrementAcIndex] = useState(1);
-
-  const [orderPlayersByTeam, setOrderPlayersByTeam] = useState<IOrderPlayers[]>([]);
 
   const selectCurrentMatchPlayers = createSelector(
     (state: RootState) => state.matchPlayers,
@@ -60,10 +57,13 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
   }
 
   useEffect(() => {
-    if ( selectedTeam === null ) return;
-    fetchTeamPlayers()
+    if ( selectedTeam === null || allMatchPlayers === null ) return;
+    fetchTeamPlayers(selectedTeam.id)
       .then(response => {
-        setListTeamsPlayers(response.data);
+        const lineupPlayerIds = allMatchPlayers.lineupPlayers.map((lineupPlayer) => lineupPlayer.idPlayer)
+        const listTeamPlayers: ITeamPlayers[] = response.data;
+        const newListTeamPlayers = listTeamPlayers.filter((player: ITeamPlayers) => lineupPlayerIds.includes(player.playerId) === false);
+        setListTeamsPlayers(newListTeamPlayers);
       })
       .catch(error => {
         changeApiError(error);
@@ -71,10 +71,10 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
       .finally(() => {
         setModalOpen(true);
       });
-  }, [selectedTeam]);
+  }, [allMatchPlayers, selectedTeam]);
 
 
-  useEffect(() => {
+  /* useEffect(() => {
     if( listTeamsPlayers === null) return;
 
     const listActivePlayerIds = allMatchPlayers?.lineupPlayers.map((lineupPlayer: IMatchLineup) => lineupPlayer.idPlayer) || [];
@@ -96,16 +96,51 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
     // Order them by priority, then team name and player name
     listOrderPlayers.sort((a,b) => b.priority - a.priority || -b.currentTeamName.localeCompare(a.currentTeamName) || -b.name.localeCompare(a.name) )
     setOrderPlayersByTeam(listOrderPlayers);
-  },[allMatchPlayers?.lineupPlayers, allPlayers, listTeamsPlayers, selectedTeam.id])
+  },[allMatchPlayers?.lineupPlayers, allPlayers, listTeamsPlayers, selectedTeam.id]) */
 
   /**
    * Form behaviors
    */
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
-  const { handleSubmit, control, reset, formState: { errors } } = methods;
+  const { handleSubmit, control, reset, getValues, formState: { errors } } = methods;
+  
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus || ! selectedTeam ) return;
+    
     setRequestStatus(true);
+    const playerIds = data.players.map((teamPlayer: ITeamPlayers) => teamPlayer.playerId);
+
+    addLineupPlayers(match.id, selectedTeam.id, playerIds)
+      .then((response) =>{
+        reset()
+        let newPlayers = []
+        for( const dataTeamPlayer of response.data){
+          newPlayers.push({
+            id: dataTeamPlayer.id,
+            idMatch: dataTeamPlayer.idMatch,
+            idTeam: dataTeamPlayer.idTeam,
+            idPlayer: dataTeamPlayer.idPlayer,
+            atBats: 0,
+            single: 0,
+            double: 0,
+            triple: 0,
+            homerun: 0,
+            out: 0,
+            hitOrder: 0,
+          } as IMatchLineup);
+          
+        }
+        dispatch(addMatchPlayers(match,newPlayers));
+        handleModalClose();
+      })
+      .catch((error) => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setRequestStatus(false);
+        /* setModalOpen(true); */
+      });
+    /* setRequestStatus(true);
     reinitializeApiMessages();
  
     addMatchLineup(match.id, selectedTeam.id, data.player.id)
@@ -113,14 +148,12 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
         reset()
         setIncrementAcIndex(incrementAcIndex+1);
         changeApiSuccess(response.message);
-        const responseData = response.data[0];
-        setOrderPlayersByTeam(orderPlayersByTeam.filter((player: IOrderPlayers) => player.id !== responseData.idPlayer));
-        
+        setOrderPlayersByTeam(orderPlayersByTeam.filter((player: IOrderPlayers) => player.id !== response.data.idPlayer));
         const newPlayer = {
-          id: responseData.id,
-          idMatch: responseData.idMatch,
-          idTeam: responseData.idTeam,
-          idPlayer: responseData.idPlayer,
+          id: response.data.id,
+          idMatch: match.id,
+          idTeam: selectedTeam.id,
+          idPlayer: response.data.idPlayer,
           atBats: 0,
           single: 0,
           double: 0,
@@ -136,9 +169,17 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
       })
       .finally(() => {
         setRequestStatus(false);
-      })
+      }) */
       
   }
+
+  const handleCheckPlayer = (checkedPlayer:ITeamPlayers) => {
+    const { players: ids } = getValues();
+    const newIds = ids?.includes(checkedPlayer)
+      ? ids?.filter(id => id !== checkedPlayer)
+      : [...(ids ?? []), checkedPlayer];
+    return newIds;
+  };
 
   return (
     <>
@@ -149,46 +190,48 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
       >
         <Box sx={styleModal}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add player to <b>{selectedTeam?.name}</b> match lineup 
+            Add <b>{selectedTeam?.name}</b> players to match lineup 
           </Typography>
           
           <Paper>
-            { orderPlayersByTeam && (
-              <Controller
-                name={"player"}
-                control={control}
-                rules={{ 
-                  required: "This is required",
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Autocomplete 
-                    id={"player-autocomplete"}
-                    disablePortal
-                    onChange={(_, data) => {
-                      onChange(data);
-                      return data;
-                    }}
-                    key={`playcer-ac-${incrementAcIndex}`}
-                    options={orderPlayersByTeam}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id }
-                    groupBy={(option) => option.currentTeamName }
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Available Players" 
-                        error={errors.player ? true : false} 
-                        helperText={errors.player ? (errors.player as any).message : '' }
-                      />
-                    )}
-                  />
-                )}
-              />
+            { listTeamsPlayers && (
+              <FormGroup>
+                {errors.players && ( <FormHelperText error={true}>{(errors.players as any).message}</FormHelperText> ) }
+                
+                <Controller
+                  name={"players"}
+                  control={control}
+                  rules={{ 
+                    required: "Check at least one player",
+                  }}
+                  
+                  render={({ field: { onChange, value } }) => (
+                    <>
+                      { listTeamsPlayers.map((teamPlayer: ITeamPlayers) => {
+                        
+                        return (
+                          <FormControlLabel 
+                            key={`player-checkbox-${teamPlayer.playerId}`} 
+                            label={`${teamPlayer.playerName}`}
+                            control={
+                              <Checkbox 
+                                value={teamPlayer}
+                                onChange={() => onChange(handleCheckPlayer(teamPlayer))}
+                              />
+                            }  
+                          />
+                        )
+                      })}
+                    </>
+                    
+                  )}
+                />
+              </FormGroup>
             )}
             <Button 
               onClick={handleSubmit(onSubmit)}
               variant="contained"
-              >Add player to team</Button>
+              >Add players to lineup</Button>
 
             { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
             { apiError && <Alert severity="error">{apiError}</Alert> }
@@ -199,4 +242,4 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
     </>
   )
 }
-export default AddMatchLineup;
+export default AddTeamPlayersLineup;

@@ -1,6 +1,6 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery } = require("../services/db");
+const { mysqlQuery, mysqlQueryPoolInserts } = require("../services/db");
 const { is_missing_keys } = require("../utils/validation");
 
 exports.getAllMatches = async (req, res, next) => {
@@ -81,27 +81,24 @@ exports.createPlayerLineup = async (req, res, next) => {
     return next(new AppError("No match id found", 404));
   }
 
-  const bodyRequiredKeys = ["idPlayer", "idTeam"]
+  const bodyRequiredKeys = ["idPlayers", "idTeam"]
   if( is_missing_keys(bodyRequiredKeys, req.body) ) {
     return next(new AppError(`Missing body parameters`, 404));
   }
-
-  const values = [
-    [[req.params.id, req.body.idTeam, req.body.idPlayer]]
-  ];
-  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer) VALUES ?"
-  const resultMainQuery = await mysqlQuery(query, values);
-
+  let values = []
+  const listIds = req.body.idPlayers;
+  listIds.forEach((id) => {
+    values.push([[req.params.id, req.body.idTeam, id]])
+  });
+  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer) VALUES (?)"
+  const resultMainQuery = await mysqlQueryPoolInserts(query, values);
+  
   let customMessage = '';
   let customData = {}
   if( resultMainQuery.status ){
-    customMessage = `added player to match lineup!`;
-    customData = {
-      id: resultMainQuery.data.insertId,
-      idMatch: req.params.id,
-      idTeam: req.body.idTeam,
-      idPlayer: req.body.idPlayer
-    }
+    customMessage = `added ${resultMainQuery.data.length} player(s) to match lineup!`;
+    const resultLineupQuery = await mysqlQuery("SELECT id, idMatch, idTeam, idPlayer FROM match_lineup WHERE id IN (?)", [resultMainQuery.data]);
+    customData = resultLineupQuery.data;
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };

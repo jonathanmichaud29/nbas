@@ -5,7 +5,7 @@ import { createSelector } from 'reselect'
 import { Alert, IconButton, List, ListItem  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
-/* import GroupAddIcon from '@mui/icons-material/GroupAdd'; */
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import { AppDispatch, RootState } from "../redux/store";
 import { removeMatchPlayer } from "../redux/matchPlayerSlice"
@@ -16,6 +16,7 @@ import { IPlayer } from '../Interfaces/Player';
 import { deletePlayerLineup } from '../ApiCall/matches';
 
 import AddMatchLineup from '../Modals/AddMatchLineup';
+import AddTeamPlayersLineup from '../Modals/AddTeamPlayersLineup';
 import ConfirmDelete from "../Modals/ConfirmDelete";
 
 function TeamMatchLineup (props: ITeamMatchLineupProps) {
@@ -24,7 +25,6 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
 
   const [apiError, changeApiError] = useState("");
   const [lineupTeam, setLineupTeam] = useState<IMatchLineup[] | null>(null);
-  const [isModalOpenAddMatchLineup, setOpenAddMatchLineup] = useState(false);
 
   const selectCurrentMatchPlayers = createSelector(
     (state: RootState) => state.matchPlayers,
@@ -41,18 +41,31 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
     }
     return defaultReturn;
   }
+
+  /**
+   * Handle multiples modals
+   */
+  const [isModalOpenAddMatchLineup, setOpenAddMatchLineup] = useState(false);
+  const [isModalOpenConfirmDeleteLineup, setOpenConfirmDeleteLineup] = useState(false);
+  const [isModalOpenAddTeamPlayersLineup, setOpenModalAddTeamPlayersLineup] = useState(false);
+
+  const [currentLineup, setCurrentLineup] = useState<IMatchLineup | null>(null);
+  const [currentPlayerName, setCurrentPlayerName] = useState("");
+
+  const handleOpenAddTeamPlayersLineup = () => {
+    setOpenModalAddTeamPlayersLineup(true);
+  }
+  const cbCloseAddTeamPlayersLineup = () => {
+    setOpenModalAddTeamPlayersLineup(false);
+  }
   
   const handleOpenAddMatchLineup = () => {
     setOpenAddMatchLineup(true);
   }
-
   const cbCloseAddMatchLineup = () => {
     setOpenAddMatchLineup(false);
   }
 
-  const [currentLineup, setCurrentLineup] = useState<IMatchLineup | null>(null);
-  const [currentPlayerName, setCurrentPlayerName] = useState("");
-  const [isModalOpenConfirmDeleteLineup, setOpenConfirmDeleteLineup] = useState(false);
   const handleDeletePlayerLineup = (lineup: IMatchLineup) => {
     setCurrentLineup(lineup);
     setCurrentPlayerName(getPlayerName(lineup.idPlayer));
@@ -104,14 +117,14 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
         >
         <PeopleIcon />
       </IconButton>
-      {/* <IconButton 
-        key={`action-add-match-lineup-${match.id}-${team.id}`}
-        aria-label={`Add Player to ${team.name} lineup`}
-        title={`Add Player to ${team.name} lineup`}
-        onClick={ () => handleOpenAddMatchLineup() }
+      <IconButton 
+        key={`action-add-team-lineup-${match.id}-${team.id}`}
+        aria-label={`Add all ${team.name} Players to lineup`}
+        title={`Add all ${team.name} Players to lineup`}
+        onClick={ () => handleOpenAddTeamPlayersLineup() }
         >
-        <GroupAddIcon />
-      </IconButton> */}
+        <GroupsIcon />
+      </IconButton>
 
       { lineupTeam && lineupTeam.length > 0 ? (
           <List>
@@ -159,6 +172,16 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
           description={`Are-you sure you want to remove the player '${currentPlayerName}' from this lineup?`}
           />
       ) }
+      { isAdmin && isModalOpenAddTeamPlayersLineup && (
+        <AddTeamPlayersLineup
+          key={`team-players-lineup-${match.id}-${team.id}`}
+          isOpen={isModalOpenAddTeamPlayersLineup}
+          match={match}
+          selectedTeam={team}
+          callbackCloseModal={cbCloseAddTeamPlayersLineup}
+          allPlayers={allPlayers}
+          />
+      )}
     </>
   )
 }
