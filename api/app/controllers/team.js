@@ -159,7 +159,7 @@ exports.createTeamPlayer = async (req, res, next) => {
 exports.deleteTeamPlayer = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   
-  const bodyRequiredKeys = ["team_id", "team_name", "player_id", "player_name"]
+  const bodyRequiredKeys = ["teamId", "teamName", "playerId", "playerName"]
   if( is_missing_keys(bodyRequiredKeys, req.body) ) {
     return next(new AppError(`Missing body parameters`, 404));
   }
