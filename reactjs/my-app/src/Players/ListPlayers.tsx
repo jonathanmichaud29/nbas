@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch, RootState } from "../redux/store";
@@ -6,6 +7,7 @@ import { addPlayers, removePlayer } from "../redux/playerSlice";
 
 import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import { deletePlayer, fetchPlayers } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/Player';
@@ -82,6 +84,17 @@ function ListPlayers(props: IPlayerProps) {
     <List>
       {listPlayers.map((player: IPlayer) => {
         let listActions = [];
+        listActions.push(
+          <IconButton 
+            key={`action-view-player-${player.id}`}
+            aria-label={`${player.name} Profile`}
+            title={`${player.name} Profile`}
+            >
+            <Link to={`/player/${player.id}`}>
+              <AccountBoxIcon />
+            </Link>
+          </IconButton>
+        )
         if( isAdmin ) {
           listActions.push(
             <IconButton 
@@ -92,6 +105,7 @@ function ListPlayers(props: IPlayerProps) {
               >
               <Delete />
             </IconButton>
+            
           )
         }
         return (

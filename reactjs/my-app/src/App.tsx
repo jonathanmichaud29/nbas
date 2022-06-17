@@ -12,6 +12,7 @@ import {
  */
 import PublicApp from './Public/PublicApp';
 import HomePage from './Public/HomePage'
+import PublicPlayer from './Public/PublicPlayer'
 
 /**
  * Admin Components
@@ -33,6 +34,7 @@ function App() {
 
           <Route path="/" element={<PublicApp />}>
             <Route path="" element={<HomePage />} />
+            <Route path="player/:id" element={<PublicPlayer />} />
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>

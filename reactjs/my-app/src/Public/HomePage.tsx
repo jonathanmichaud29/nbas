@@ -1,5 +1,6 @@
 import ListTeams from "../Teams/ListTeams";
 import ListPlayers from "../Players/ListPlayers";
+import ListMatches from "../Matchs/ListMatches";
 function HomePage() {
   return (
     <div className="public-layout">
@@ -8,6 +9,7 @@ function HomePage() {
         isViewPlayers={true}
       />
       <ListPlayers />
+      <ListMatches />
     </div>
   )
 }

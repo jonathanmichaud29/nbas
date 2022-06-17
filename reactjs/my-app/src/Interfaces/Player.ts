@@ -1,3 +1,6 @@
+import { IMatch, IMatchLineup } from './Match'
+import { ITeam } from './Team';
+
 export interface IPlayer{
   id: number;
   name: string;
@@ -5,4 +8,16 @@ export interface IPlayer{
 
 export interface IPlayerProps{
   isAdmin?: boolean;
+}
+
+export interface IPlayerProfileProps{
+  player: IPlayer;
+}
+
+export interface IPlayerMatchResumeProps {
+  player:       IPlayer;
+  playerLineup: IMatchLineup;
+  match:        IMatch;
+  teamHome:     ITeam;
+  teamAway:     ITeam;
 }

@@ -51,6 +51,10 @@ router
   .post(playerControllers.getSpecificPlayers);
 
 router
+  .route("/player-matches/:id")
+  .get(playerControllers.getPlayerMatches)
+
+router
   .route("/match/")
   .get(matchControllers.getAllMatches)
   .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
