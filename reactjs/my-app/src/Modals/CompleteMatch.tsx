@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
-import { Controller, SubmitHandler, useForm, useFieldArray, FormProvider } from "react-hook-form";
+import { SubmitHandler, useForm, useFieldArray, FormProvider } from "react-hook-form";
 
-import { Alert, Paper, Button, Box, Grid, Modal, List, ListItem, Typography, Autocomplete, TextField } from "@mui/material";
+import { Alert, Paper, Button, Box, Grid, Modal, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
-
 import { AppDispatch, RootState } from "../redux/store";
-import { removeMatchPlayer } from "../redux/matchPlayerSlice"
 
-import { updateMatchLineup } from '../ApiCall/matches';
+import { fetchMatchLineups, updateMatchLineup } from '../ApiCall/matches';
 
 import { IPlayer } from "../Interfaces/Player";
 import { ICompleteMatchProps, IMatchLineup, IPlayerLineupStats} from '../Interfaces/Match'
@@ -19,6 +17,7 @@ import FormNumberInput from '../Forms/FormNumberInput';
 
 import { castNumber } from '../utils/castValues';
 import styleModal from './styleModal'
+import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
 
 
@@ -35,7 +34,7 @@ const defaultValues = {
   playerStats: []
 }
 function CompleteMatch(props: ICompleteMatchProps) {
-  /* const dispatch = useDispatch<AppDispatch>(); */
+  const dispatch = useDispatch<AppDispatch>();
   const {isOpen, match, teamHome, teamAway, callbackCloseModal, allPlayers} = props;
   
   /**
@@ -56,8 +55,8 @@ function CompleteMatch(props: ICompleteMatchProps) {
   const allMatchPlayers = useSelector(selectCurrentMatchPlayers) || null;
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
-  const { handleSubmit, control, reset, setValue/* , formState: { errors } */ } = methods;
-  const { fields, append, remove/* , prepend, remove, swap, move, insert */ } = useFieldArray(
+  const { handleSubmit, control, setValue } = methods;
+  const { fields, append, remove } = useFieldArray(
     { control, name: "playerStats" }
   );
   const getPlayerName = (idPlayer: number): string => {
@@ -125,10 +124,9 @@ function CompleteMatch(props: ICompleteMatchProps) {
    */
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
-    console.log("data send", data);
+    
     setRequestStatus(true);
     reinitializeApiMessages();
-
 
     let updatedMatch = Object.assign({},match);
     updatedMatch.isCompleted = 1;
@@ -152,7 +150,13 @@ function CompleteMatch(props: ICompleteMatchProps) {
     updateMatchLineup(updatedMatch, formattedPlayerStats)
       .then((response) =>{
         changeApiSuccess(response.message);
-        handleModalClose()
+        fetchMatchLineups(match.id)
+          .then((response) => {
+            dispatch(addMatchPlayers(updatedMatch, response.data))
+          })
+          .finally(() => {
+            handleModalClose()
+          })
       })
       .catch(error => {
         changeApiError(error);

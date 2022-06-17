@@ -16,9 +16,14 @@ const matchPlayerSlice = createSlice({
         }
         else {
           let newMatchPlayers = state[indexState];
+          newMatchPlayers.match = action.payload.match;
           for( const newLineupPlayer of action.payload.lineupPlayers ){
-            if( state[indexState].lineupPlayers.find((lineupPlayer: IMatchLineup) => lineupPlayer.id === newLineupPlayer.id ) === undefined ) {
+            const indexPlayer = state[indexState].lineupPlayers.findIndex((lineupPlayer: IMatchLineup) => lineupPlayer.id === newLineupPlayer.id );
+            if( indexPlayer === -1 ) {
               newMatchPlayers.lineupPlayers.push(newLineupPlayer);
+            }
+            else {
+              newMatchPlayers.lineupPlayers.splice(indexPlayer, 1, newLineupPlayer);
             }
           }
           state.splice(indexState, 1, newMatchPlayers);
