@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -35,7 +35,7 @@ function CreateMatch() {
   const [requestStatus, setRequestStatus] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const listTeams = useSelector((state: RootState) => state ).teams
+  const listTeams = useSelector((state: RootState) => state.teams )
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -160,6 +160,7 @@ function CreateMatch() {
                   label="Match Date"
                   value={value}
                   onChange={onChange}
+                  minutesStep={5}
                   minDate={new Date('2022-05-01')}
                   maxDate={new Date('2022-10-31')}
                   inputFormat="yyyy-MM-dd hh:mm a"
