@@ -1,5 +1,4 @@
 const mysql = require('mysql2');
-const mysqlPromise = require('mysql2/promise');
 
 const configDB = {
   host: process.env.DB_HOST,
@@ -45,6 +44,49 @@ exports.mysqlQueryPoolInserts = async(query, values) => {
       success = false;
     })
   
+  
+
+  if( success ){
+    await promiseConn.commit();
+    return {
+      status: true, 
+      data: data, 
+      error: {}
+    }
+  } else {
+    await promiseConn.rollback();
+    return {
+      status: false, 
+      data: [], 
+      error: error
+    }
+  }
+  
+}
+
+
+exports.mysqlQueryPoolMixUpdates = async(queries) => {
+  let success = true;
+  let data = [];
+  let error = {}; 
+  const promisePool = connPool.promise();
+  const promiseConn = await promisePool.getConnection()
+
+  await promiseConn.beginTransaction();
+  
+  await Promise.all( queries.map(async(queryValues) => {
+    return await promiseConn.execute(queryValues.query, queryValues.values)
+      .then( () => {
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        return Promise.reject(err);
+      })
+  }))
+    .catch((err) => {
+      success = false;
+    })
   
 
   if( success ){

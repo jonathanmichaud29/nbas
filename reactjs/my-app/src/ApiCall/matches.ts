@@ -1,3 +1,4 @@
+import { IMatch, IPlayerLineupStats } from '../Interfaces/Match';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
 const fetchMatches = async () => {
@@ -94,4 +95,17 @@ const deletePlayerLineup = async(argLineupId: number) => {
 }
 
 
-export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups, addMatchLineup, deletePlayerLineup, addLineupPlayers }
+const updateMatchLineup = async(argMatch: IMatch, argLineups: IPlayerLineupStats[]) => {
+  return await axiosProtected.put(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argMatch.id}`,{
+    match: argMatch,
+    lineups: argLineups
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups, addMatchLineup, deletePlayerLineup, addLineupPlayers, updateMatchLineup }

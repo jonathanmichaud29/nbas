@@ -63,6 +63,7 @@ router
 router
   .route("/match-lineup/:id")
   .get(matchControllers.getMatchLineups)
+  .put(matchControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
 
 router
   .route("/match-lineup/player/:id")

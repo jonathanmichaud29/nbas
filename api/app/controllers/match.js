@@ -1,6 +1,6 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery, mysqlQueryPoolInserts } = require("../services/db");
+const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
 const { is_missing_keys } = require("../utils/validation");
 
 exports.getAllMatches = async (req, res, next) => {
@@ -114,4 +114,42 @@ exports.deletePlayerLineup = async (req, res, next) => {
     customMessage = `lineup removed from match!`;
   }
   return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
+};
+
+exports.updateMatchLineups = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No match id found", 404));
+  }
+  const bodyRequiredKeys = ["match", "lineups"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
+  }
+  const myMatch = req.body.match;
+  const myLineups = req.body.lineups;
+
+  const idTeamWon = myMatch.teamAwayPoints > myMatch.teamHomePoints ? myMatch.idTeamAway : myMatch.idTeamHome;
+  const idTeamLost = idTeamWon !== myMatch.idTeamAway ? myMatch.idTeamAway : myMatch.idTeamHome;
+
+  let queries = new Array();
+
+  queries.push({
+    query: "UPDATE matches SET isCompleted=?, teamHomePoints=?, teamAwayPoints=?, idTeamWon=?, idTeamLost=? WHERE id=?",
+    values: [myMatch.isCompleted, myMatch.teamHomePoints, myMatch.teamAwayPoints, idTeamWon, idTeamLost, myMatch.id]
+  })
+  myLineups.every((lineup) => {
+    queries.push({
+      query: "UPDATE match_lineup SET `hitOrder`=?, `atBats`=?, `single`=?, `double`=?, `triple`=?, `homerun`=?, `out`=? WHERE `id`=?",
+      values: [lineup.hitOrder, lineup.atBats, lineup.single, lineup.double, lineup.triple, lineup.homerun, lineup.out, lineup.lineupId]
+    })
+    return true;
+  })
+  
+  const resultMainQuery = await mysqlQueryPoolMixUpdates(queries);
+  
+  let customMessage = '';
+  let customData = {}
+  if( resultMainQuery.status ){
+    customMessage = `match #${req.body.match.id} updated!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };

@@ -5,7 +5,8 @@ import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 import { addPlayers } from "../redux/playerSlice";
 
-import { Alert, Box, CircularProgress } from "@mui/material";
+import { Alert, Box, CircularProgress, IconButton } from "@mui/material";
+import FactCheckIcon from '@mui/icons-material/FactCheck';
 
 import { IMatchProps } from "../Interfaces/Match";
 import { ITeam } from '../Interfaces/Team';
@@ -15,7 +16,7 @@ import { fetchMatchLineups } from '../ApiCall/matches';
 import { fetchPlayers } from '../ApiCall/players';
 
 import TeamMatchLineup from '../Teams/TeamMatchLineup';
-
+import CompleteMatch from '../Modals/CompleteMatch';
 
 function ViewMatch(props: IMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,7 +38,6 @@ function ViewMatch(props: IMatchProps) {
    * Fetch Teams details
    */
   useEffect( () => {
-    if( match === null ) return;
     fetchTeams([match.idTeamHome, match.idTeamAway])
       .then(response => {
         response.data.forEach((team: ITeam) => {
@@ -78,12 +78,33 @@ function ViewMatch(props: IMatchProps) {
   }, [dispatch, match]);
 
 
+  /**
+   * Handle modals
+   */
+
+  const [isModalOpenCompleteMatch, setModalOpenCompleteMatch] = useState(false);
+  const handleOpenCompleteMatch = () => {
+    setModalOpenCompleteMatch(true);
+  }
+  const cbCloseCompleteMatch = () => {
+    setModalOpenCompleteMatch(false);
+  }
   return (
     <>
       <h1>View Match #{match.id}</h1>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       {/* { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> } */}
+      { /* match.isCompleted === 0 && */ isLoaded && (
+        <IconButton 
+          key={`complete-match-${match.id}`}
+          aria-label={`Complete match statistics`}
+          title={`Complete match statistics`}
+          onClick={ () => handleOpenCompleteMatch() }
+          >
+          <FactCheckIcon />
+        </IconButton>
+      )}
       { isLoaded && teamHome && (
         <TeamMatchLineup 
           key={`team-home-lineup-${match.id}`}
@@ -103,6 +124,17 @@ function ViewMatch(props: IMatchProps) {
           team={teamAway}
           allPlayers={listPlayers}
         />
+      )}
+      { /* isAdmin &&  */isLoaded && isModalOpenCompleteMatch && (
+        <CompleteMatch
+          key={`modal-complete-match-${match.id}`}
+          isOpen={isModalOpenCompleteMatch}
+          match={match}
+          teamHome={teamHome}
+          teamAway={teamAway}
+          callbackCloseModal={cbCloseCompleteMatch}
+          allPlayers={listPlayers}
+          />
       )}
     </>
   )
