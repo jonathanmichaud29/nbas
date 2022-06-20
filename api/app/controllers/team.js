@@ -173,3 +173,54 @@ exports.deleteTeamPlayer = async (req, res, next) => {
   }
   return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };
+
+
+exports.getTeamMatches = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No team id found", 404));
+  }
+  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE idTeam=?", [req.params.id])
+  let customData = {
+    matchLineups:[],
+    matches:[],
+    teams:[],
+    players:[],
+  }
+
+  let listPlayerIds = [];
+  let listTeamIds = [];
+  let listMatchIds = [];
+  let customMessage = '';
+  
+  if( resultMainQuery.status ){
+    customData.matchLineups = resultMainQuery.data;
+    listMatchIds = resultMainQuery.data.map((row) => row.idMatch)
+    listPlayerIds = resultMainQuery.data.map((row) => row.idPlayer)
+  }
+
+  if( listPlayerIds.length > 0 ){
+    const resultQueryPlayers = await mysqlQuery("SELECT * FROM players WHERE id IN ?", [[listPlayerIds]])
+    if( resultQueryPlayers.status ){
+      customData.players = resultQueryPlayers.data;
+    }
+  }
+
+  if( listMatchIds.length > 0 ){
+    const resultQueryMatches = await mysqlQuery("SELECT * FROM matches WHERE id IN ?", [[listMatchIds]])
+    if( resultQueryMatches.status ){
+      customData.matches = resultQueryMatches.data;
+      const teamAwayIds = resultQueryMatches.data.map((row) => row.idTeamAway)
+      const teamHomeIds = resultQueryMatches.data.map((row) => row.idTeamHome)
+      listTeamIds = teamHomeIds.concat(teamAwayIds)
+    }
+  }
+
+  if( listTeamIds.length > 0 ){
+    const resultQueryTeams = await mysqlQuery("SELECT * FROM teams WHERE id IN ?", [[listTeamIds]])
+    if( resultQueryTeams.status ){
+      customData.teams = resultQueryTeams.data;
+    }
+  }
+
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+};

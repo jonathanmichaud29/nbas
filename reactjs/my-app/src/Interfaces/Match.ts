@@ -44,6 +44,16 @@ export interface IMatchLineup {
   hitOrder: number;
 }
 
+export interface IPlayerStats {
+  id: number;
+  atBats: number;
+  single: number;
+  double: number;
+  triple: number;
+  homerun: number;
+  out: number;
+}
+
 export interface IPlayerLineupStats {
   lineupId: number;
   atBats: number;

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
@@ -6,6 +7,7 @@ import { Alert, Box, CircularProgress, IconButton, List, ListItem } from "@mui/m
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
 import { fetchTeams, deleteTeam } from "../ApiCall/teams";
@@ -109,6 +111,17 @@ function ListTeams(props: ITeamProps) {
     <List>
       {listTeams.map((team: ITeam) => {
         let listActions = [];
+        listActions.push(
+          <IconButton 
+            key={`action-view-team-${team.id}`}
+            aria-label={`${team.name} Profile`}
+            title={`${team.name} Profile`}
+            >
+            <Link to={`/team/${team.id}`}>
+              <QueryStatsIcon />
+            </Link>
+          </IconButton>
+        )
         if( isAdmin ) {
           listActions.push(
             <IconButton 

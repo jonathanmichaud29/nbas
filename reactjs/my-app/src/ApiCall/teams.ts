@@ -1,7 +1,7 @@
 import { ITeamPlayers } from '../Interfaces/Team';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
-const fetchTeam = async (idTeam: number) => {
+export const fetchTeam = async (idTeam: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/${idTeam}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -11,7 +11,7 @@ const fetchTeam = async (idTeam: number) => {
     })
 }
 
-const fetchTeams = async (argIds?: Array<number>) => {
+export const fetchTeams = async (argIds?: Array<number>) => {
   if( argIds ){
     return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/list/`, {
       listIds: argIds
@@ -35,7 +35,17 @@ const fetchTeams = async (argIds?: Array<number>) => {
   
 }
 
-const createTeam = async (argName: string) => {
+export const fetchTeamHistoryMatches = async (id: number) => {
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-matches/${id}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export const createTeam = async (argName: string) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team/`,{
     name: argName
@@ -48,7 +58,7 @@ const createTeam = async (argName: string) => {
     })
 }
 
-const deleteTeam = async (argId: number) => {
+export const deleteTeam = async (argId: number) => {
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team/${argId}`,{
     
   })
@@ -60,7 +70,7 @@ const deleteTeam = async (argId: number) => {
     })
 }
 
-const fetchTeamPlayers = async (argId?: number) => {
+export const fetchTeamPlayers = async (argId?: number) => {
   if( argId ) {
     return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argId}`,{
       
@@ -85,7 +95,7 @@ const fetchTeamPlayers = async (argId?: number) => {
   }
 }
 
-const fetchUnassignedPlayers = async () => {
+export const fetchUnassignedPlayers = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/unassigned-players/`,{
     
   })
@@ -97,7 +107,7 @@ const fetchUnassignedPlayers = async () => {
     })
 }
 
-const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
+export const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team-players/${argTeamId}`,{
     idPlayer: argPlayerId
   })
@@ -109,7 +119,7 @@ const addTeamPlayer = async(argTeamId: number, argPlayerId: number) => {
     })
 }
 
-const removeTeamPlayer = async(argTeamPlayer: ITeamPlayers) => {
+export const removeTeamPlayer = async(argTeamPlayer: ITeamPlayers) => {
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team-player/`,{
     data:{
       teamId: argTeamPlayer.teamId,
@@ -125,4 +135,3 @@ const removeTeamPlayer = async(argTeamPlayer: ITeamPlayers) => {
       return Promise.reject(error.response.data.message);
     })
 }
-export { fetchTeam, fetchTeams, createTeam, deleteTeam, fetchTeamPlayers, addTeamPlayer, fetchUnassignedPlayers, removeTeamPlayer }

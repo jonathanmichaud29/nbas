@@ -74,4 +74,8 @@ router
   .post(matchControllers.createPlayerLineup, firebaseAuthMiddleware.decodeToken)
   .delete(matchControllers.deletePlayerLineup, firebaseAuthMiddleware.decodeToken)
 
+router
+  .route("/team-matches/:id")
+  .get(teamControllers.getTeamMatches)
+
 module.exports = router;
