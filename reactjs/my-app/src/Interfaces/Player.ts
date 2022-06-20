@@ -21,3 +21,7 @@ export interface IPlayerMatchResumeProps {
   teamHome:     ITeam;
   teamAway:     ITeam;
 }
+export interface IPlayerYearStatsProps {
+  player:       IPlayer;
+  playerLineups:IMatchLineup[];
+}

@@ -31,13 +31,6 @@ exports.createMatch = async (req, res, next) => {
     customMessage = `match created!`
     const resultLineupQuery = await mysqlQuery("SELECT * FROM matches WHERE id=?", [resultMainQuery.data.insertId]);
     customData = resultLineupQuery.data[0];
-    /* customData = {
-      id: resultMainQuery.data.insertId,
-      idTeamHome: req.body.idTeamHome,
-      idTeamAway: req.body.idTeamAway,
-      date: finalDate
-    } */
-    
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };
