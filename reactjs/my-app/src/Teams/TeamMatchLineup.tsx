@@ -19,6 +19,8 @@ import AddMatchLineup from '../Modals/AddMatchLineup';
 import AddTeamPlayersLineup from '../Modals/AddTeamPlayersLineup';
 import ConfirmDelete from "../Modals/ConfirmDelete";
 
+import { getPlayerName } from '../utils/dataAssociation';
+
 function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { isAdmin, match, isHomeTeam, team, allPlayers } = props;
@@ -31,16 +33,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
     (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
   )
   const allMatchPlayers = useSelector(selectCurrentMatchPlayers) || null;
-  
-  
-  const getPlayerName = (idPlayer: number): string => {
-    const defaultReturn = "Player not found in lineup";
-    if( allPlayers ){
-      const playerFound = allPlayers.find((player: IPlayer) => player.id === idPlayer);
-      if( playerFound ) return playerFound.name;
-    }
-    return defaultReturn;
-  }
+
 
   /**
    * Handle multiples modals
@@ -68,7 +61,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
 
   const handleDeletePlayerLineup = (lineup: IMatchLineup) => {
     setCurrentLineup(lineup);
-    setCurrentPlayerName(getPlayerName(lineup.idPlayer));
+    setCurrentPlayerName(getPlayerName(lineup.idPlayer, allPlayers));
     setOpenConfirmDeleteLineup(true);
   }
   const cbCloseModalDelete = () => {
@@ -146,7 +139,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
                 <ListItem 
                   key={`match-lineup-${lineup.id}`}
                   secondaryAction={ listActions.map((action) => action) }
-                  >{getPlayerName(lineup.idPlayer)}</ListItem>
+                  >{getPlayerName(lineup.idPlayer, allPlayers)}</ListItem>
               )
             })}
           </List>

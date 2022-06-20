@@ -19,7 +19,7 @@ import { castNumber } from '../utils/castValues';
 import styleModal from './styleModal'
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
-
+import { getPlayerName } from '../utils/dataAssociation';
 
 interface IFormInput {
   /* player: IPlayer; */
@@ -59,14 +59,6 @@ function CompleteMatch(props: ICompleteMatchProps) {
   const { fields, append, remove } = useFieldArray(
     { control, name: "playerStats" }
   );
-  const getPlayerName = (idPlayer: number): string => {
-    const defaultReturn = "Player not found in lineup";
-    if( allPlayers ){
-      const playerFound = allPlayers.find((player: IPlayer) => player.id === idPlayer);
-      if( playerFound ) return playerFound.name;
-    }
-    return defaultReturn;
-  }
 
   const reinitializeApiMessages = () => {
     changeApiSuccess("")
@@ -221,7 +213,7 @@ function CompleteMatch(props: ICompleteMatchProps) {
                           const currentFieldIndex = fields.findIndex((field, index) => field.lineupId === lineup.id)
                           if( currentFieldIndex === -1 ) return '';
                           const currentField = fields[currentFieldIndex];
-                          const playerName = getPlayerName(lineup.idPlayer);
+                          const playerName = getPlayerName(lineup.idPlayer, allPlayers);
                           return (
                           <TableRow key={`row-player-${lineup.id}`}>
                             <TableCell>{playerName}</TableCell>
@@ -319,7 +311,7 @@ function CompleteMatch(props: ICompleteMatchProps) {
                           const currentFieldIndex = fields.findIndex((field, index) => field.lineupId === lineup.id)
                           if( currentFieldIndex === -1 ) return '';
                           const currentField = fields[currentFieldIndex];
-                          const playerName = getPlayerName(lineup.idPlayer);
+                          const playerName = getPlayerName(lineup.idPlayer, allPlayers);
                           return (
                           <TableRow key={`row-player-${lineup.id}`}>
                             <TableCell>{playerName}</TableCell>

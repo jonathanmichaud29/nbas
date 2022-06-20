@@ -12,25 +12,17 @@ import { IPlayerLineupStats } from "../Interfaces/Match";
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
+import { getPlayerName } from '../utils/dataAssociation';
+
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   const {team, matchLineups, match, players, teamHome, teamAway} = props;
 
   const [allStats, setAllStats] = useState<IPlayerLineupStats | null>(null);
-  const [orderedLineups, setOrderedLineups] = useState<IPlayerLineupStats | null>(null);
 
   const dateReadable = createDateReadable(match.date);
 
   const isLoaded = allStats !== null;
-
-  const getPlayerName = (idPlayer: number): string => {
-    const defaultReturn = "Player not found in lineup";
-    if( players ){
-      const playerFound = players.find((player: IPlayer) => player.id === idPlayer);
-      if( playerFound ) return playerFound.name;
-    }
-    return defaultReturn;
-  }
 
   useEffect(() => {
     // Add all stats from match lineups
@@ -109,7 +101,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
                 { matchLineups.map((matchLineup) => {
                   return (
                     <TableRow>
-                      <TableCell>{getPlayerName(matchLineup.idPlayer)}</TableCell>
+                      <TableCell>{getPlayerName(matchLineup.idPlayer, players)}</TableCell>
                       <TableCell>{matchLineup.hitOrder}</TableCell>
                       <TableCell>{matchLineup.atBats}</TableCell>
                       <TableCell>{matchLineup.out}</TableCell>

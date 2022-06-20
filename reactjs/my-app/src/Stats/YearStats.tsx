@@ -10,7 +10,7 @@ import { IYearStatsProps } from '../Interfaces/Generic';
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
-
+import { getPlayerName } from '../utils/dataAssociation';
 
 function YearStats(props: IYearStatsProps) {
 
@@ -20,15 +20,6 @@ function YearStats(props: IYearStatsProps) {
   const [allPlayerStats, setAllPlayerStats] = useState<IPlayerStats[] | null>(null);
 
   const isLoaded = allTeamStats !== null;
-
-  const getPlayerName = (idPlayer: number): string => {
-    const defaultReturn = "Player not found in lineup";
-    if( players ){
-      const playerFound = players.find((player: IPlayer) => player.id === idPlayer);
-      if( playerFound ) return playerFound.name;
-    }
-    return defaultReturn;
-  }
 
   useEffect(() => {
     let playersStats = [] as IPlayerStats[];
@@ -132,7 +123,7 @@ function YearStats(props: IYearStatsProps) {
                 { allPlayerStats && allPlayerStats.map((playerStats) => {
                   return (
                     <TableRow>
-                      <TableCell>{getPlayerName(playerStats.id)}</TableCell>
+                      <TableCell>{getPlayerName(playerStats.id, players)}</TableCell>
                       <TableCell>{playerStats.atBats}</TableCell>
                       <TableCell>{playerStats.out}</TableCell>
                       <TableCell>{playerStats.single}</TableCell>
