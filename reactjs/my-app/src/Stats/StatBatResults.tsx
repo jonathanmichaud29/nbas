@@ -1,17 +1,14 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
+import { IStatBatResultsProps } from '../Interfaces/Generic'
+
 ChartJS.register(ArcElement, Tooltip, Legend); // Doughnut
 
-interface IPlayerStatBatResults {
-  single: number;
-  double: number;
-  triple: number;
-  homerun: number;
-  out: number;
-}
 
-function StatBatResults(props: IPlayerStatBatResults) {
+
+
+function StatBatResults(props: IStatBatResultsProps) {
   const { single, double, triple, homerun, out} = props;
 
   const dataChartAtBats = {

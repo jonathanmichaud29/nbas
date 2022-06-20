@@ -1,19 +1,11 @@
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
+import { IStatBattingPercentageProps } from '../Interfaces/Generic';
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
 
-interface IPlayerStatBatResults {
-  single: Array<number>;
-  double: Array<number>;
-  triple: Array<number>;
-  homerun: Array<number>;
-  out: Array<number>;
-  atBats: Array<number>;
-  columns: Array<string>;
-}
-
-function StatBattingPercentage(props: IPlayerStatBatResults) {
+function StatBattingPercentage(props: IStatBattingPercentageProps) {
   const { single, double, triple, homerun, out, atBats, columns} = props;
 
   
