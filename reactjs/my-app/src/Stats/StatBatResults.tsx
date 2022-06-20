@@ -11,7 +11,7 @@ interface IPlayerStatBatResults {
   out: number;
 }
 
-function PlayerStatBatResults(props: IPlayerStatBatResults) {
+function StatBatResults(props: IPlayerStatBatResults) {
   const { single, double, triple, homerun, out} = props;
 
   const dataChartAtBats = {
@@ -44,4 +44,4 @@ function PlayerStatBatResults(props: IPlayerStatBatResults) {
   )
 }
 
-export default PlayerStatBatResults;
+export default StatBatResults;

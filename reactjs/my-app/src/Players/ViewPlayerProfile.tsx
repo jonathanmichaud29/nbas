@@ -10,7 +10,7 @@ import { IMatch, IMatchLineup } from '../Interfaces/Match'
 import { ITeam } from '../Interfaces/Team'
 
 import PlayerMatchResume from './PlayerMatchResume'
-import PlayerYearStats from './PlayerYearStats'
+import YearStats from '../Stats/YearStats';
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
@@ -44,10 +44,10 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && (
-        <PlayerYearStats
+        <YearStats
           key={`player-year-stat-${player.id}`}
-          player={player}
-          playerLineups={listMatchLineups}
+          matchLineups={listMatchLineups}
+          players={[player]}
         /> 
       )}
       { isLoaded && listMatches && listMatches.map((match: IMatch) => {
@@ -58,7 +58,6 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
         return (
           <PlayerMatchResume
             key={`player-match-resume-${match.id}`}
-            player={player}
             playerLineup={playerLineup}
             match={match}
             teamHome={teamHome}

@@ -15,7 +15,6 @@ export interface IPlayerProfileProps{
 }
 
 export interface IPlayerMatchResumeProps {
-  player:       IPlayer;
   playerLineup: IMatchLineup;
   match:        IMatch;
   teamHome:     ITeam;

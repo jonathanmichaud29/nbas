@@ -5,8 +5,8 @@ import { IPlayerLineupStats } from "../Interfaces/Match";
 
 import { IPlayerYearStatsProps } from '../Interfaces/Player';
 
-import PlayerStatBatResults from './PlayerStatBatResults';
-import PlayerStatBattingPercentage from './PlayerStatBattingPercentage';
+import StatBatResults from '../Stats/StatBatResults';
+import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 function PlayerYearStats(props: IPlayerYearStatsProps) {
 
@@ -48,7 +48,7 @@ function PlayerYearStats(props: IPlayerYearStatsProps) {
               <Typography variant="h6" component="h4" align="center">
                 At Bats results
               </Typography>
-              <PlayerStatBatResults
+              <StatBatResults
                 single={allStats.single}
                 double={allStats.double}
                 triple={allStats.triple}
@@ -57,7 +57,7 @@ function PlayerYearStats(props: IPlayerYearStatsProps) {
               />
             </Grid>
             <Grid item xs={8}>
-              <PlayerStatBattingPercentage
+              <StatBattingPercentage
                 single={[allStats.single]}
                 double={[allStats.double]}
                 triple={[allStats.triple]}

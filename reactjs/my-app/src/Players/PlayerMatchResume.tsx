@@ -5,12 +5,12 @@ import { IPlayerMatchResumeProps } from '../Interfaces/Player';
 
 import { createDateReadable } from '../utils/dateFormatter';
 
-import PlayerStatBatResults from './PlayerStatBatResults';
-import PlayerStatBattingPercentage from './PlayerStatBattingPercentage';
+import StatBatResults from "../Stats/StatBatResults";
+import StatBattingPercentage from "../Stats/StatBattingPercentage";
 
 function PlayerMatchResume(props: IPlayerMatchResumeProps) {
 
-  const {player, playerLineup, match, teamHome, teamAway} = props;
+  const {playerLineup, match, teamHome, teamAway} = props;
 
   const dateReadable = createDateReadable(match.date);
   const playingForTeam: ITeam = ( playerLineup.idTeam === teamHome.id ? teamHome : teamAway);
@@ -26,7 +26,7 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
             <Typography variant="h6" component="h4" align="center">
               At Bats results
             </Typography>
-            <PlayerStatBatResults
+            <StatBatResults
               single={playerLineup.single}
               double={playerLineup.double}
               triple={playerLineup.triple}
@@ -35,7 +35,7 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
             />
           </Grid>
           <Grid item xs={8}>
-            <PlayerStatBattingPercentage
+            <StatBattingPercentage
               single={[playerLineup.single]}
               double={[playerLineup.double]}
               triple={[playerLineup.triple]}

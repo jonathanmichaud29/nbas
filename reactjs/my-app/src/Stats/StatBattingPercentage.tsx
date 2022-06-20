@@ -13,7 +13,7 @@ interface IPlayerStatBatResults {
   columns: Array<string>;
 }
 
-function PlayerStatBattingPercentage(props: IPlayerStatBatResults) {
+function StatBattingPercentage(props: IPlayerStatBatResults) {
   const { single, double, triple, homerun, out, atBats, columns} = props;
 
   
@@ -87,4 +87,4 @@ function PlayerStatBattingPercentage(props: IPlayerStatBatResults) {
   )
 }
 
-export default PlayerStatBattingPercentage;
+export default StatBattingPercentage;

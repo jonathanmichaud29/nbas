@@ -33,7 +33,6 @@ function TeamStanding(props: ITeamStandingProps){
 
   return (
     <>
-      <h2>{team.name} Standing</h2>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
