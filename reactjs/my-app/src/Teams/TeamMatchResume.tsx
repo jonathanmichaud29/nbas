@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 
 import { Box, Grid, Typography } from "@mui/material";
-import { DataGrid, GridColDef} from '@mui/x-data-grid';
+import { DataGrid} from '@mui/x-data-grid';
 
 import { createDateReadable } from '../utils/dateFormatter';
 

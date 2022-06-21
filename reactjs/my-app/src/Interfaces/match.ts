@@ -27,7 +27,7 @@ export interface IAddMatchLineupProps{
   match: IMatch;
   selectedTeam: ITeam;
   callbackCloseModal(): void;
-  allPlayers: Array<IPlayer>
+  allPlayers: Array<IPlayer>;
 }
 
 export interface IMatchLineup {

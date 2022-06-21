@@ -1,7 +1,7 @@
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-import { IStatBattingPercentageProps } from '../Interfaces/stats';
+import { IStatBattingPercentageProps, IBattingPercentageStats } from '../Interfaces/stats';
 import { getStatIndexHits,getStatIndexSlugging } from '../utils/statsAggregation'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
@@ -9,10 +9,11 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 function StatBattingPercentage(props: IStatBattingPercentageProps) {
   const { single, double, triple, homerun, atBats, columns} = props;
 
-  let stats: any = [];
+  let stats = [] as IBattingPercentageStats[];
   columns.forEach((value, index) => {
     const nbHits = getStatIndexHits(index, single, double, triple, homerun);
     const sluggingTotal = getStatIndexSlugging(index, single, double, triple, homerun);
+    
     stats.push({
       battingAverage: nbHits / atBats[index], // = Hit / AtBats
       /* onBasePercentage: 0.300, // = ( Hit + Walk + Hit by pitch ) / ( AtBats + Walk + Hit by pitch + Sacrifice Flies) */

@@ -8,9 +8,8 @@ import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
 import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperText, Modal, Paper, Typography } from "@mui/material";
 
-import { IAddMatchLineupProps, IMatch, IMatchLineup } from "../Interfaces/match";
-import { IPlayer } from "../Interfaces/player";
-import { ITeamPlayers, IOrderPlayers } from '../Interfaces/team'
+import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
+import { ITeamPlayers } from '../Interfaces/team'
 
 import { fetchTeamPlayers } from "../ApiCall/teams";
 import { addLineupPlayers } from '../ApiCall/matches';
@@ -27,7 +26,7 @@ interface IFormInput {
 
 function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const {isOpen, match, selectedTeam, callbackCloseModal, allPlayers} = props;
+  const {isOpen, match, selectedTeam, callbackCloseModal} = props;
   
   /**
    * Set States

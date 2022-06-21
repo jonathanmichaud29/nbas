@@ -5,6 +5,14 @@ export interface IYearStatsProps {
   matchLineups:   IMatchLineup[];
   players:        IPlayer[];
 }
+
+export interface IBattingPercentageStats {
+  battingAverage: number;
+  // onBasePercentage: number;
+  sluggingPercentage: number;
+  // onBaseSluggingPercentage: number;
+}
+
 export interface ITeamStats {
   atBats: number;
   single: number;
@@ -22,6 +30,8 @@ export interface IPlayerStats {
   homerun: number;
   out: number;
 }
+
+export interface IPlayerStatsExtended extends IPlayerStats, IBattingPercentageStats {};
 
 export interface IPlayerLineupStats {
   lineupId: number;

@@ -11,7 +11,6 @@ import { AppDispatch, RootState } from "../redux/store";
 import { removeMatchPlayer } from "../redux/matchPlayerSlice"
 
 import { IMatchLineup, ITeamMatchLineupProps } from '../Interfaces/match';
-import { IPlayer } from '../Interfaces/player';
 
 import { deletePlayerLineup } from '../ApiCall/matches';
 
