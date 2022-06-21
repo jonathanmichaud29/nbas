@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Box, Grid, Typography } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 
-import { IPlayerStats, ITeamStats, IYearStatsProps } from '../Interfaces/stats';
+import { IPlayerStatsExtended, ITeamStats, IYearStatsProps } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
@@ -16,12 +16,12 @@ function YearStats(props: IYearStatsProps) {
   const {matchLineups, players} = props;
 
   const [allTeamStats, setAllTeamStats] = useState<ITeamStats | null>(null);
-  const [allPlayerStats, setAllPlayerStats] = useState<IPlayerStats[] | null>(null);
+  const [allPlayerStats, setAllPlayerStats] = useState<IPlayerStatsExtended[] | null>(null);
 
   const isLoaded = allTeamStats !== null && allPlayerStats !== null;
 
   useEffect(() => {
-    let playersStats = [] as IPlayerStats[];
+    let playersStats = [] as IPlayerStatsExtended[];
     let teamStats: ITeamStats = {
       atBats: 0,
       single: 0,
@@ -49,6 +49,8 @@ function YearStats(props: IYearStatsProps) {
           triple: matchLineup.triple,
           homerun: matchLineup.homerun,
           out: matchLineup.out,
+          sluggingPercentage: 0,
+          battingAverage: 0,
         })
       }
       else {
