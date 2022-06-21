@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 
-import { ITeam } from "../Interfaces/Team";
-import { IPlayerMatchResumeProps } from '../Interfaces/Player';
+import { ITeam } from "../Interfaces/team";
+import { IPlayerMatchResumeProps } from '../Interfaces/player';
 
 import { createDateReadable } from '../utils/dateFormatter';
 

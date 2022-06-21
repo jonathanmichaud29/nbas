@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
 
-import { ITeamPlayersProps } from "../Interfaces/Team";
-import { IPlayer } from "../Interfaces/Player";
+import { ITeamPlayersProps } from "../Interfaces/team";
+import { IPlayer } from "../Interfaces/player";
 import { addTeamPlayer, fetchUnassignedPlayers } from "../ApiCall/teams";
 
 import styleModal from './styleModal'

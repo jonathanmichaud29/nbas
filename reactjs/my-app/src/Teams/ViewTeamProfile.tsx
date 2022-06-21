@@ -5,9 +5,9 @@ import { Alert, Box, CircularProgress } from "@mui/material";
 
 import { fetchTeamHistoryMatches } from '../ApiCall/teams';
 
-import { ITeamProfileProps, ITeam } from '../Interfaces/Team'
-import { IMatch, IMatchLineup } from '../Interfaces/Match'
-import { IPlayer } from '../Interfaces/Player'
+import { ITeamProfileProps, ITeam } from '../Interfaces/team'
+import { IMatch, IMatchLineup } from '../Interfaces/match'
+import { IPlayer } from '../Interfaces/player'
 
 import TeamStanding from './TeamStanding'
 import TeamMatchResume from './TeamMatchResume'

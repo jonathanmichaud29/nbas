@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Box, Modal, Typography, List, ListItem, IconButton } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 
-import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/Team";
+import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/team";
 import { fetchTeamPlayers, removeTeamPlayer } from "../ApiCall/teams";
 
 import styleModal from './styleModal'

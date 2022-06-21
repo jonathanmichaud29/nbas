@@ -1,7 +1,7 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
-import { IStatBatResultsProps } from '../Interfaces/Generic'
+import { IStatBatResultsProps } from '../Interfaces/stats'
 
 ChartJS.register(ArcElement, Tooltip, Legend); // Doughnut
 

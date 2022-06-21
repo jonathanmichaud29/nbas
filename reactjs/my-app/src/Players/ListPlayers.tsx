@@ -10,7 +10,7 @@ import { Delete } from '@mui/icons-material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import { deletePlayer, fetchPlayers } from '../ApiCall/players'
-import { IPlayer, IPlayerProps } from '../Interfaces/Player';
+import { IPlayer, IPlayerProps } from '../Interfaces/player';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
 

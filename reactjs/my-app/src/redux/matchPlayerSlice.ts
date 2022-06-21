@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { IMatch, IMatchPlayer, IMatchPlayers, IMatchLineup } from '../Interfaces/Match';
+import { IMatch, IMatchPlayer, IMatchPlayers, IMatchLineup } from '../Interfaces/match';
 
 const initialState = [] as IMatchPlayers[];
 

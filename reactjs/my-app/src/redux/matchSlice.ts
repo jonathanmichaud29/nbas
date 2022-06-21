@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { IMatch } from '../Interfaces/Match';
+import { IMatch } from '../Interfaces/match';
 const initialState = [] as IMatch[];
 
 const matchSlice = createSlice({

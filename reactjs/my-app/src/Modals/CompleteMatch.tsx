@@ -10,8 +10,8 @@ import { AppDispatch, RootState } from "../redux/store";
 
 import { fetchMatchLineups, updateMatchLineup } from '../ApiCall/matches';
 
-import { IPlayer } from "../Interfaces/Player";
-import { ICompleteMatchProps, IMatchLineup, IPlayerLineupStats} from '../Interfaces/Match'
+import { IPlayer } from "../Interfaces/player";
+import { ICompleteMatchProps, IMatchLineup, IPlayerLineupStats} from '../Interfaces/match'
 
 import FormNumberInput from '../Forms/FormNumberInput';
 

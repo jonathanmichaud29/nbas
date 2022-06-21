@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { Box, Grid, Typography } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 
-import { IPlayerStats, IPlayerLineupStats } from "../Interfaces/Match";
-import { IYearStatsProps } from '../Interfaces/Generic';
+import { IPlayerStats, IPlayerLineupStats } from "../Interfaces/match";
+import { IYearStatsProps } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';

@@ -1,5 +1,5 @@
-import { IPlayer } from './Player';
-import { IMatch, IMatchLineup } from './Match';
+import { IPlayer } from './player';
+import { IMatch, IMatchLineup } from './match';
 
 export interface ITeam{
   id: number;

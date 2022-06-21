@@ -1,5 +1,5 @@
-import { ITeam } from './Team'
-import {IPlayer} from './Player'
+import { ITeam } from './team'
+import {IPlayer} from './player'
 
 export interface IMatch{
   id: number;

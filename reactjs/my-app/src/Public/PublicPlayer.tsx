@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 
 import { Alert, Box, CircularProgress  } from "@mui/material";
 
-import { IPlayer } from "../Interfaces/Player";
+import { IPlayer } from "../Interfaces/player";
 
 import { fetchPlayer } from '../ApiCall/players';
 

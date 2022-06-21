@@ -8,9 +8,9 @@ import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
 import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperText, Modal, Paper, Typography } from "@mui/material";
 
-import { IAddMatchLineupProps, IMatch, IMatchLineup } from "../Interfaces/Match";
-import { IPlayer } from "../Interfaces/Player";
-import { ITeamPlayers, IOrderPlayers } from '../Interfaces/Team'
+import { IAddMatchLineupProps, IMatch, IMatchLineup } from "../Interfaces/match";
+import { IPlayer } from "../Interfaces/player";
+import { ITeamPlayers, IOrderPlayers } from '../Interfaces/team'
 
 import { fetchTeamPlayers } from "../ApiCall/teams";
 import { addLineupPlayers } from '../ApiCall/matches';

@@ -5,8 +5,8 @@ import { DataGrid, GridColDef} from '@mui/x-data-grid';
 
 import { createDateReadable } from '../utils/dateFormatter';
 
-import { ITeamMatchResumeProps } from '../Interfaces/Team';
-import { IPlayerStats } from "../Interfaces/Match";
+import { ITeamMatchResumeProps } from '../Interfaces/team';
+import { IPlayerStats } from "../Interfaces/match";
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';

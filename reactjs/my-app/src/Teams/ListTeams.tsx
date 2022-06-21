@@ -11,7 +11,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
 import { fetchTeams, deleteTeam } from "../ApiCall/teams";
-import { ITeam, ITeamProps } from "../Interfaces/Team";
+import { ITeam, ITeamProps } from "../Interfaces/team";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";

@@ -8,8 +8,8 @@ import { addPlayers } from "../redux/playerSlice";
 import { Alert, Box, CircularProgress, IconButton } from "@mui/material";
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 
-import { IMatchProps } from "../Interfaces/Match";
-import { ITeam } from '../Interfaces/Team';
+import { IMatchProps } from "../Interfaces/match";
+import { ITeam } from '../Interfaces/team';
 
 import { fetchTeams } from '../ApiCall/teams';
 import { fetchMatchLineups } from '../ApiCall/matches';

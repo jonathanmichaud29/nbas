@@ -1,13 +1,5 @@
-import { IMatchLineup } from './Match'
-import { IPlayer } from './Player'
-
-export interface IConfirmDeleteProps{
-  isOpen:         boolean;
-  title:          string;
-  description:    string;
-  callbackConfirmDelete(): void;
-  callbackCloseModal(): void;
-}
+import { IMatchLineup } from './match'
+import { IPlayer } from './player'
 
 export interface IYearStatsProps {
   matchLineups:   IMatchLineup[];

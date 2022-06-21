@@ -1,4 +1,4 @@
-import { IPlayer } from '../Interfaces/Player';
+import { IPlayer } from '../Interfaces/player';
 
 export const getPlayerName = (idPlayer: number, listPlayers: Array<IPlayer>): string => {
   const defaultReturn = "Player not found in lineup";

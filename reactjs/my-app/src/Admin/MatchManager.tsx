@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 
 import { Alert, Box, CircularProgress  } from "@mui/material";
 
-import { IMatch } from "../Interfaces/Match";
+import { IMatch } from "../Interfaces/match";
 
 import { fetchMatch } from '../ApiCall/matches';
 

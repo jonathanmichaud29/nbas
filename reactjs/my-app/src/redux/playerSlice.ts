@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { IPlayer } from '../Interfaces/Player';
+import { IPlayer } from '../Interfaces/player';
 const initialState = [] as IPlayer[];
 
 const playerSlice = createSlice({

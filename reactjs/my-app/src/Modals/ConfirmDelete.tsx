@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Button, Box, Modal, Typography, ButtonGroup } from "@mui/material";
 
-import { IConfirmDeleteProps } from "../Interfaces/Generic";
+import { IConfirmDeleteProps } from "../Interfaces/generic";
 
 import styleModal from './styleModal'
 

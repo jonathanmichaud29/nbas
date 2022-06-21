@@ -1,4 +1,4 @@
-import { ITeamPlayers } from '../Interfaces/Team';
+import { ITeamPlayers } from '../Interfaces/team';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
 export const fetchTeam = async (idTeam: number) => {

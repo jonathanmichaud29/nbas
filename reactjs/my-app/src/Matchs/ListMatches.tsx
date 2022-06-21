@@ -7,8 +7,8 @@ import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 
-import { IMatch, IListMatchProps } from '../Interfaces/Match';
-import { ITeam } from '../Interfaces/Team';
+import { IMatch, IListMatchProps } from '../Interfaces/match';
+import { ITeam } from '../Interfaces/team';
 
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";

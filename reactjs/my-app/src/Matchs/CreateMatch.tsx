@@ -13,7 +13,7 @@ import { addTeams } from "../redux/teamSlice";
 import { createMatch } from '../ApiCall/matches';
 
 import { fetchTeams } from '../ApiCall/teams';
-import { ITeam } from '../Interfaces/Team';
+import { ITeam } from '../Interfaces/team';
 
 const defaultValues = {
   teamHome: 0,
