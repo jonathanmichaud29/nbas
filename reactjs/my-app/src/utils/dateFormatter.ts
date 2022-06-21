@@ -4,7 +4,7 @@
  * @param argDate 
  * @returns
  */
-const createDateReadable = (argDate: Date): string => {
+export const createDateReadable = (argDate: Date): string => {
   const dateObject = new Date(argDate)
   return dateObject.toLocaleDateString("en-CA",{ 
     year: 'numeric', 
@@ -17,6 +17,12 @@ const createDateReadable = (argDate: Date): string => {
   });
 }
 
-export {
-  createDateReadable
+export const createShortDateReadable = (argDate: Date): string => {
+  const dateObject = new Date(argDate)
+  return dateObject.toLocaleDateString("en-CA",{ 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit',
+    timeZone: 'America/Toronto'
+  });
 }

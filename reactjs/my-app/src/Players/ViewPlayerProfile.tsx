@@ -11,6 +11,7 @@ import { ITeam } from '../Interfaces/team'
 
 import PlayerMatchResume from './PlayerMatchResume'
 import YearStats from '../Stats/YearStats';
+import ProgressionStats from '../Stats/ProgressionStats';
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
@@ -27,7 +28,9 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
     fetchPlayerHistoryMatches(player.id)
       .then((response) => {
         setListTeams(response.data.teams);
-        setListMatches(response.data.matches);
+        const allMatches: IMatch[] = response.data.matches.map((match: IMatch) => match);
+        allMatches.sort((a,b) => a.date < b.date ? -1 : 1);
+        setListMatches(allMatches);
         setListMatchLineups(response.data.matchLineups);
       })
       .catch((error) => {
@@ -49,6 +52,13 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
           matchLineups={listMatchLineups}
           players={[player]}
         /> 
+      )}
+      { isLoaded && (
+        <ProgressionStats
+          key={`progression-player-stat-${player.id}`}
+          matches={listMatches}
+          matchLineups={listMatchLineups}
+        />
       )}
       { isLoaded && listMatches && listMatches.map((match: IMatch) => {
         const teamHome = listTeams.find((team) => team.id === match.idTeamHome)

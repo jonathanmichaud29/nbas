@@ -1,4 +1,4 @@
-import { IMatchLineup } from './match'
+import { IMatch, IMatchLineup } from './match'
 import { IPlayer } from './player'
 
 export interface IYearStatsProps {
@@ -59,4 +59,9 @@ export interface IStatBattingPercentageProps {
   homerun: Array<number>;
   atBats: Array<number>;
   columns: Array<string>;
+}
+
+export interface IProgressionStatsProps {
+  matches: IMatch[];
+  matchLineups: IMatchLineup[];
 }
