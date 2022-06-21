@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import { Box, Grid, Typography } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 
-import { IPlayerStats, IPlayerLineupStats } from "../Interfaces/match";
-import { IYearStatsProps } from '../Interfaces/stats';
+import { IPlayerStats, ITeamStats, IYearStatsProps } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
@@ -16,22 +15,20 @@ function YearStats(props: IYearStatsProps) {
 
   const {matchLineups, players} = props;
 
-  const [allTeamStats, setAllTeamStats] = useState<IPlayerLineupStats | null>(null);
+  const [allTeamStats, setAllTeamStats] = useState<ITeamStats | null>(null);
   const [allPlayerStats, setAllPlayerStats] = useState<IPlayerStats[] | null>(null);
 
   const isLoaded = allTeamStats !== null && allPlayerStats !== null;
 
   useEffect(() => {
     let playersStats = [] as IPlayerStats[];
-    let teamStats: IPlayerLineupStats = {
-      lineupId: 0,
+    let teamStats: ITeamStats = {
       atBats: 0,
       single: 0,
       double: 0,
       triple: 0,
       homerun: 0,
       out: 0,
-      hitOrder: 0,
     };
     
     matchLineups.forEach((matchLineup) => {
@@ -104,7 +101,6 @@ function YearStats(props: IYearStatsProps) {
                 double={[allTeamStats.double]}
                 triple={[allTeamStats.triple]}
                 homerun={[allTeamStats.homerun]}
-                out={[allTeamStats.out]}
                 atBats={[allTeamStats.atBats]}
                 columns={["year long stats"]}
               />

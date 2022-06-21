@@ -40,7 +40,6 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
               double={[playerLineup.double]}
               triple={[playerLineup.triple]}
               homerun={[playerLineup.homerun]}
-              out={[playerLineup.out]}
               atBats={[playerLineup.atBats]}
               columns={[dateReadable]}
             />

@@ -7,7 +7,7 @@ import { getStatIndexHits,getStatIndexSlugging } from '../utils/statsAggregation
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
 
 function StatBattingPercentage(props: IStatBattingPercentageProps) {
-  const { single, double, triple, homerun, out, atBats, columns} = props;
+  const { single, double, triple, homerun, atBats, columns} = props;
 
   let stats: any = [];
   columns.forEach((value, index) => {

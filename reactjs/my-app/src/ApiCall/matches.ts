@@ -1,4 +1,5 @@
-import { IMatch, IPlayerLineupStats } from '../Interfaces/match';
+import { IMatch } from '../Interfaces/match';
+import { IPlayerLineupStats } from '../Interfaces/stats';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
 const fetchMatches = async () => {

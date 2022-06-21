@@ -5,6 +5,34 @@ export interface IYearStatsProps {
   matchLineups:   IMatchLineup[];
   players:        IPlayer[];
 }
+export interface ITeamStats {
+  atBats: number;
+  single: number;
+  double: number;
+  triple: number;
+  homerun: number;
+  out: number;
+}
+export interface IPlayerStats {
+  id: number;
+  atBats: number;
+  single: number;
+  double: number;
+  triple: number;
+  homerun: number;
+  out: number;
+}
+
+export interface IPlayerLineupStats {
+  lineupId: number;
+  atBats: number;
+  single: number;
+  double: number;
+  triple: number;
+  homerun: number;
+  out: number;
+  hitOrder: number;
+}
 
 export interface IStatBatResultsProps {
   single: number;
@@ -19,7 +47,6 @@ export interface IStatBattingPercentageProps {
   double: Array<number>;
   triple: Array<number>;
   homerun: Array<number>;
-  out: Array<number>;
   atBats: Array<number>;
   columns: Array<string>;
 }

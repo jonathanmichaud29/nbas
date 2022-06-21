@@ -6,7 +6,7 @@ import { DataGrid, GridColDef} from '@mui/x-data-grid';
 import { createDateReadable } from '../utils/dateFormatter';
 
 import { ITeamMatchResumeProps } from '../Interfaces/team';
-import { IPlayerStats } from "../Interfaces/match";
+import { IPlayerStats } from "../Interfaces/stats";
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
@@ -90,7 +90,6 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
                 double={[allStats.double]}
                 triple={[allStats.triple]}
                 homerun={[allStats.homerun]}
-                out={[allStats.out]}
                 atBats={[allStats.atBats]}
                 columns={["team stats"]}
               />
