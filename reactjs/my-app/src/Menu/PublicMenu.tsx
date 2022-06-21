@@ -37,6 +37,7 @@ function PublicMenu() {
     <div className="main-menu">
       <List dense={true}>
         <ListItem><Link to="/">Home</Link></ListItem>
+        <ListItem><Link to="/stats/players">Players Stats</Link></ListItem>
         { renderPublicLinks() }
         { renderAdminLinks() }
 

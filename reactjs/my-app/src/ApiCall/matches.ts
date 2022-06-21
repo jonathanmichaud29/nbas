@@ -2,7 +2,7 @@ import { IMatch } from '../Interfaces/match';
 import { IPlayerLineupStats } from '../Interfaces/stats';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
-const fetchMatches = async () => {
+export const fetchMatches = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -12,7 +12,7 @@ const fetchMatches = async () => {
     })
 }
 
-const fetchMatch = async (id: number) => {
+export const fetchMatch = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/${id}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -22,7 +22,7 @@ const fetchMatch = async (id: number) => {
     })
 }
 
-const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
+export const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match/`,{
     idTeamHome: argTeamHome,
@@ -37,7 +37,7 @@ const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Da
     })
 }
 
-const deleteMatch = async (argId: number) => {
+export const deleteMatch = async (argId: number) => {
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/match/${argId}`,{
     
   })
@@ -49,7 +49,7 @@ const deleteMatch = async (argId: number) => {
     })
 }
 
-const fetchMatchLineups = async(argId: number) => {
+export const fetchMatchLineups = async(argId: number) => {
   return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -59,7 +59,17 @@ const fetchMatchLineups = async(argId: number) => {
     })
 }
 
-const addMatchLineup = async(argMatchId: number, argTeamId: number, argPlayerId: number) => {
+export const fetchMatchesLineups = async() => {
+  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/matches-lineups/`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export const addMatchLineup = async(argMatchId: number, argTeamId: number, argPlayerId: number) => {
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argMatchId}`, {
     idTeam: argTeamId,
     idPlayers: [argPlayerId]
@@ -72,7 +82,7 @@ const addMatchLineup = async(argMatchId: number, argTeamId: number, argPlayerId:
     })
 }
 
-const addLineupPlayers = async(argMatchId: number, argTeamId: number, argPlayerIds: Array<number>) => {
+export const addLineupPlayers = async(argMatchId: number, argTeamId: number, argPlayerIds: Array<number>) => {
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argMatchId}`, {
     idTeam: argTeamId,
     idPlayers: argPlayerIds
@@ -85,7 +95,7 @@ const addLineupPlayers = async(argMatchId: number, argTeamId: number, argPlayerI
     })
 }
 
-const deletePlayerLineup = async(argLineupId: number) => {
+export const deletePlayerLineup = async(argLineupId: number) => {
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argLineupId}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -96,7 +106,7 @@ const deletePlayerLineup = async(argLineupId: number) => {
 }
 
 
-const updateMatchLineup = async(argMatch: IMatch, argLineups: IPlayerLineupStats[]) => {
+export const updateMatchLineup = async(argMatch: IMatch, argLineups: IPlayerLineupStats[]) => {
   return await axiosProtected.put(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argMatch.id}`,{
     match: argMatch,
     lineups: argLineups
@@ -108,5 +118,3 @@ const updateMatchLineup = async(argMatch: IMatch, argLineups: IPlayerLineupStats
       return Promise.reject(error.response.data.message);
     })
 }
-
-export { createMatch, deleteMatch, fetchMatches, fetchMatch, fetchMatchLineups, addMatchLineup, deletePlayerLineup, addLineupPlayers, updateMatchLineup }

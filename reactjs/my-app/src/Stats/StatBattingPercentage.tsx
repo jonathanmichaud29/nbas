@@ -20,7 +20,6 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
       sluggingPercentage: sluggingTotal / atBats[index], // Single + (Double x 2) + (Triple x 3 ) + (Homerun x 4) / AtBats
       /* onBaseSluggingPercentage: 1.700, // OnBase + Slugging */
     });
-    return true;
   })
 
   const chartOptionsPercentage = {

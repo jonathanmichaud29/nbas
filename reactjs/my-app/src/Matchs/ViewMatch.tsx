@@ -95,7 +95,7 @@ function ViewMatch(props: IMatchProps) {
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       {/* { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> } */}
-      { /* match.isCompleted === 0 && */ isLoaded && (
+      { isLoaded && (
         <IconButton 
           key={`complete-match-${match.id}`}
           aria-label={`Complete match statistics`}

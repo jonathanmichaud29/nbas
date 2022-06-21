@@ -9,7 +9,8 @@ import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
-import { playerStatsColumns } from '../utils/dataGridColumns'
+import { playerExtendedStatsColumns } from '../utils/dataGridColumns'
+import { getStatHits,getStatSlugging } from '../utils/statsAggregation'
 
 function YearStats(props: IYearStatsProps) {
 
@@ -62,6 +63,20 @@ function YearStats(props: IYearStatsProps) {
         playerFound.out += matchLineup.out;
       }
     });
+    playersStats.every((playerStats) => {
+      const nbHits = getStatHits(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);
+      const sluggingTotal = getStatSlugging(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);
+      playerStats.battingAverage = ( nbHits / playerStats.atBats);
+      playerStats.sluggingPercentage = ( sluggingTotal / playerStats.atBats);
+      if( isNaN(playerStats.battingAverage) ) {
+        playerStats.battingAverage = 0;
+      }
+      if( isNaN(playerStats.sluggingPercentage) ) {
+        playerStats.sluggingPercentage = 0;
+      }
+      return true;
+    })
+    
     setAllTeamStats(teamStats);
     setAllPlayerStats(playersStats);
   }, [matchLineups]);
@@ -76,6 +91,8 @@ function YearStats(props: IYearStatsProps) {
       double: playerStats.double,
       triple: playerStats.triple,
       homerun: playerStats.homerun,
+      battingAverage: playerStats.battingAverage,
+      sluggingPercentage: playerStats.sluggingPercentage,
     }
   }) ) || [];
 
@@ -111,7 +128,7 @@ function YearStats(props: IYearStatsProps) {
 
           <DataGrid
             rows={rows}
-            columns={playerStatsColumns}
+            columns={playerExtendedStatsColumns}
             pageSize={20}
             rowsPerPageOptions={[20]}
             checkboxSelection

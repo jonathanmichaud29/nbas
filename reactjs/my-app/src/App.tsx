@@ -14,6 +14,7 @@ import PublicApp from './Public/PublicApp';
 import HomePage from './Public/HomePage'
 import PublicMatch from './Public/PublicMatch'
 import PublicPlayer from './Public/PublicPlayer'
+import PublicPlayersStats from './Public/PublicPlayersStats'
 import PublicTeam from './Public/PublicTeam'
 
 /**
@@ -39,6 +40,7 @@ function App() {
             <Route path="player/:id" element={<PublicPlayer />} />
             <Route path="team/:id" element={<PublicTeam />} />
             <Route path="match/:id" element={<PublicMatch />} />
+            <Route path="stats/players" element={<PublicPlayersStats />} />
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>

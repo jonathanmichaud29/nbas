@@ -74,6 +74,15 @@ exports.getMatchLineups = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 
+exports.getMatchesLineups = async (req, res, next) => {
+  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE idMatch", []);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customMessage = `all matches lineups retrieved`;
+  }
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
+};
+
 exports.createPlayerLineup = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No match id found", 404));
