@@ -49,4 +49,5 @@ export interface ITeamMatchResumeProps {
   players:      IPlayer[];
   teamHome:     ITeam;
   teamAway:     ITeam;
+  hideHeader?:   boolean
 }

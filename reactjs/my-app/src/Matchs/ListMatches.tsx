@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "../redux/store";
 import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
+import InfoIcon from '@mui/icons-material/Info';
 
 import { IMatch, IListMatchProps } from '../Interfaces/match';
 import { ITeam } from '../Interfaces/team';
@@ -111,6 +112,17 @@ function ListMatches(props: IListMatchProps) {
     <List>
       {listMatches.map((match: IMatch) => {
         let listActions = [];
+        listActions.push(
+          <IconButton 
+            key={`action-view-match-${match.id}`}
+            aria-label={`View Match ${match.id}`}
+            title={`View Match ${match.id}`}
+            >
+            <Link to={`/match/${match.id}`}>
+              <InfoIcon />
+            </Link>
+          </IconButton>
+        );
         if( isAdmin ) {
           listActions.push(
             <IconButton 

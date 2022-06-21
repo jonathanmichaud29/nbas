@@ -1,6 +1,6 @@
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
-const fetchPlayer = async (id: number) => {
+export const fetchPlayer = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/${id}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -10,7 +10,7 @@ const fetchPlayer = async (id: number) => {
     })
 }
 
-const fetchPlayerHistoryMatches = async (id: number) => {
+export const fetchPlayerHistoryMatches = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player-matches/${id}`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -20,7 +20,7 @@ const fetchPlayerHistoryMatches = async (id: number) => {
     })
 }
 
-const fetchPlayers = async () => {
+export const fetchPlayers = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)
     .then(response => {
       return Promise.resolve(response.data);
@@ -30,7 +30,7 @@ const fetchPlayers = async () => {
     })
 }
 
-const fetchSpecificPlayers = async(listIds: Array<number>) => {
+export const fetchSpecificPlayers = async(listIds: Array<number>) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/player/list/`, {
     listIds: listIds
   })
@@ -42,7 +42,7 @@ const fetchSpecificPlayers = async(listIds: Array<number>) => {
     })
 }
 
-const createPlayer = async (argName: string) => {
+export const createPlayer = async (argName: string) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/player/`,{
     name: argName
@@ -55,7 +55,7 @@ const createPlayer = async (argName: string) => {
     })
 }
 
-const deletePlayer = async (argId: number) => {
+export const deletePlayer = async (argId: number) => {
   return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/player/${argId}`,{
     
   })
@@ -66,5 +66,3 @@ const deletePlayer = async (argId: number) => {
       return Promise.reject(error.response.data.message);
     })
 }
-
-export { createPlayer, deletePlayer, fetchPlayers, fetchSpecificPlayers, fetchPlayer, fetchPlayerHistoryMatches }

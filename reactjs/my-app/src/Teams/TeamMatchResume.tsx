@@ -16,7 +16,7 @@ import { playerStatsColumns } from '../utils/dataGridColumns'
 
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
-  const {team, matchLineups, match, players, teamHome, teamAway} = props;
+  const {team, matchLineups, match, players, teamHome, teamAway, hideHeader} = props;
 
   const [allStats, setAllStats] = useState<IPlayerStats | null>(null);
 
@@ -66,9 +66,13 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
   
   return (
     <div>
-      <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
-      <p><b>{ match.idTeamWon === team.id ? 'Victory' : 'Defeat'}</b> - {match.teamHomePoints} VS {match.teamAwayPoints}</p>
-      <h4>Game Stats</h4>
+      { ! hideHeader && (
+        <>
+          <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
+          <p><b>{ match.idTeamWon === team.id ? 'Victory' : 'Defeat'}</b> - {match.teamHomePoints} VS {match.teamAwayPoints}</p>
+        </>
+      )}
+      <h4>{team.name} Stats</h4>
       { isLoaded && (
         <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
           <Grid container spacing={2}>

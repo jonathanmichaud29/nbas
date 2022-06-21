@@ -18,6 +18,10 @@ export interface IMatchProps{
   isAdmin?: boolean;
 }
 
+export interface IMatchDetailsProps {
+  match: IMatch;
+}
+
 export interface IListMatchProps{
   isAdmin?: boolean;
 }
