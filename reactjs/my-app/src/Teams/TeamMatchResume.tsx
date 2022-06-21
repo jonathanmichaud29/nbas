@@ -1,24 +1,24 @@
 import { useState, useEffect} from 'react';
 
-import { Box, Grid, Paper, Typography } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material";
+import { DataGrid, GridColDef} from '@mui/x-data-grid';
 
 import { createDateReadable } from '../utils/dateFormatter';
 
-import { IPlayer } from '../Interfaces/Player';
-import { ITeam, ITeamMatchResumeProps } from '../Interfaces/Team';
-import { IPlayerLineupStats } from "../Interfaces/Match";
+import { ITeamMatchResumeProps } from '../Interfaces/Team';
+import { IPlayerStats } from "../Interfaces/Match";
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
+import { playerStatsColumns } from '../utils/dataGridColumns'
 
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   const {team, matchLineups, match, players, teamHome, teamAway} = props;
 
-  const [allStats, setAllStats] = useState<IPlayerLineupStats | null>(null);
+  const [allStats, setAllStats] = useState<IPlayerStats | null>(null);
 
   const dateReadable = createDateReadable(match.date);
 
@@ -26,17 +26,17 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   useEffect(() => {
     // Add all stats from match lineups
-    let newStats: IPlayerLineupStats = {
-      lineupId: 0,
+    let newStats: IPlayerStats = {
+      id: 0,
       atBats: 0,
       single: 0,
       double: 0,
       triple: 0,
       homerun: 0,
       out: 0,
-      hitOrder: 0,
     };
     matchLineups.forEach((matchLineup) => {
+      newStats.id = matchLineup.idPlayer;
       newStats.atBats += matchLineup.atBats;
       newStats.single += matchLineup.single;
       newStats.double += matchLineup.double;
@@ -50,6 +50,20 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
     matchLineups.sort((a,b) => a.hitOrder - b.hitOrder);
   }, [matchLineups])
 
+
+  const rows = ( matchLineups && matchLineups.map((playerStats) => {
+    return {
+      id: playerStats.idPlayer,
+      playerName: getPlayerName(playerStats.idPlayer, players),
+      atBats: playerStats.atBats,
+      out: playerStats.out,
+      single: playerStats.single,
+      double: playerStats.double,
+      triple: playerStats.triple,
+      homerun: playerStats.homerun,
+    }
+  }) ) || [];
+  
   return (
     <div>
       <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
@@ -83,38 +97,16 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
             </Grid>
           </Grid>
 
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Player</TableCell>
-                  <TableCell>Bat Order</TableCell>
-                  <TableCell>At Bats</TableCell>
-                  <TableCell>Out</TableCell>
-                  <TableCell>Single</TableCell>
-                  <TableCell>Double</TableCell>
-                  <TableCell>Triple</TableCell>
-                  <TableCell>Homerun</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                { matchLineups.map((matchLineup) => {
-                  return (
-                    <TableRow>
-                      <TableCell>{getPlayerName(matchLineup.idPlayer, players)}</TableCell>
-                      <TableCell>{matchLineup.hitOrder}</TableCell>
-                      <TableCell>{matchLineup.atBats}</TableCell>
-                      <TableCell>{matchLineup.out}</TableCell>
-                      <TableCell>{matchLineup.single}</TableCell>
-                      <TableCell>{matchLineup.double}</TableCell>
-                      <TableCell>{matchLineup.triple}</TableCell>
-                      <TableCell>{matchLineup.homerun}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <DataGrid
+            rows={rows}
+            columns={playerStatsColumns}
+            pageSize={20}
+            rowsPerPageOptions={[20]}
+            checkboxSelection
+            disableSelectionOnClick
+            getRowId={(row) => row.id + "-match-" + match.id}
+            autoHeight={true}
+          />
         </Box>
       )}
     </div>

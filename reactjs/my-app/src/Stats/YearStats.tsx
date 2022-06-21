@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import { Box, Grid, Paper, Typography } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
 
-import { IPlayer } from "../Interfaces/Player";
 import { IPlayerStats, IPlayerLineupStats } from "../Interfaces/Match";
 import { IYearStatsProps } from '../Interfaces/Generic';
 
@@ -11,6 +10,7 @@ import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
+import { playerStatsColumns } from '../utils/dataGridColumns'
 
 function YearStats(props: IYearStatsProps) {
 
@@ -19,7 +19,7 @@ function YearStats(props: IYearStatsProps) {
   const [allTeamStats, setAllTeamStats] = useState<IPlayerLineupStats | null>(null);
   const [allPlayerStats, setAllPlayerStats] = useState<IPlayerStats[] | null>(null);
 
-  const isLoaded = allTeamStats !== null;
+  const isLoaded = allTeamStats !== null && allPlayerStats !== null;
 
   useEffect(() => {
     let playersStats = [] as IPlayerStats[];
@@ -33,15 +33,7 @@ function YearStats(props: IYearStatsProps) {
       out: 0,
       hitOrder: 0,
     };
-    const templatePlayerStats: IPlayerStats = {
-      id: 0,
-      atBats: 0,
-      single: 0,
-      double: 0,
-      triple: 0,
-      homerun: 0,
-      out: 0,
-    };
+    
     matchLineups.forEach((matchLineup) => {
       teamStats.atBats += matchLineup.atBats;
       teamStats.single += matchLineup.single;
@@ -73,7 +65,20 @@ function YearStats(props: IYearStatsProps) {
     });
     setAllTeamStats(teamStats);
     setAllPlayerStats(playersStats);
-  }, [matchLineups])
+  }, [matchLineups]);
+
+
+  const rows = ( allPlayerStats && allPlayerStats.map((playerStats) => {
+    return {
+      playerName: getPlayerName(playerStats.id, players),
+      atBats: playerStats.atBats,
+      out: playerStats.out,
+      single: playerStats.single,
+      double: playerStats.double,
+      triple: playerStats.triple,
+      homerun: playerStats.homerun,
+    }
+  }) ) || [];
 
   return (
     <div>
@@ -106,36 +111,16 @@ function YearStats(props: IYearStatsProps) {
             </Grid>
           </Grid>
 
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Player</TableCell>
-                  <TableCell>At Bats</TableCell>
-                  <TableCell>Out</TableCell>
-                  <TableCell>Single</TableCell>
-                  <TableCell>Double</TableCell>
-                  <TableCell>Triple</TableCell>
-                  <TableCell>Homerun</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                { allPlayerStats && allPlayerStats.map((playerStats) => {
-                  return (
-                    <TableRow>
-                      <TableCell>{getPlayerName(playerStats.id, players)}</TableCell>
-                      <TableCell>{playerStats.atBats}</TableCell>
-                      <TableCell>{playerStats.out}</TableCell>
-                      <TableCell>{playerStats.single}</TableCell>
-                      <TableCell>{playerStats.double}</TableCell>
-                      <TableCell>{playerStats.triple}</TableCell>
-                      <TableCell>{playerStats.homerun}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <DataGrid
+            rows={rows}
+            columns={playerStatsColumns}
+            pageSize={20}
+            rowsPerPageOptions={[20]}
+            checkboxSelection
+            disableSelectionOnClick
+            getRowId={(row) => row.playerName}
+            autoHeight={true}
+          />
         </Box>
       )}
     </div>
