@@ -4,7 +4,6 @@ import { Alert, Box, CircularProgress  } from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
-import { IPlayerStatsExtended } from '../Interfaces/stats';
 
 import { fetchPlayers } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';

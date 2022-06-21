@@ -40,7 +40,7 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
         min: 0,
         suggestedMax: 1,
       }
-     }
+    }
     
   };
   const labelsChart = columns;
