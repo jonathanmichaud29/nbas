@@ -40,8 +40,6 @@ function PublicMenu() {
         <ListItem><Link to="/stats/players">Players Stats</Link></ListItem>
         { renderPublicLinks() }
         { renderAdminLinks() }
-
-        
       </List>
     </div>
   )

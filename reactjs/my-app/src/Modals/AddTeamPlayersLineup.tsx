@@ -72,31 +72,6 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
       });
   }, [allMatchPlayers, selectedTeam]);
 
-
-  /* useEffect(() => {
-    if( listTeamsPlayers === null) return;
-
-    const listActivePlayerIds = allMatchPlayers?.lineupPlayers.map((lineupPlayer: IMatchLineup) => lineupPlayer.idPlayer) || [];
-    
-    // Player's Categorisation and add new attributes helping to sort them in the list
-    let listOrderPlayers: IOrderPlayers[] = allPlayers.map((player: IPlayer) => {
-      const teamPlayerFound = listTeamsPlayers.find((teamPlayer) => teamPlayer.playerId === player.id) || null;
-      return {
-        currentTeamName: ( teamPlayerFound === null ? 'Reservist' : teamPlayerFound.teamName ),
-        priority: ( teamPlayerFound !== null && teamPlayerFound.teamId === selectedTeam.id ? 1 : 0 ),
-        ...player
-      }
-    });
-    
-    // Remove Player's Categorisation that are actually in this match lineup
-    listOrderPlayers = listOrderPlayers.filter((orderPlayer: IOrderPlayers) => {
-      return listActivePlayerIds.find((elem: number) => elem === orderPlayer.id ) === undefined
-    })
-    // Order them by priority, then team name and player name
-    listOrderPlayers.sort((a,b) => b.priority - a.priority || -b.currentTeamName.localeCompare(a.currentTeamName) || -b.name.localeCompare(a.name) )
-    setOrderPlayersByTeam(listOrderPlayers);
-  },[allMatchPlayers?.lineupPlayers, allPlayers, listTeamsPlayers, selectedTeam.id]) */
-
   /**
    * Form behaviors
    */
@@ -126,6 +101,16 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
             homerun: 0,
             out: 0,
             hitOrder: 0,
+            hitByPitch: 0,
+            walk: 0,
+            strikeOut: 0,
+            stolenBase: 0,
+            caughtStealing: 0,
+            plateAppearance: 0,
+            sacrificeBunt: 0,
+            sacrificeFly: 0,
+            runsBattedIn: 0,
+            hit: 0,
           } as IMatchLineup);
           
         }
@@ -137,39 +122,8 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
       })
       .finally(() => {
         setRequestStatus(false);
-        /* setModalOpen(true); */
       });
-    /* setRequestStatus(true);
-    reinitializeApiMessages();
- 
-    addMatchLineup(match.id, selectedTeam.id, data.player.id)
-      .then((response) =>{
-        reset()
-        setIncrementAcIndex(incrementAcIndex+1);
-        changeApiSuccess(response.message);
-        setOrderPlayersByTeam(orderPlayersByTeam.filter((player: IOrderPlayers) => player.id !== response.data.idPlayer));
-        const newPlayer = {
-          id: response.data.id,
-          idMatch: match.id,
-          idTeam: selectedTeam.id,
-          idPlayer: response.data.idPlayer,
-          atBats: 0,
-          single: 0,
-          double: 0,
-          triple: 0,
-          homerun: 0,
-          out: 0,
-          hitOrder: 0,
-        } as IMatchLineup;
-        dispatch(addMatchPlayer(match,newPlayer));
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        setRequestStatus(false);
-      }) */
-      
+    
   }
 
   const handleCheckPlayer = (checkedPlayer:ITeamPlayers) => {

@@ -128,6 +128,16 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
           homerun: 0,
           out: 0,
           hitOrder: 0,
+          hitByPitch: 0,
+          walk: 0,
+          strikeOut: 0,
+          stolenBase: 0,
+          caughtStealing: 0,
+          plateAppearance: 0,
+          sacrificeBunt: 0,
+          sacrificeFly: 0,
+          runsBattedIn: 0,
+          hit: 0,
         } as IMatchLineup;
         dispatch(addMatchPlayer(match,newPlayer));
       })

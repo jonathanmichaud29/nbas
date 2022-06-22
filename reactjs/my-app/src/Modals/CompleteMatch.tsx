@@ -4,19 +4,20 @@ import { createSelector } from 'reselect'
 import { SubmitHandler, useForm, useFieldArray, FormProvider } from "react-hook-form";
 
 import { Alert, Paper, Button, Box, Grid, Modal, Typography } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material"
+import HelpIcon from '@mui/icons-material/Help';
 
 import { AppDispatch, RootState } from "../redux/store";
 
 import { fetchMatchLineups, updateMatchLineup } from '../ApiCall/matches';
 
 import { IPlayerLineupStats } from "../Interfaces/stats";
-import { ICompleteMatchProps, IMatchLineup } from '../Interfaces/match'
+import { ICompleteMatchProps, IMatchLineup, IMatchPlayers } from '../Interfaces/match'
 
 import FormNumberInput from '../Forms/FormNumberInput';
 
 import { castNumber } from '../utils/castValues';
-import styleModal from './styleModal'
+import styleModalLarge from './styleModalLarge'
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
 import { getPlayerName } from '../utils/dataAssociation';
@@ -98,6 +99,16 @@ function CompleteMatch(props: ICompleteMatchProps) {
       triple: lineupPlayer.triple,
       homerun: lineupPlayer.homerun,
       out: lineupPlayer.out,
+      hitByPitch: lineupPlayer.hitByPitch,
+      walk: lineupPlayer.walk,
+      strikeOut: lineupPlayer.strikeOut,
+      stolenBase: lineupPlayer.stolenBase,
+      caughtStealing: lineupPlayer.caughtStealing,
+      plateAppearance: lineupPlayer.plateAppearance,
+      sacrificeBunt: lineupPlayer.sacrificeBunt,
+      sacrificeFly: lineupPlayer.sacrificeFly,
+      runsBattedIn: lineupPlayer.runsBattedIn,
+      hit: lineupPlayer.hit,
     }));
     teamAwayPlayers.forEach((lineupPlayer: IMatchLineup) => append({
       lineupId: lineupPlayer.id, 
@@ -108,6 +119,16 @@ function CompleteMatch(props: ICompleteMatchProps) {
       triple: lineupPlayer.triple,
       homerun: lineupPlayer.homerun,
       out: lineupPlayer.out,
+      hitByPitch: lineupPlayer.hitByPitch,
+      walk: lineupPlayer.walk,
+      strikeOut: lineupPlayer.strikeOut,
+      stolenBase: lineupPlayer.stolenBase,
+      caughtStealing: lineupPlayer.caughtStealing,
+      plateAppearance: lineupPlayer.plateAppearance,
+      sacrificeBunt: lineupPlayer.sacrificeBunt,
+      sacrificeFly: lineupPlayer.sacrificeFly,
+      runsBattedIn: lineupPlayer.runsBattedIn,
+      hit: lineupPlayer.hit,
     }));
   }, [allMatchPlayers, teamHome, teamAway, setValue, append, remove]);
 
@@ -128,14 +149,24 @@ function CompleteMatch(props: ICompleteMatchProps) {
     // Cast possible string values to numbers
     const formattedPlayerStats = data.playerStats.map((lineup: IPlayerLineupStats) => {
       return {
-        hitOrder:   castNumber(lineup.hitOrder),
-        atBats:     castNumber(lineup.atBats),
-        single:     castNumber(lineup.single),
-        double:     castNumber(lineup.double),
-        triple:     castNumber(lineup.triple),
-        homerun:    castNumber(lineup.homerun),
-        lineupId:   castNumber(lineup.lineupId),
-        out:        castNumber(lineup.out)
+        hitOrder:         castNumber(lineup.hitOrder),
+        atBats:           castNumber(lineup.atBats),
+        single:           castNumber(lineup.single),
+        double:           castNumber(lineup.double),
+        triple:           castNumber(lineup.triple),
+        homerun:          castNumber(lineup.homerun),
+        lineupId:         castNumber(lineup.lineupId),
+        out:              castNumber(lineup.out),
+        hitByPitch:       castNumber(lineup.hitByPitch),
+        walk:             castNumber(lineup.walk),
+        strikeOut:        castNumber(lineup.strikeOut),
+        stolenBase:       castNumber(lineup.stolenBase),
+        caughtStealing:   castNumber(lineup.caughtStealing),
+        plateAppearance:  castNumber(lineup.plateAppearance),
+        sacrificeBunt:    castNumber(lineup.sacrificeBunt),
+        sacrificeFly:     castNumber(lineup.sacrificeFly),
+        runsBattedIn:     castNumber(lineup.runsBattedIn),
+        hit:              castNumber(lineup.hit),
       }
     })
 
@@ -165,7 +196,7 @@ function CompleteMatch(props: ICompleteMatchProps) {
         onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
       >
-        <Box sx={styleModal}>
+        <Box sx={styleModalLarge}>
           <Typography id="modal-modal-title" variant="h6" component="h2" align="center">
             Complete Match #<b>{match.id}</b>
           </Typography>
@@ -199,13 +230,70 @@ function CompleteMatch(props: ICompleteMatchProps) {
                       <TableHead>
                         <TableRow>
                           <TableCell>Player</TableCell>
-                          <TableCell align="center">Bat Order</TableCell>
-                          <TableCell align="center">At Bats</TableCell>
-                          <TableCell align="center">Out</TableCell>
-                          <TableCell align="center">Single</TableCell>
-                          <TableCell align="center">Double</TableCell>
-                          <TableCell align="center">Triple</TableCell>
-                          <TableCell align="center">Homerun</TableCell>
+                          <TableCell align="center">
+                            <span>Bat Order</span>
+                            <Tooltip title="Batting Order during a match."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Plate Appearance</span>
+                            <Tooltip title="The number of times a player has taken his turn at bat."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>At Bats</span>
+                            <Tooltip title="Trips to the plate that do not result in a walk, hit by pitch, sacrifice, or reach on interference."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Hit Out</span>
+                            <Tooltip title="When a batter does not make a safe hit. "><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Strike Out</span>
+                            <Tooltip title="When the umpire calls three strikes on the batter."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Walk</span>
+                            <Tooltip title="When a batter is awarded first base after four balls have been called by the umpire or the opposing team opts to intentionally award the batter first base."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Hits</span>
+                            <Tooltip title="When a batter reaches base safely on a fair ball unless the batter is deemed by the official scorer to have reached on an error or a fielder's choice."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Single</span>
+                            <Tooltip title="When a batter reaches base safely on a fair ball unless the batter is deemed by the official scorer to have reached on an error or a fielder's choice."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Double</span>
+                            <Tooltip title="When a batter reaches on a hit and stops at second base or only advances farther than second base on an error or a fielder's attempt to put out another baserunner."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Triple</span>
+                            <Tooltip title="When a batter reaches on a hit and stops at third base or only advances farther than third base on an error or a fielder's attempt to put out another baserunner."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Homerun</span>
+                            <Tooltip title="When a batter reaches on a hit, touches all bases, and scores a run without a putout recorded or the benefit of error"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Runs Batted In</span>
+                            <Tooltip title="Runs which score because of the batter's safe hit, sac bunt, sac fly, infield out or fielder's choice or is forced to score by a bases loaded walk, hit batter, or interference"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Sacrifice Bunt</span>
+                            <Tooltip title="When a batter advances one or more runners at least one base with a bunt"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Sacrifice Fly</span>
+                            <Tooltip title="When a batter hits a fly ball to the outfield that is caught and a runner scores"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Stolen Base</span>
+                            <Tooltip title="When the runner advances one base unaided by a hit, a putout, an error, a force-out, a fielder's choice, a passed ball, a wild pitch or a walk"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Caught Stealing</span>
+                            <Tooltip title="When a runner attemps to steal but is tagged out before safely attaining the next base"><HelpIcon /></Tooltip>
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -228,6 +316,15 @@ function CompleteMatch(props: ICompleteMatchProps) {
                             </TableCell>
                             <TableCell>
                               <FormNumberInput
+                                label={`PA`}
+                                controllerName={`playerStats.${currentFieldIndex}.plateAppearance`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
                                 label={`AB`}
                                 controllerName={`playerStats.${currentFieldIndex}.atBats`}
                                 controllerKey={currentField.id}
@@ -237,8 +334,35 @@ function CompleteMatch(props: ICompleteMatchProps) {
                             </TableCell>
                             <TableCell>
                               <FormNumberInput
-                                label={`Out`}
+                                label={`Hit Out`}
                                 controllerName={`playerStats.${currentFieldIndex}.out`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Strike Out`}
+                                controllerName={`playerStats.${currentFieldIndex}.strikeOut`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Walk`}
+                                controllerName={`playerStats.${currentFieldIndex}.walk`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Hit`}
+                                controllerName={`playerStats.${currentFieldIndex}.hit`}
                                 controllerKey={currentField.id}
                                 fieldMinValue={0}
                                 isRequired={true}
@@ -280,6 +404,51 @@ function CompleteMatch(props: ICompleteMatchProps) {
                                 isRequired={true}
                               />
                             </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`RBI`}
+                                controllerName={`playerStats.${currentFieldIndex}.runsBattedIn`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SAC`}
+                                controllerName={`playerStats.${currentFieldIndex}.sacrificeBunt`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SF`}
+                                controllerName={`playerStats.${currentFieldIndex}.sacrificeFly`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SB`}
+                                controllerName={`playerStats.${currentFieldIndex}.stolenBase`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`HR`}
+                                controllerName={`playerStats.${currentFieldIndex}.caughtStealing`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
                             
                           </TableRow>
                           )
@@ -294,16 +463,73 @@ function CompleteMatch(props: ICompleteMatchProps) {
                   </Typography>
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                      <TableHead>
+                    <TableHead>
                         <TableRow>
                           <TableCell>Player</TableCell>
-                          <TableCell align="center">Bat Order</TableCell>
-                          <TableCell align="center">At Bats</TableCell>
-                          <TableCell align="center">Out</TableCell>
-                          <TableCell align="center">Single</TableCell>
-                          <TableCell align="center">Double</TableCell>
-                          <TableCell align="center">Triple</TableCell>
-                          <TableCell align="center">Homerun</TableCell>
+                          <TableCell align="center">
+                            <span>Bat Order</span>
+                            <Tooltip title="Batting Order during a match."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Plate Appearance</span>
+                            <Tooltip title="The number of times a player has taken his turn at bat."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>At Bats</span>
+                            <Tooltip title="Trips to the plate that do not result in a walk, hit by pitch, sacrifice, or reach on interference."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Hit Out</span>
+                            <Tooltip title="When a batter does not make a safe hit. "><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Strike Out</span>
+                            <Tooltip title="When the umpire calls three strikes on the batter."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Walk</span>
+                            <Tooltip title="When a batter is awarded first base after four balls have been called by the umpire or the opposing team opts to intentionally award the batter first base."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Hits</span>
+                            <Tooltip title="When a batter reaches base safely on a fair ball unless the batter is deemed by the official scorer to have reached on an error or a fielder's choice."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Single</span>
+                            <Tooltip title="When a batter reaches base safely on a fair ball unless the batter is deemed by the official scorer to have reached on an error or a fielder's choice."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Double</span>
+                            <Tooltip title="When a batter reaches on a hit and stops at second base or only advances farther than second base on an error or a fielder's attempt to put out another baserunner."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Triple</span>
+                            <Tooltip title="When a batter reaches on a hit and stops at third base or only advances farther than third base on an error or a fielder's attempt to put out another baserunner."><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Homerun</span>
+                            <Tooltip title="When a batter reaches on a hit, touches all bases, and scores a run without a putout recorded or the benefit of error"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Runs Batted In</span>
+                            <Tooltip title="Runs which score because of the batter's safe hit, sac bunt, sac fly, infield out or fielder's choice or is forced to score by a bases loaded walk, hit batter, or interference"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Sacrifice Bunt</span>
+                            <Tooltip title="When a batter advances one or more runners at least one base with a bunt"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Sacrifice Fly</span>
+                            <Tooltip title="When a batter hits a fly ball to the outfield that is caught and a runner scores"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Stolen Base</span>
+                            <Tooltip title="When the runner advances one base unaided by a hit, a putout, an error, a force-out, a fielder's choice, a passed ball, a wild pitch or a walk"><HelpIcon /></Tooltip>
+                          </TableCell>
+                          <TableCell align="center">
+                            <span>Caught Stealing</span>
+                            <Tooltip title="When a runner attemps to steal but is tagged out before safely attaining the next base"><HelpIcon /></Tooltip>
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -326,6 +552,15 @@ function CompleteMatch(props: ICompleteMatchProps) {
                             </TableCell>
                             <TableCell>
                               <FormNumberInput
+                                label={`PA`}
+                                controllerName={`playerStats.${currentFieldIndex}.plateAppearance`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
                                 label={`AB`}
                                 controllerName={`playerStats.${currentFieldIndex}.atBats`}
                                 controllerKey={currentField.id}
@@ -335,8 +570,35 @@ function CompleteMatch(props: ICompleteMatchProps) {
                             </TableCell>
                             <TableCell>
                               <FormNumberInput
-                                label={`Out`}
+                                label={`Hit Out`}
                                 controllerName={`playerStats.${currentFieldIndex}.out`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Strike Out`}
+                                controllerName={`playerStats.${currentFieldIndex}.strikeOut`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Walk`}
+                                controllerName={`playerStats.${currentFieldIndex}.walk`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`Hit`}
+                                controllerName={`playerStats.${currentFieldIndex}.hit`}
                                 controllerKey={currentField.id}
                                 fieldMinValue={0}
                                 isRequired={true}
@@ -373,6 +635,51 @@ function CompleteMatch(props: ICompleteMatchProps) {
                               <FormNumberInput
                                 label={`HR`}
                                 controllerName={`playerStats.${currentFieldIndex}.homerun`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`RBI`}
+                                controllerName={`playerStats.${currentFieldIndex}.runsBattedIn`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SAC`}
+                                controllerName={`playerStats.${currentFieldIndex}.sacrificeBunt`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SF`}
+                                controllerName={`playerStats.${currentFieldIndex}.sacrificeFly`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`SB`}
+                                controllerName={`playerStats.${currentFieldIndex}.stolenBase`}
+                                controllerKey={currentField.id}
+                                fieldMinValue={0}
+                                isRequired={true}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <FormNumberInput
+                                label={`HR`}
+                                controllerName={`playerStats.${currentFieldIndex}.caughtStealing`}
                                 controllerKey={currentField.id}
                                 fieldMinValue={0}
                                 isRequired={true}

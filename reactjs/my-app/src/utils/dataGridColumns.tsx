@@ -96,7 +96,6 @@ export const playerExtendedStatsColumns: GridColDef[] = [
     field: 'actions',
     headerName: 'Links',
     renderCell: (params: GridRenderCellParams<any>) => {
-      console.log(params);
       return (
         <IconButton 
           key={`action-view-player-${params.row.id}`}

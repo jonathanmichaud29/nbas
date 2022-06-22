@@ -46,6 +46,16 @@ export interface IMatchLineup {
   homerun: number;
   out: number;
   hitOrder: number;
+  hitByPitch: number;
+  walk: number;
+  strikeOut: number;
+  stolenBase: number;
+  caughtStealing: number;
+  plateAppearance: number;
+  sacrificeBunt: number;
+  sacrificeFly: number;
+  runsBattedIn: number;
+  hit: number;
 }
 
 export interface IMatchPlayers {
