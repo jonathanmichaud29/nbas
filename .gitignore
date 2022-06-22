@@ -3,5 +3,4 @@
 .env.test
 .env.production
 
-build
 node_modules
