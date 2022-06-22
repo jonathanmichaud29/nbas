@@ -4,13 +4,15 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --ignore node_modules/ --watch /app /app/app.js"
+    "dev": "nodemon --ignore node_modules/ --watch /app /app/app.js",
+    "build": "node ./app/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "firebase": "^9.8.2",
     "firebase-admin": "^10.2.0",
