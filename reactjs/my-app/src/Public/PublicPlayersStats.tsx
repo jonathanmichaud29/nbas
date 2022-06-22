@@ -56,7 +56,7 @@ function PublicPlayersStats() {
 
   return (
     <div className="public-layout">
-      <h1>Players Stats</h1>
+      <h1>League Players Standing</h1>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && (

@@ -1,4 +1,8 @@
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Link } from 'react-router-dom';
+
+import { IconButton } from "@mui/material";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 export const playerStatsColumns: GridColDef[] = [
   { field: 'id', headerName: 'ID', hide: true},
@@ -88,4 +92,22 @@ export const playerExtendedStatsColumns: GridColDef[] = [
     type: 'number',
     description: "Slugging Percentage = Total Hits value ( Single + Double*2 + Triple*3 + Homerun*4 ) divided by the number of times a hit occured",
   },
+  {
+    field: 'actions',
+    headerName: 'Links',
+    renderCell: (params: GridRenderCellParams<any>) => {
+      console.log(params);
+      return (
+        <IconButton 
+          key={`action-view-player-${params.row.id}`}
+          aria-label={`${params.row.playerName} Profile`}
+          title={`${params.row.playerName} Profile`}
+          >
+          <Link to={`/player/${params.row.id}`}>
+            <AccountBoxIcon />
+          </Link>
+        </IconButton>
+      )
+    }
+  }
 ];

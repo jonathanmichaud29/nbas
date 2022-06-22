@@ -84,6 +84,7 @@ function YearStats(props: IYearStatsProps) {
 
   const rows = ( allPlayerStats && allPlayerStats.map((playerStats) => {
     return {
+      id: playerStats.id,
       playerName: getPlayerName(playerStats.id, players),
       atBats: playerStats.atBats,
       out: playerStats.out,
