@@ -1,12 +1,40 @@
 version: "3.9"
 
+x-nginx-conf:
+  &nginx-conf
+  type: bind
+  source: ./nginx/conf.d
+  target: /
+
 services:
+  nbas-nginx:
+    container_name: nbas-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    #links:
+    #  - wp-consultationj
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - <<: *nginx-conf
+        target:  /etc/nginx/conf.d
+      - ./nginx/default/nginx.conf:/etc/nginx/nginx.conf
+      #- <<: *public-html
+      #  target:  /var/www/html
+    depends_on:
+      - nbas-reactjs
+      - nbas-api
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
   nbas-api:
+    container_name: nbas-api
     build:
       context: api
       dockerfile: Dockerfile
-    env_file:
-      - .env
+    #env_file:
+    #  - .env
     ports:
       - 4000:4000
     volumes:
@@ -19,17 +47,18 @@ services:
     tty: true        # docker run -t
 
   nbas-reactjs:
+    container_name: nbas-reactjs
     build:
       context: reactjs
       dockerfile: Dockerfile
-      args:
-        FIREBASE_APIKEY: ${FIREBASE_APIKEY}
-        FIREBASE_AUTHDOMAIN: ${FIREBASE_AUTHDOMAIN}
-        FIREBASE_PROJECTID: ${FIREBASE_PROJECTID}
-        FIREBASE_STORAGEBUCKET: ${FIREBASE_STORAGEBUCKET}
-        FIREBASE_MESSAGINGSENDERID: ${FIREBASE_MESSAGINGSENDERID}
-        FIREBASE_APPID: ${FIREBASE_APPID}
-        API_DOMAIN: ${API_DOMAIN}
+      #args:
+      #  FIREBASE_APIKEY: ${FIREBASE_APIKEY}
+      #  FIREBASE_AUTHDOMAIN: ${FIREBASE_AUTHDOMAIN}
+      #  FIREBASE_PROJECTID: ${FIREBASE_PROJECTID}
+      #  FIREBASE_STORAGEBUCKET: ${FIREBASE_STORAGEBUCKET}
+      #  FIREBASE_MESSAGINGSENDERID: ${FIREBASE_MESSAGINGSENDERID}
+      #  FIREBASE_APPID: ${FIREBASE_APPID}
+      #  API_DOMAIN: ${API_DOMAIN}
     ports:
       - 3000:3000
     volumes:
@@ -42,6 +71,12 @@ services:
       - type: bind
         source: ./reactjs/my-app/tsconfig.json
         target: /app/tsconfig.json
+      - type: bind
+        source: ./reactjs/my-app/.env.development
+        target: /app/.env.development
+      - type: bind
+        source: ./reactjs/my-app/.env.production
+        target: /app/.env.production
     depends_on:
       - nbas-mysql
     stdin_open: true # docker run -i
@@ -51,8 +86,8 @@ services:
     image: mysql:8.0
     cap_add:
       - SYS_NICE
-    env_file:
-      - .env
+    #env_file:
+    #  - .env
     ports:
       - 3306:3306
     volumes:

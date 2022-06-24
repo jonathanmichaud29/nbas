@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --ignore node_modules/ --watch /app /app/app.js",
-    "build": "node ./app/app.js"
+    "dev": "NODE_ENV=development nodemon --ignore node_modules/ --watch /app /app/app.js",
+    "build": "NODE_ENV=production node ./app/app.js"
   },
   "keywords": [],
   "author": "",
