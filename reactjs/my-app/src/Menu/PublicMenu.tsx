@@ -1,47 +1,106 @@
-import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../Firebase/firebase";
-import { Link } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
-import { List, ListItem  } from "@mui/material";
+import { auth } from "../Firebase/firebase";
+
+import { Avatar, Box, Button, Grid, List, ListItem, Menu, MenuItem } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { pink } from '@mui/material/colors';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+
+
+
+import logo from '../assets/logo.jpg'
+import './_publicMenu.scss';
+
+
 
 function PublicMenu() {
   const [user, loading] = useAuthState(auth);
-
-  useEffect(() => {
-    if (loading) return;
-  }, [user, loading]);
+  const location = useLocation();
+  const { pathname } = location;
+  console.log("location", location, "pathname", pathname);
 
   const renderPublicLinks = () => {
-    if( ! loading && ! user ) {
+    const links = [
+      {
+        label:"Player Stats",
+        url: "/stats/players",
+      },
+      {
+        label:"Teams Stats",
+        url: "/stats/teams",
+      },
+      {
+        label:"Calendar",
+        url: "/stats/calendar",
+      }
+    ];
+    return links.map((link, index) => {
       return (
-        <ListItem><Link to="/admin/login">Login</Link></ListItem>
+        <ListItem key={`public-menu-${index}`}><NavLink to={link.url}>{link.label}</NavLink></ListItem>
       )
-    }
+    })
   }
-
-  const renderAdminLinks = () => {
-    if( ! loading && user ) {
-      return (
-        <>
-          <ListItem><Link to="/admin/dashboard">Dashboard</Link></ListItem>
-          <ListItem><Link to="/admin/teams">Teams</Link></ListItem>
-          <ListItem><Link to="/admin/players">Players</Link></ListItem>
-          <ListItem><Link to="/admin/calendar">Calendar</Link></ListItem>
-        </>
-      )
-    }
+  const renderUserLinks = () => {
+    if( loading ) return;
+    const links = ( user ? [
+      {
+        label:"User Profile",
+        url: "/admin/dashboard",
+      },
+      {
+        label:"Players",
+        url: "/admin/players",
+      },
+      {
+        label:"Teams",
+        url: "/admin/teams",
+      },
+      {
+        label:"Calendar",
+        url: "/admin/calendar",
+      },
+    ]
+    : [
+      {
+        label:"Login",
+        url: "/admin/login",
+      }
+    ]);
+    
+    return links.map((link, index) => <MenuItem key={`user-menu-${index}`}><NavLink to={link.url}>{link.label}</NavLink></MenuItem>)
   }
 
   return (
-    <div className="main-menu">
-      <List dense={true}>
-        <ListItem><Link to="/">Home</Link></ListItem>
-        <ListItem><Link to="/stats/players">Players Stats</Link></ListItem>
-        { renderPublicLinks() }
-        { renderAdminLinks() }
-      </List>
-    </div>
+    <Box id="header">
+      <Grid container>
+        <Grid item xs={2} className="logo">
+          <NavLink to="/"><img src={logo} alt="Home" /></NavLink>
+        </Grid>
+        <Grid item xs={8} className="publicLinks">
+          <List>
+            { renderPublicLinks() }
+          </List>
+        </Grid>
+        <Grid item xs={2} className="privateLinks">
+          <PopupState variant="popover" popupId="popup-admin">
+            {(popupState) => (
+              <>
+                <Button {...bindTrigger(popupState)}>
+                  <Avatar sx={{ bgcolor: pink[500] }}>
+                    <AccountCircleIcon />
+                  </Avatar>
+                </Button>
+                <Menu {...bindMenu(popupState)}>
+                  { renderUserLinks() }
+                </Menu>
+              </>
+            )}
+          </PopupState>
+        </Grid>
+      </Grid>
+    </Box>
   )
 }
 export default PublicMenu;

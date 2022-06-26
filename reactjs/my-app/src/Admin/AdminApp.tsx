@@ -3,7 +3,6 @@ import PublicMenu from "../Menu/PublicMenu";
 function AdminApp() {
   return (
     <div className="public-layout">
-      <h1>Admin App</h1>
       <PublicMenu />
       <Outlet />
     </div>

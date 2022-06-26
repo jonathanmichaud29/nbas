@@ -26,6 +26,7 @@ const db = getFirestore(app);
 const generateMessageFromFirebaseErrorCode = (err: any) => {
   let sError = "Unknown error validating user credential";
   switch(err.code){
+    case "auth/invalid-email":
     case "auth/wrong-password":
     case "auth/user-not-found":
       sError = "Invalid user or password";
@@ -41,9 +42,11 @@ const generateMessageFromFirebaseErrorCode = (err: any) => {
 
 const logInWithEmailAndPassword = async (email: string, password: string) => {
   try {
-    return await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return Promise.resolve(result);
   } catch (err: any) {
-    throw TypeError(generateMessageFromFirebaseErrorCode(err));
+    //throw TypeError(generateMessageFromFirebaseErrorCode(err));
+    return Promise.reject(generateMessageFromFirebaseErrorCode(err));
   }
 };
 
