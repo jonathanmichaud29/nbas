@@ -24,6 +24,7 @@ function YearStats(props: IYearStatsProps) {
   useEffect(() => {
     let playersStats = [] as IPlayerStatsExtended[];
     let teamStats: ITeamStats = {
+      id: 0,
       atBats: 0,
       single: 0,
       double: 0,
@@ -33,6 +34,7 @@ function YearStats(props: IYearStatsProps) {
     };
     
     matchLineups.forEach((matchLineup) => {
+      teamStats.id = matchLineup.idTeam;
       teamStats.atBats += matchLineup.atBats;
       teamStats.single += matchLineup.single;
       teamStats.double += matchLineup.double;
@@ -101,12 +103,9 @@ function YearStats(props: IYearStatsProps) {
     <div>
       <h3>Year stats</h3>
       { isLoaded && (
-        <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <Typography variant="h6" component="h4" align="center">
-                At Bats results
-              </Typography>
+        <Box sx={{ flexGrow: 1, justifyContent: "center"}}>
+          <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
+            <Grid item xs={12} sm={6} /* style={{width:'100%'}} */>
               <StatBatResults
                 single={allTeamStats.single}
                 double={allTeamStats.double}
@@ -115,7 +114,7 @@ function YearStats(props: IYearStatsProps) {
                 out={allTeamStats.out}
               />
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12} sm={6} /* style={{width:'100%'}} */>
               <StatBattingPercentage
                 single={[allTeamStats.single]}
                 double={[allTeamStats.double]}

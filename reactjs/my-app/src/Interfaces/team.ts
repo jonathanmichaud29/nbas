@@ -42,6 +42,23 @@ export interface ITeamStandingProps {
   matches: IMatch[];
 }
 
+export interface ITeamStanding {
+  idTeam: number;
+  gamePlayed: number;
+  win: number;
+  lost: number;
+}
+
+export interface IAllTeamsStandingProps {
+  standings: ITeamStanding[];
+  teams: ITeam[];
+}
+
+export interface IAllTeamsStatsProps {
+  teams: ITeam[];
+  matchesLineups: IMatchLineup[];
+}
+
 export interface ITeamMatchResumeProps {
   team:         ITeam;
   matchLineups: IMatchLineup[];

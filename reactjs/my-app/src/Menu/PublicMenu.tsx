@@ -1,5 +1,5 @@
 import { useAuthState } from "react-firebase-hooks/auth";
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import { auth } from "../Firebase/firebase";
 
@@ -17,9 +17,6 @@ import './_publicMenu.scss';
 
 function PublicMenu() {
   const [user, loading] = useAuthState(auth);
-  const location = useLocation();
-  const { pathname } = location;
-  console.log("location", location, "pathname", pathname);
 
   const renderPublicLinks = () => {
     const links = [

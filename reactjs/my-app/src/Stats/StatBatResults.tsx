@@ -11,6 +11,10 @@ ChartJS.register(ArcElement, Tooltip, Legend); // Doughnut
 function StatBatResults(props: IStatBatResultsProps) {
   const { single, double, triple, homerun, out} = props;
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio:false,
+  }
   const dataChartAtBats = {
     labels: ['Single', 'Double', 'Triple', 'Homerun', 'Out'],
     datasets: [
@@ -37,7 +41,9 @@ function StatBatResults(props: IStatBatResultsProps) {
   };
 
   return (
-    <Doughnut data={dataChartAtBats} />
+    <div style={{position:'relative', height:'300px'}}>
+      <Doughnut options={chartOptions} data={dataChartAtBats} />
+    </div>
   )
 }
 

@@ -14,6 +14,7 @@ export interface IBattingPercentageStats {
 }
 
 export interface ITeamStats {
+  id: number;
   atBats: number;
   single: number;
   double: number;

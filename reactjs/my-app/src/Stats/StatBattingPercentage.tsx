@@ -24,6 +24,7 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
 
   const chartOptionsPercentage = {
     responsive: true,
+    maintainAspectRatio:false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -71,7 +72,9 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
   };
 
   return (
-    <Bar options={chartOptionsPercentage} data={dataChartBattingPercentage} />
+    <div style={{position:'relative', height:'300px'}}>
+      <Bar options={chartOptionsPercentage} data={dataChartBattingPercentage} />
+    </div>
   )
 }
 
