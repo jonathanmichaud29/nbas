@@ -79,6 +79,7 @@ function PublicTeamsStats() {
   }, [listMatchesLineups]);
 
   useEffect(() => {
+    if( listMatches !== null) return;
     fetchMatches()
       .then(response => {
         setListMatches(response.data);
