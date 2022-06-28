@@ -20,6 +20,20 @@ exports.getTeams = async (req, res, next) => {
 
 }; 
 
+exports.getStandingTeams = async (req, res, next) => {
+  if (!req.body.listIds) return next(new AppError("No form data found", 404));
+  const values = [req.body.listIds]
+  const query = "SELECT t.id, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls "+
+    "FROM nbas.teams as t "+
+    "INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) "+
+    "WHERE m.isCompleted=1 AND t.id IN (?)"+
+    "GROUP BY t.id"
+  const resultMainQuery = await mysqlQuery(query, values)
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+
+}; 
+
+
 exports.createTeam = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
 

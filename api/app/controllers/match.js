@@ -45,6 +45,39 @@ exports.getMatch = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 
+exports.getSingleMatch = async (req, res, next) => {
+  if (!req.body) {
+    return next(new AppError("No parameters received to fetch a match", 404));
+  }
+  let values = [];
+  let wheres = [];
+  let orderBy = [];
+  console.log(req.body);
+  if (req.body.isLast ){
+    orderBy.push("ORDER BY date DESC");
+  }
+  else{
+    orderBy.push("ORDER BY date ASC");
+  }
+  if (req.body.idMatch ){
+    values.push(req.body.idMatch);
+    wheres.push('`id`=?')
+  }
+  if( req.body.valueCompleted !== undefined ) {
+    values.push(req.body.valueCompleted);
+    wheres.push('`isCompleted`=?')
+  }
+
+  const query = "SELECT * FROM matches "+
+  "WHERE " + wheres.join(" AND ") + " " + 
+  orderBy.join(", ") + " " +
+  "LIMIT 1";
+  console.log(query);
+  const resultMainQuery = await mysqlQuery(query, values)
+
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
 
 exports.deleteMatch = async (req, res, next) => {
   if (!req.params.id) {

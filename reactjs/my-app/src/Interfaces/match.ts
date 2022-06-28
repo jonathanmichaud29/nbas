@@ -18,6 +18,12 @@ export interface IMatchProps{
   isAdmin?: boolean;
 }
 
+export interface IMatchResumeProps {
+  title: string;
+  isLatestMatch: boolean;
+}
+
+
 export interface IMatchDetailsProps {
   match: IMatch;
 }

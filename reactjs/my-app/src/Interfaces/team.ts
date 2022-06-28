@@ -6,6 +6,8 @@ export interface ITeam{
   name: string;
 }
 
+
+
 export interface ITeamProps{
   isAdmin?: boolean;
   isAddPlayers?: boolean;
@@ -37,9 +39,18 @@ export interface IOrderTeamPlayers {
 
 export interface IOrderPlayers extends IPlayer, IOrderTeamPlayers {};
 
+
+
 export interface ITeamStandingProps {
   team: ITeam;
   matches: IMatch[];
+}
+
+export interface IStandingTeam {
+  id: number;
+  nbWins: number;
+  nbLosts: number;
+  nbNulls: number;
 }
 
 export interface ITeamStanding {

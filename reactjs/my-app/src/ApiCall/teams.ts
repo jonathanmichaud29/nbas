@@ -35,6 +35,18 @@ export const fetchTeams = async (argIds?: Array<number>) => {
   
 }
 
+export const fetchStandingTeams = async (argIds: Array<number>) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/standing/`, {
+    listIds: argIds
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })  
+}
+
 export const fetchTeamHistoryMatches = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-matches/${id}`)
     .then(response => {

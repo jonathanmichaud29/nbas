@@ -22,6 +22,23 @@ export const fetchMatch = async (id: number) => {
     })
 }
 
+export interface IFetchSingleMatchParams {
+  idMatch?: number;
+  isLast?: boolean;
+  isUpcoming?: boolean;
+  valueCompleted?: number;
+}
+export const fetchSingleMatch = async (bodyParams: IFetchSingleMatchParams) => {
+  
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/single-match/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
 export const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
   
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match/`,{

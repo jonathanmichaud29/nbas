@@ -15,6 +15,10 @@ router
   .route("/team/list/")
   .post(teamControllers.getTeams)
 
+  router
+  .route("/team/standing/")
+  .post(teamControllers.getStandingTeams)
+
 router
  .route("/team/:id")
  .get(teamControllers.getTeam)
@@ -58,6 +62,10 @@ router
   .route("/match/")
   .get(matchControllers.getAllMatches)
   .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/single-match/")
+  .post(matchControllers.getSingleMatch)
 
 router
   .route("/match/:id")
