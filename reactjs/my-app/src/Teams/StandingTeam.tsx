@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { Paper } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
-import { ITeamStandingProps }  from '../Interfaces/team'
+import { IStandingTeamProps }  from '../Interfaces/team'
 
-function TeamStanding(props: ITeamStandingProps){
+function StandingTeam(props: IStandingTeamProps){
   
   const {team, matches} = props;
 
@@ -53,4 +53,4 @@ function TeamStanding(props: ITeamStandingProps){
   )
 }
 
-export default TeamStanding;
+export default StandingTeam;

@@ -73,9 +73,13 @@ router
   .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/match-lineup/:id")
+  .route("/match-lineup/:idMatch")
   .get(matchControllers.getMatchLineups)
   .put(matchControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/match-lineup/:idMatch/:idTeam")
+  .get(matchControllers.getMatchLineups)
 
 router
   .route("/match-lineup/player/:id")
@@ -83,8 +87,12 @@ router
   .delete(matchControllers.deletePlayerLineup, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/matches-lineups")
+  .route("/matches-lineups/")
   .get(matchControllers.getMatchesLineups);
+
+router
+  .route("/players-lineups/")
+  .post(matchControllers.getPlayersMatchLineups)
 
 router
   .route("/team-matches/:id")

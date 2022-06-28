@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 
@@ -9,6 +10,7 @@ import { IMatch, IMatchResumeProps } from '../Interfaces/match'
 import { ITeam, IStandingTeam } from "../Interfaces/team";
 
 import Scoreboard from './Scoreboard';
+import BestStatPlayers from '../Players/BestStatPlayers'
 
 function MatchResume(props: IMatchResumeProps) {
   
@@ -80,8 +82,9 @@ function MatchResume(props: IMatchResumeProps) {
   }, [match, standingTeams])
 
   return (
-    <Box>
-      <Typography>
+    <>
+      
+      <Typography variant="h4" component="h2">
         {title}
       </Typography>
       { ! isLoaded && <Box><CircularProgress /></Box>}
@@ -94,8 +97,20 @@ function MatchResume(props: IMatchResumeProps) {
           standingTeams={standingTeams}
         /> 
       )}
+      { isLoaded &&
+        <BestStatPlayers 
+          match={match}
+          team={teamHome}
+        />
+      }
+      { isLoaded &&
+        <BestStatPlayers 
+          match={match}
+          team={teamAway}
+        />
+      }
 
-    </Box>
+    </>
   )
 }
 

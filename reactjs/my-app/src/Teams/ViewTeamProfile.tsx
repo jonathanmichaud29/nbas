@@ -9,7 +9,7 @@ import { ITeamProfileProps, ITeam } from '../Interfaces/team'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
 
-import TeamStanding from './TeamStanding'
+import TeamStanding from './StandingTeam'
 import TeamMatchResume from './TeamMatchResume'
 import YearStats from '../Stats/YearStats'
 

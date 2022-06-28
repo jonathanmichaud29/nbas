@@ -9,7 +9,7 @@ import { getTeamName } from '../utils/dataAssociation'
 
 function AllTeamsStanding(props: IAllTeamsStandingProps){
   
-  const {teams, standings} = props;
+  const {teams, standingTeams} = props;
 
   return (
     <Grid
@@ -26,20 +26,22 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
             <TableHead>
               <TableRow>
                 <TableCell>Team</TableCell>
-                <TableCell>Game Played</TableCell>
-                <TableCell>Win</TableCell>
-                <TableCell>Lost</TableCell>
+                <TableCell>GP</TableCell>
+                <TableCell>W</TableCell>
+                <TableCell>L</TableCell>
+                <TableCell>N</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {standings.map((standing) => {
-                const teamName = getTeamName(standing.idTeam, teams);
+              {standingTeams.map((standingTeam) => {
+                const teamName = getTeamName(standingTeam.id, teams);
                 return (
-                  <TableRow key={`team-standing-${standing.idTeam}`}>
+                  <TableRow key={`team-standing-${standingTeam.id}`}>
                     <TableCell>{teamName}</TableCell>
-                    <TableCell align="center">{standing.gamePlayed}</TableCell>
-                    <TableCell align="center">{standing.win}</TableCell>
-                    <TableCell align="center">{standing.lost}</TableCell>
+                    <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
+                    <TableCell align="center">{standingTeam.nbWins}</TableCell>
+                    <TableCell align="center">{standingTeam.nbLosts}</TableCell>
+                    <TableCell align="center">{standingTeam.nbNulls}</TableCell>
                   </TableRow>
                 )
               })}

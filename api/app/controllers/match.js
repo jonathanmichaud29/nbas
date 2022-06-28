@@ -52,7 +52,7 @@ exports.getSingleMatch = async (req, res, next) => {
   let values = [];
   let wheres = [];
   let orderBy = [];
-  console.log(req.body);
+  
   if (req.body.isLast ){
     orderBy.push("ORDER BY date DESC");
   }
@@ -96,22 +96,51 @@ exports.deleteMatch = async (req, res, next) => {
 };
 
 exports.getMatchLineups = async (req, res, next) => {
-  if (!req.params.id) {
+  if (!req.params.idMatch) {
     return next(new AppError("No match id found", 404));
   }
-  const values = [req.params.id];
-  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE idMatch=?", values);
-  if( resultMainQuery.status ){
-    customMessage = `match deleted!`;
+  let values = [[req.params.idMatch]]
+  let wheres = ['`idMatch`=?']
+  if (req.params.idTeam !== undefined) {
+    wheres.push('`idTeam`=?')
+    values.push([req.params.idTeam]);
   }
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE "+wheres.join(" AND "), values);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customMessage = `match lineups retrieved!`;
+  }
+  else {
+    console.log(resultMainQuery.error)
+  }
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
 };
 
 exports.getMatchesLineups = async (req, res, next) => {
-  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE idMatch", []);
+  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup", []);
   let customMessage = '';
   if( resultMainQuery.status ){
     customMessage = `all matches lineups retrieved`;
+  }
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
+};
+
+exports.getPlayersMatchLineups = async (req, res, next) => {
+  if (!req.body.listPlayerIds) {
+    return next(new AppError("No player ids found", 404));
+  }
+  let values = [req.body.listPlayerIds]
+  
+  const query = "SELECT ml.* FROM match_lineup as ml " +
+    "INNER JOIN matches as m ON (ml.idMatch=m.id AND m.isCompleted=1) " +
+    "WHERE ml.idPlayer IN (?)";
+  const resultMainQuery = await mysqlQuery(query, values);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customMessage = `players match lineups retrieved!`;
+  }
+  else {
+    console.log(resultMainQuery.error)
   }
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
 };

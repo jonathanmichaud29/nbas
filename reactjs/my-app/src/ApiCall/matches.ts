@@ -66,8 +66,22 @@ export const deleteMatch = async (argId: number) => {
     })
 }
 
-export const fetchMatchLineups = async(argId: number) => {
-  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}`)
+export const fetchMatchLineups = async(argId: number, argTeamId?: number) => {
+  let bodyParams = Object();
+  if( argTeamId ){
+    bodyParams.idTeam = argTeamId;
+  }
+  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export const fetchTeamMatchLineups = async(argId: number, argTeamId: number) => {
+  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}/${argTeamId}`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -78,6 +92,18 @@ export const fetchMatchLineups = async(argId: number) => {
 
 export const fetchMatchesLineups = async() => {
   return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/matches-lineups/`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export const fetchPlayersMatchLineups = async(argPlayerIds: Array<number>) => {
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/players-lineups/`,{
+    listPlayerIds: argPlayerIds
+  })
     .then(response => {
       return Promise.resolve(response.data);
     })

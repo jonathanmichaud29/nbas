@@ -1,4 +1,6 @@
-import { Grid, Typography } from "@mui/material";
+import { Link } from 'react-router-dom';
+
+import { Grid, Paper, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
 import { ITeam, IStandingTeam } from '../Interfaces/team';
@@ -18,18 +20,18 @@ function Scoreboard(props: IScoreboardProps) {
   const {teamHome, teamAway, match, standingTeams} = props;
 
   const dateReadable = match !== null ? createDateReadable(match.date) : '';
-  const tableTitle = match.isCompleted ? `Final score - ${teamHome.name} vs ${teamAway.name}` : `${teamHome.name} vs ${teamAway.name}`;
+  const tableTitle = `${teamHome.name} vs ${teamAway.name}`;
   const teamHomeStanding = standingTeams.find((standingTeam) => standingTeam.id === teamHome.id)
   const teamAwayStanding = standingTeams.find((standingTeam) => standingTeam.id === teamAway.id)
 
   return (
-    <Grid container justifyContent="center" alignItems="center" direction="column" margin="auto">
+    <Grid container justifyContent="center" alignItems="center" direction="column">
       <Grid item >
-        <Typography>{tableTitle}</Typography>
-        <Typography>{dateReadable}</Typography>
+        <Typography variant="h6" component="h3"><Link to={`/match/${match.id}`}>{tableTitle}</Link></Typography>
+        <Typography variant="subtitle1">{dateReadable}</Typography>
       </Grid>
       <Grid item xs={3}>
-        <TableContainer>
+        <TableContainer component={Paper}>
           <Table aria-label={tableTitle}>
             <TableHead>
               <TableRow>

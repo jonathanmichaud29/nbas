@@ -41,27 +41,22 @@ export interface IOrderPlayers extends IPlayer, IOrderTeamPlayers {};
 
 
 
-export interface ITeamStandingProps {
+export interface IStandingTeamProps {
   team: ITeam;
   matches: IMatch[];
 }
 
 export interface IStandingTeam {
   id: number;
+  nbGamePlayed: number;
   nbWins: number;
   nbLosts: number;
   nbNulls: number;
 }
 
-export interface ITeamStanding {
-  idTeam: number;
-  gamePlayed: number;
-  win: number;
-  lost: number;
-}
 
 export interface IAllTeamsStandingProps {
-  standings: ITeamStanding[];
+  standingTeams: IStandingTeam[];
   teams: ITeam[];
 }
 
