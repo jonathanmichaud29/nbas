@@ -6,19 +6,20 @@ import { DataGrid} from '@mui/x-data-grid';
 import { createDateReadable } from '../utils/dateFormatter';
 
 import { ITeamMatchResumeProps } from '../Interfaces/team';
-import { IPlayerStats } from "../Interfaces/stats";
+import { IBattingStatsExtended, defaultBattingStatsExtended } from "../Interfaces/stats";
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
-import { playerStatsColumns } from '../utils/dataGridColumns'
+import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
+import { playerExtendedStatsColumns } from '../utils/dataGridColumns'
 
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   const {team, matchLineups, match, players, teamHome, teamAway, hideHeader} = props;
 
-  const [allStats, setAllStats] = useState<IPlayerStats | null>(null);
+  const [allStats, setAllStats] = useState<IBattingStatsExtended | null>(null);
 
   const dateReadable = createDateReadable(match.date);
 
@@ -26,41 +27,26 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   useEffect(() => {
     // Add all stats from match lineups
-    let newStats: IPlayerStats = {
-      id: 0,
-      atBats: 0,
-      single: 0,
-      double: 0,
-      triple: 0,
-      homerun: 0,
-      out: 0,
-    };
-    matchLineups.forEach((matchLineup) => {
-      newStats.id = matchLineup.idPlayer;
-      newStats.atBats += matchLineup.atBats;
-      newStats.single += matchLineup.single;
-      newStats.double += matchLineup.double;
-      newStats.triple += matchLineup.triple;
-      newStats.homerun += matchLineup.homerun;
-      newStats.out += matchLineup.out;
-    });
-    setAllStats(newStats);
+    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    setAllStats(teamStats);
 
     // Reorder lineups by hit Order
     matchLineups.sort((a,b) => a.hitOrder - b.hitOrder);
   }, [matchLineups])
 
-
-  const rows = ( matchLineups && matchLineups.map((playerStats) => {
+  const playersStats = getCombinedPlayersStats(matchLineups);
+  const rows = ( playersStats && playersStats.map((playerStats) => {
     return {
-      id: playerStats.idPlayer,
-      playerName: getPlayerName(playerStats.idPlayer, players),
+      id: playerStats.id,
+      playerName: getPlayerName(playerStats.id, players),
       atBats: playerStats.atBats,
       out: playerStats.out,
       single: playerStats.single,
       double: playerStats.double,
       triple: playerStats.triple,
       homerun: playerStats.homerun,
+      battingAverage: playerStats.battingAverage,
+      sluggingPercentage: playerStats.sluggingPercentage,
     }
   }) ) || [];
   
@@ -102,7 +88,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
 
           <DataGrid
             rows={rows}
-            columns={playerStatsColumns}
+            columns={playerExtendedStatsColumns}
             pageSize={20}
             rowsPerPageOptions={[20]}
             checkboxSelection

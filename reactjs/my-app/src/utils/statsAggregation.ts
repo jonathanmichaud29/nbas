@@ -1,5 +1,5 @@
 import { IMatchLineup } from '../Interfaces/match';
-import { IPlayerStatsExtended } from '../Interfaces/stats'
+import { IBattingStatsExtended } from '../Interfaces/stats'
 
 export const getStatHits = (single: number, double: number, triple: number, homerun: number) => {
   return single + double + triple + homerun;
@@ -23,7 +23,7 @@ export const getStatIndexSlugging = (index: number, single: Array<number>, doubl
 }
 
 export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
-  let playersStats = [] as IPlayerStatsExtended[];
+  let playersStats = [] as IBattingStatsExtended[];
   
   matchLineups.forEach((matchLineup) => {
     let playerFound = playersStats.find((playerStats) => playerStats.id === matchLineup.idPlayer )
@@ -50,12 +50,45 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
     }
   })
   
-  setExtendedPlayersStats(playersStats);
+  setExtendedStats(playersStats);
 
   return playersStats;
 }
 
-export const setExtendedPlayersStats = (listPlayersStats: IPlayerStatsExtended[]) => {
+export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
+  let teamsStats = [] as IBattingStatsExtended[];
+  
+  matchLineups.forEach((matchLineup) => {
+    let teamFound = teamsStats.find((teamStats) => teamStats.id === matchLineup.idTeam )
+    if( teamFound === undefined ){
+      teamsStats.push({
+        id: matchLineup.idTeam,
+        atBats: matchLineup.atBats,
+        single: matchLineup.single,
+        double: matchLineup.double,
+        triple: matchLineup.triple,
+        homerun: matchLineup.homerun,
+        out: matchLineup.out,
+        sluggingPercentage: 0,
+        battingAverage: 0,
+      });
+    }
+    else {
+      teamFound.atBats += matchLineup.atBats;
+      teamFound.single += matchLineup.single;
+      teamFound.double += matchLineup.double;
+      teamFound.triple += matchLineup.triple;
+      teamFound.homerun += matchLineup.homerun;
+      teamFound.out += matchLineup.out;
+    }
+  })
+  
+  setExtendedStats(teamsStats);
+
+  return teamsStats;
+}
+
+export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {
   listPlayersStats.every((playerStats) => {
     const nbHits = getStatHits(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);
     const sluggingTotal = getStatSlugging(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);

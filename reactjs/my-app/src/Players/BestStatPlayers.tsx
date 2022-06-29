@@ -10,7 +10,7 @@ import { fetchTeamPlayers } from '../ApiCall/teams'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
 import { ITeam, ITeamPlayers } from '../Interfaces/team'
-import { IPlayerStatsExtended } from '../Interfaces/stats'
+import { IBattingStatsExtended } from '../Interfaces/stats'
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats } from '../utils/statsAggregation';
@@ -24,7 +24,7 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
   const {match, team} = props;
 
   const [apiError, changeApiError] = useState("");
-  const [bestStatPlayers, setBestStatPlayers] = useState<IPlayerStatsExtended[] | null>(null);
+  const [bestStatPlayers, setBestStatPlayers] = useState<IBattingStatsExtended[] | null>(null);
   const [listPlayers, setListPlayers] = useState<IPlayer[] | null>(null);
 
   const isLoaded = bestStatPlayers !== null && listPlayers !== null;

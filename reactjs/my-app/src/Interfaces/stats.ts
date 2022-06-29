@@ -32,7 +32,24 @@ export interface IPlayerStats {
   out: number;
 }
 
-export interface IPlayerStatsExtended extends IPlayerStats, IBattingPercentageStats {};
+export interface IBattingStatsExtended extends IPlayerStats, IBattingPercentageStats {};
+
+export const defaultPlayerStats = {
+  id: 0,
+  atBats: 0,
+  single: 0,
+  double: 0,
+  triple: 0,
+  homerun: 0,
+  out: 0,
+}
+export const defaultBattingPercentageStats = {
+  battingAverage: 0,
+  // onBasePercentage: 0,
+  sluggingPercentage: 0,
+  // onBaseSluggingPercentage: 0,
+}
+export const defaultBattingStatsExtended = {...defaultPlayerStats, ...defaultBattingPercentageStats}
 
 export interface IPlayerLineupStats {
   lineupId: number;
