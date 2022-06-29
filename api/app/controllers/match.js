@@ -72,7 +72,6 @@ exports.getSingleMatch = async (req, res, next) => {
   "WHERE " + wheres.join(" AND ") + " " + 
   orderBy.join(", ") + " " +
   "LIMIT 1";
-  console.log(query);
   const resultMainQuery = await mysqlQuery(query, values)
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);

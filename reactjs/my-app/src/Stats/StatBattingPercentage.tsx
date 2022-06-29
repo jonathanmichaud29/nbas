@@ -1,26 +1,12 @@
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-import { IStatBattingPercentageProps, IBattingPercentageStats } from '../Interfaces/stats';
-import { getStatIndexHits,getStatIndexSlugging } from '../utils/statsAggregation'
+import { IStatBattingPercentageProps } from '../Interfaces/stats';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
 
 function StatBattingPercentage(props: IStatBattingPercentageProps) {
-  const { single, double, triple, homerun, atBats, columns} = props;
-
-  let stats = [] as IBattingPercentageStats[];
-  columns.forEach((value, index) => {
-    const nbHits = getStatIndexHits(index, single, double, triple, homerun);
-    const sluggingTotal = getStatIndexSlugging(index, single, double, triple, homerun);
-    
-    stats.push({
-      battingAverage: nbHits / atBats[index], // = Hit / AtBats
-      /* onBasePercentage: 0.300, // = ( Hit + Walk + Hit by pitch ) / ( AtBats + Walk + Hit by pitch + Sacrifice Flies) */
-      sluggingPercentage: sluggingTotal / atBats[index], // Single + (Double x 2) + (Triple x 3 ) + (Homerun x 4) / AtBats
-      /* onBaseSluggingPercentage: 1.700, // OnBase + Slugging */
-    });
-  })
+  const { stats, columns} = props;
 
   const chartOptionsPercentage = {
     responsive: true,
@@ -53,21 +39,21 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
         data: labelsChart.map((label, index) => stats[index].battingAverage),
         backgroundColor: 'rgba(0, 255, 0, 1)',
       },
-      /* {
+      {
         label: 'On Base %',
-        data: labelsChart.map(() => stats.onBasePercentage),
+        data: labelsChart.map((label, index) => stats[index].onBasePercentage),
         backgroundColor: 'rgba(0, 255, 200, 1)',
-      }, */
+      },
       {
         label: 'Slugging %',
         data: labelsChart.map((label, index) => stats[index].sluggingPercentage),
         backgroundColor: 'rgba(0, 180, 255, 1)',
       },
-      /* {
+      {
         label: 'On Base Slugging %',
-        data: labelsChart.map(() => stats.onBaseSluggingPercentage),
+        data: labelsChart.map((label, index) => stats[index].onBaseSluggingPercentage),
         backgroundColor: 'rgba(0, 0, 255, 1)',
-      }, */
+      },
     ],
   };
 

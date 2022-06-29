@@ -76,11 +76,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
             </Grid>
             <Grid item xs={8}>
               <StatBattingPercentage
-                single={[allStats.single]}
-                double={[allStats.double]}
-                triple={[allStats.triple]}
-                homerun={[allStats.homerun]}
-                atBats={[allStats.atBats]}
+                stats={[allStats]}
                 columns={["team stats"]}
               />
             </Grid>

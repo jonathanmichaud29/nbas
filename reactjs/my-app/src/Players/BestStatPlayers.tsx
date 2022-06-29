@@ -29,6 +29,9 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
 
   const isLoaded = bestStatPlayers !== null && listPlayers !== null;
 
+  /**
+   * Fetch Best players stats for this specific match
+   */
   useEffect(() => {
     if( bestStatPlayers !== null || match.isCompleted === 0 ) return;
 
@@ -50,21 +53,9 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
       });
   }, [match, team, bestStatPlayers])
 
-  useEffect(() => {
-    if( listPlayers !== null || bestStatPlayers === null ) return;
-    const listPlayerIds = bestStatPlayers.map((playerStats) => playerStats.id)
-    fetchSpecificPlayers(listPlayerIds)
-      .then(response => {
-        setListPlayers(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [bestStatPlayers, listPlayers])
-
+  /**
+   * Fetch Best players stats for this season
+   */
   useEffect(() => {
     if( bestStatPlayers !== null || match.isCompleted === 1 ) return;
     fetchTeamPlayers(team.id)
@@ -94,7 +85,25 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
       .finally(() => {
         
       });
-  },[match])
+  },[bestStatPlayers, match, team])
+
+  /**
+   * Fetch Players Information about the best players found
+   */
+  useEffect(() => {
+    if( listPlayers !== null || bestStatPlayers === null ) return;
+    const listPlayerIds = bestStatPlayers.map((playerStats) => playerStats.id)
+    fetchSpecificPlayers(listPlayerIds)
+      .then(response => {
+        setListPlayers(response.data)
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+  }, [bestStatPlayers, listPlayers])
 
   return (
     <>

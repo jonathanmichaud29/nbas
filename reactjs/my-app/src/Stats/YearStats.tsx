@@ -16,17 +16,17 @@ function YearStats(props: IYearStatsProps) {
 
   const {matchLineups, players} = props;
 
-  const [allTeamStats, setAllTeamStats] = useState<ITeamStats | null>(null);
+  const [allStats, setAllStats] = useState<IBattingStatsExtended | null>(null);
   const [allPlayerStats, setAllPlayerStats] = useState<IBattingStatsExtended[] | null>(null);
 
-  const isLoaded = allTeamStats !== null && allPlayerStats !== null;
+  const isLoaded = allStats !== null && allPlayerStats !== null;
 
   useEffect(() => {
     const playersStats: IBattingStatsExtended[] = getCombinedPlayersStats(matchLineups);
-    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
-    
-    setAllTeamStats(teamStats);
     setAllPlayerStats(playersStats);
+
+    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    setAllStats(teamStats);
   }, [matchLineups]);
 
 
@@ -51,22 +51,18 @@ function YearStats(props: IYearStatsProps) {
       { isLoaded && (
         <Box sx={{ flexGrow: 1, justifyContent: "center"}}>
           <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
-            <Grid item xs={12} sm={6} /* style={{width:'100%'}} */>
+            <Grid item xs={12} sm={6}>
               <StatBatResults
-                single={allTeamStats.single}
-                double={allTeamStats.double}
-                triple={allTeamStats.triple}
-                homerun={allTeamStats.homerun}
-                out={allTeamStats.out}
+                single={allStats.single}
+                double={allStats.double}
+                triple={allStats.triple}
+                homerun={allStats.homerun}
+                out={allStats.out}
               />
             </Grid>
-            <Grid item xs={12} sm={6} /* style={{width:'100%'}} */>
+            <Grid item xs={12} sm={6}>
               <StatBattingPercentage
-                single={[allTeamStats.single]}
-                double={[allTeamStats.double]}
-                triple={[allTeamStats.triple]}
-                homerun={[allTeamStats.homerun]}
-                atBats={[allTeamStats.atBats]}
+                stats={[allStats]}
                 columns={["year long stats"]}
               />
             </Grid>

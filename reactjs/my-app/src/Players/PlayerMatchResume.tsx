@@ -3,10 +3,11 @@ import { Box, Grid, Typography } from "@mui/material";
 import { ITeam } from "../Interfaces/team";
 import { IPlayerMatchResumeProps } from '../Interfaces/player';
 
-import { createDateReadable } from '../utils/dateFormatter';
-
 import StatBatResults from "../Stats/StatBatResults";
 import StatBattingPercentage from "../Stats/StatBattingPercentage";
+
+import { createDateReadable } from '../utils/dateFormatter';
+import { getCombinedPlayersStats } from '../utils/statsAggregation'
 
 function PlayerMatchResume(props: IPlayerMatchResumeProps) {
 
@@ -14,12 +15,12 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
 
   const dateReadable = createDateReadable(match.date);
   const playingForTeam: ITeam = ( playerLineup.idTeam === teamHome.id ? teamHome : teamAway);
-
+  const playerStats = getCombinedPlayersStats([playerLineup])[0];
+  console.log("playerLineup", playerLineup);
   return (
     <div>
       <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
       <p>Played with <b>{playingForTeam.name}</b></p>
-      <h4>Game Stats</h4>
       <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
@@ -36,11 +37,7 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
           </Grid>
           <Grid item xs={8}>
             <StatBattingPercentage
-              single={[playerLineup.single]}
-              double={[playerLineup.double]}
-              triple={[playerLineup.triple]}
-              homerun={[playerLineup.homerun]}
-              atBats={[playerLineup.atBats]}
+              stats={[playerStats]}
               columns={[dateReadable]}
             />
           </Grid>

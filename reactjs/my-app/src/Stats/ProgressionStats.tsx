@@ -47,8 +47,8 @@ function ProgressionStats(props: IProgressionStatsProps){
       stats.push({
         battingAverage: nbHits / matchLineup.atBats,
         sluggingPercentage: sluggingTotal / matchLineup.atBats,
-        /* onBasePercentage: 0.300, */
-        /* onBaseSluggingPercentage: 1.700, */
+        onBasePercentage: 0.300,
+        onBaseSluggingPercentage: 1.700,
       });
     }
   })

@@ -36,8 +36,13 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
         triple: matchLineup.triple,
         homerun: matchLineup.homerun,
         out: matchLineup.out,
+        walk: matchLineup.walk,
+        hitByPitch: matchLineup.hitByPitch,
+        sacrificeFly: matchLineup.sacrificeFly,
         sluggingPercentage: 0,
         battingAverage: 0,
+        onBasePercentage: 0,
+        onBaseSluggingPercentage: 0,
       });
     }
     else {
@@ -47,6 +52,9 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
       playerFound.triple += matchLineup.triple;
       playerFound.homerun += matchLineup.homerun;
       playerFound.out += matchLineup.out;
+      playerFound.walk += matchLineup.walk;
+      playerFound.hitByPitch += matchLineup.hitByPitch;
+      playerFound.sacrificeFly += matchLineup.sacrificeFly;
     }
   })
   
@@ -69,8 +77,13 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
         triple: matchLineup.triple,
         homerun: matchLineup.homerun,
         out: matchLineup.out,
+        walk: matchLineup.walk,
+        hitByPitch: matchLineup.hitByPitch,
+        sacrificeFly: matchLineup.sacrificeFly,
         sluggingPercentage: 0,
         battingAverage: 0,
+        onBasePercentage: 0,
+        onBaseSluggingPercentage: 0,
       });
     }
     else {
@@ -80,6 +93,9 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
       teamFound.triple += matchLineup.triple;
       teamFound.homerun += matchLineup.homerun;
       teamFound.out += matchLineup.out;
+      teamFound.walk += matchLineup.walk;
+      teamFound.hitByPitch += matchLineup.hitByPitch;
+      teamFound.sacrificeFly += matchLineup.sacrificeFly;
     }
   })
   
@@ -92,20 +108,43 @@ export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {
   listPlayersStats.every((playerStats) => {
     const nbHits = getStatHits(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);
     const sluggingTotal = getStatSlugging(playerStats.single, playerStats.double, playerStats.triple, playerStats.homerun);
+
+    // Batting Average
     playerStats.battingAverage = ( nbHits / playerStats.atBats);
-    playerStats.sluggingPercentage = ( sluggingTotal / playerStats.atBats);
     if( isNaN(playerStats.battingAverage) ) {
       playerStats.battingAverage = 0;
     }
     else {
       playerStats.battingAverage = (Math.round(playerStats.battingAverage * 1000) / 1000);
     }
+
+    // Slugging Percentage
+    playerStats.sluggingPercentage = ( sluggingTotal / playerStats.atBats);
     if( isNaN(playerStats.sluggingPercentage) ) {
       playerStats.sluggingPercentage = 0;
     }
     else {
       playerStats.sluggingPercentage = (Math.round(playerStats.sluggingPercentage * 1000) / 1000);
     }
+
+    // On Base Percentage
+    playerStats.onBasePercentage = (nbHits + playerStats.walk + playerStats.hitByPitch) / ( playerStats.atBats + playerStats.hitByPitch + playerStats.sacrificeFly);
+    if( isNaN(playerStats.onBasePercentage) ) {
+      playerStats.onBasePercentage = 0;
+    }
+    else {
+      playerStats.onBasePercentage = (Math.round(playerStats.onBasePercentage * 1000) / 1000);
+    }
+
+    // On Base Slugging Percentage
+    playerStats.onBaseSluggingPercentage = playerStats.onBasePercentage + playerStats.sluggingPercentage;
+    if( isNaN(playerStats.onBaseSluggingPercentage) ) {
+      playerStats.onBaseSluggingPercentage = 0;
+    }
+    else {
+      playerStats.onBaseSluggingPercentage = (Math.round(playerStats.onBaseSluggingPercentage * 1000) / 1000);
+    }
+    
     return true;
   })
 }

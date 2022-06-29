@@ -8,9 +8,9 @@ export interface IYearStatsProps {
 
 export interface IBattingPercentageStats {
   battingAverage: number;
-  // onBasePercentage: number;
+  onBasePercentage: number;
   sluggingPercentage: number;
-  // onBaseSluggingPercentage: number;
+  onBaseSluggingPercentage: number;
 }
 
 export interface ITeamStats {
@@ -30,6 +30,9 @@ export interface IPlayerStats {
   triple: number;
   homerun: number;
   out: number;
+  walk: number;
+  hitByPitch: number;
+  sacrificeFly: number;
 }
 
 export interface IBattingStatsExtended extends IPlayerStats, IBattingPercentageStats {};
@@ -42,12 +45,15 @@ export const defaultPlayerStats = {
   triple: 0,
   homerun: 0,
   out: 0,
+  walk: 0,
+  hitByPitch: 0,
+  sacrificeFly: 0,
 }
 export const defaultBattingPercentageStats = {
   battingAverage: 0,
-  // onBasePercentage: 0,
+  onBasePercentage: 0,
   sluggingPercentage: 0,
-  // onBaseSluggingPercentage: 0,
+  onBaseSluggingPercentage: 0,
 }
 export const defaultBattingStatsExtended = {...defaultPlayerStats, ...defaultBattingPercentageStats}
 
@@ -81,11 +87,7 @@ export interface IStatBatResultsProps {
 }
 
 export interface IStatBattingPercentageProps {
-  single: Array<number>;
-  double: Array<number>;
-  triple: Array<number>;
-  homerun: Array<number>;
-  atBats: Array<number>;
+  stats: Array<IBattingPercentageStats>;
   columns: Array<string>;
 }
 
