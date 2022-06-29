@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 
 import { Box, Grid, Typography } from "@mui/material";
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid, GridToolbar} from '@mui/x-data-grid';
 
 import { createDateReadable } from '../utils/dateFormatter';
 
@@ -13,7 +13,7 @@ import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
-import { playerExtendedStatsColumns } from '../utils/dataGridColumns'
+import { playerExtendedStatsColumns, defaultStateStatsColumns, defaultDataGridProps } from '../utils/dataGridColumns'
 
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
@@ -45,8 +45,11 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
       double: playerStats.double,
       triple: playerStats.triple,
       homerun: playerStats.homerun,
+      runsBattedIn: playerStats.runsBattedIn,
       battingAverage: playerStats.battingAverage,
+      onBasePercentage: playerStats.onBasePercentage,
       sluggingPercentage: playerStats.sluggingPercentage,
+      onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
     }
   }) ) || [];
   
@@ -82,16 +85,18 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
             </Grid>
           </Grid>
 
-          <DataGrid
-            rows={rows}
-            columns={playerExtendedStatsColumns}
-            pageSize={20}
-            rowsPerPageOptions={[20]}
-            checkboxSelection
-            disableSelectionOnClick
-            getRowId={(row) => row.id + "-match-" + match.id}
-            autoHeight={true}
-          />
+          { rows.length > 0 && (
+            <DataGrid
+              {...defaultDataGridProps}
+              rows={rows}
+              columns={playerExtendedStatsColumns}
+              getRowId={(row) => row.id + "-match-" + match.id}
+              initialState={defaultStateStatsColumns}
+              components={{
+                Toolbar: GridToolbar
+              }}
+            />
+          )}
         </Box>
       )}
     </div>

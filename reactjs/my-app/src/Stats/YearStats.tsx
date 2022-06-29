@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 
 import { Box, Grid } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
-import { IBattingStatsExtended, ITeamStats, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
+import { IBattingStatsExtended, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
 
 import { getPlayerName } from '../utils/dataAssociation';
-import { playerExtendedStatsColumns } from '../utils/dataGridColumns'
+import { playerExtendedStatsColumns, defaultStateStatsColumns, defaultDataGridProps } from '../utils/dataGridColumns'
 import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation'
 
 function YearStats(props: IYearStatsProps) {
@@ -29,7 +29,6 @@ function YearStats(props: IYearStatsProps) {
     setAllStats(teamStats);
   }, [matchLineups]);
 
-
   const rows = ( allPlayerStats && allPlayerStats.map((playerStats) => {
     return {
       id: playerStats.id,
@@ -40,8 +39,11 @@ function YearStats(props: IYearStatsProps) {
       double: playerStats.double,
       triple: playerStats.triple,
       homerun: playerStats.homerun,
+      runsBattedIn: playerStats.runsBattedIn,
       battingAverage: playerStats.battingAverage,
+      onBasePercentage: playerStats.onBasePercentage,
       sluggingPercentage: playerStats.sluggingPercentage,
+      onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
     }
   }) ) || [];
 
@@ -67,17 +69,18 @@ function YearStats(props: IYearStatsProps) {
               />
             </Grid>
           </Grid>
-
-          <DataGrid
-            rows={rows}
-            columns={playerExtendedStatsColumns}
-            pageSize={20}
-            rowsPerPageOptions={[20]}
-            checkboxSelection
-            disableSelectionOnClick
-            getRowId={(row) => row.playerName}
-            autoHeight={true}
-          />
+          { rows.length > 0 && (
+            <DataGrid
+              {...defaultDataGridProps}
+              rows={rows}
+              columns={playerExtendedStatsColumns}
+              getRowId={(row) => row.playerName}
+              initialState={defaultStateStatsColumns}
+              components={{
+                Toolbar: GridToolbar
+              }}
+            />
+          )}
         </Box>
       )}
     </div>

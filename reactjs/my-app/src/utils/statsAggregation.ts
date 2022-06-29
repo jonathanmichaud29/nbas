@@ -43,6 +43,7 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
         battingAverage: 0,
         onBasePercentage: 0,
         onBaseSluggingPercentage: 0,
+        runsBattedIn: 0,
       });
     }
     else {
@@ -55,6 +56,7 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
       playerFound.walk += matchLineup.walk;
       playerFound.hitByPitch += matchLineup.hitByPitch;
       playerFound.sacrificeFly += matchLineup.sacrificeFly;
+      playerFound.runsBattedIn += matchLineup.runsBattedIn;
     }
   })
   
@@ -84,6 +86,7 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
         battingAverage: 0,
         onBasePercentage: 0,
         onBaseSluggingPercentage: 0,
+        runsBattedIn: 0,
       });
     }
     else {
@@ -96,6 +99,7 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
       teamFound.walk += matchLineup.walk;
       teamFound.hitByPitch += matchLineup.hitByPitch;
       teamFound.sacrificeFly += matchLineup.sacrificeFly;
+      teamFound.runsBattedIn += matchLineup.runsBattedIn;
     }
   })
   
@@ -144,7 +148,7 @@ export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {
     else {
       playerStats.onBaseSluggingPercentage = (Math.round(playerStats.onBaseSluggingPercentage * 1000) / 1000);
     }
-    
+
     return true;
   })
 }
