@@ -1,4 +1,4 @@
-
+import { Link } from 'react-router-dom';
 
 import { Grid, Paper } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
@@ -37,7 +37,7 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
                 const teamName = getTeamName(standingTeam.id, teams);
                 return (
                   <TableRow key={`team-standing-${standingTeam.id}`}>
-                    <TableCell>{teamName}</TableCell>
+                    <TableCell><Link to={`/team/${standingTeam.id}`}>{teamName}</Link></TableCell>
                     <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
                     <TableCell align="center">{standingTeam.nbWins}</TableCell>
                     <TableCell align="center">{standingTeam.nbLosts}</TableCell>

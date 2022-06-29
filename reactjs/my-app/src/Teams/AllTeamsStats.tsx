@@ -64,7 +64,7 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
               <Grid item style={{width:'100%'}}>
                 <StatBattingPercentage
                   stats={[teamStats]}
-                  columns={["year long stats"]}
+                  columns={["Season stats"]}
                 />
               </Grid>
             </Grid>
