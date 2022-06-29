@@ -12,7 +12,7 @@ interface IScoreboardProps {
   teamHome: ITeam;
   teamAway: ITeam;
   match: IMatch;
-  standingTeams: IStandingTeam[];
+  standingTeams?: IStandingTeam[];
 }
 
 function Scoreboard(props: IScoreboardProps) {
@@ -21,8 +21,10 @@ function Scoreboard(props: IScoreboardProps) {
 
   const dateReadable = match !== null ? createDateReadable(match.date) : '';
   const tableTitle = `${teamHome.name} vs ${teamAway.name}`;
-  const teamHomeStanding = standingTeams.find((standingTeam) => standingTeam.id === teamHome.id)
-  const teamAwayStanding = standingTeams.find((standingTeam) => standingTeam.id === teamAway.id)
+  const teamHomeStanding = standingTeams && standingTeams.find((standingTeam) => standingTeam.id === teamHome.id)
+  const teamAwayStanding = standingTeams && standingTeams.find((standingTeam) => standingTeam.id === teamAway.id)
+
+  const isTeamStandings = standingTeams && teamHomeStanding && teamAwayStanding;
 
   return (
     <Grid container justifyContent="center" alignItems="center" direction="column">
@@ -37,25 +39,37 @@ function Scoreboard(props: IScoreboardProps) {
               <TableRow>
                 <TableCell align="center">Team</TableCell>
                 { match.isCompleted === 1 && <TableCell>Points</TableCell> }
-                <TableCell>W</TableCell> 
-                <TableCell>L</TableCell>
-                <TableCell>N</TableCell>
+                { isTeamStandings && (
+                  <>
+                    <TableCell>W</TableCell> 
+                    <TableCell>L</TableCell>
+                    <TableCell>N</TableCell>
+                  </>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell>{teamHome.name}</TableCell>
+                <TableCell><Link to={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
                 { match.isCompleted === 1 && <TableCell align="center">{match.teamHomePoints}</TableCell> }
-                <TableCell align="center">{teamHomeStanding?.nbWins}</TableCell>
-                <TableCell align="center">{teamHomeStanding?.nbLosts}</TableCell>
-                <TableCell align="center">{teamHomeStanding?.nbNulls}</TableCell>
+                { isTeamStandings && (
+                  <>
+                    <TableCell align="center">{teamHomeStanding.nbWins}</TableCell>
+                    <TableCell align="center">{teamHomeStanding.nbLosts}</TableCell>
+                    <TableCell align="center">{teamHomeStanding.nbNulls}</TableCell>
+                  </>
+                )}
               </TableRow>
               <TableRow>
-                <TableCell>{teamAway.name}</TableCell>
+              <TableCell><Link to={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
                 { match.isCompleted === 1 && <TableCell align="center">{match.teamAwayPoints}</TableCell> }
-                <TableCell align="center">{teamAwayStanding?.nbWins}</TableCell>
-                <TableCell align="center">{teamAwayStanding?.nbLosts}</TableCell>
-                <TableCell align="center">{teamAwayStanding?.nbNulls}</TableCell>
+                { isTeamStandings && (
+                  <>
+                    <TableCell align="center">{teamAwayStanding.nbWins}</TableCell>
+                    <TableCell align="center">{teamAwayStanding.nbLosts}</TableCell>
+                    <TableCell align="center">{teamAwayStanding.nbNulls}</TableCell>
+                  </>
+                )}
               </TableRow>
             </TableBody>
           </Table>

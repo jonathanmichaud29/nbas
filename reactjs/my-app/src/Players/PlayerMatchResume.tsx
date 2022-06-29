@@ -8,6 +8,7 @@ import StatBattingPercentage from "../Stats/StatBattingPercentage";
 
 import { createDateReadable } from '../utils/dateFormatter';
 import { getCombinedPlayersStats } from '../utils/statsAggregation'
+import Scoreboard from "../Matchs/Scoreboard";
 
 function PlayerMatchResume(props: IPlayerMatchResumeProps) {
 
@@ -18,11 +19,17 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
   const playerStats = getCombinedPlayersStats([playerLineup])[0];
   console.log("playerLineup", playerLineup);
   return (
-    <div>
-      <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
-      <p>Played with <b>{playingForTeam.name}</b></p>
+    <>
       <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
         <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Scoreboard
+              match={match}
+              teamHome={teamHome}
+              teamAway={teamAway}
+            />
+            <Typography>Played with <b>{playingForTeam.name}</b></Typography>
+          </Grid>
           <Grid item xs={4}>
             <Typography variant="h6" component="h4" align="center">
               At Bats results
@@ -43,7 +50,7 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   )
 }
 

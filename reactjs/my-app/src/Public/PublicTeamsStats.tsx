@@ -3,14 +3,12 @@ import { useState, useEffect } from 'react';
 import { Alert, Box, CircularProgress, Typography  } from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
-import { IMatch, IMatchLineup } from '../Interfaces/match';
+import { IMatchLineup } from '../Interfaces/match';
 import { ITeam, IStandingTeam } from '../Interfaces/team';
 
 import { fetchPlayers } from '../ApiCall/players';
-import { fetchMatches, fetchMatchesLineups } from '../ApiCall/matches';
+import { fetchMatchesLineups } from '../ApiCall/matches';
 import { fetchStandingTeams, fetchTeams } from '../ApiCall/teams';
-
-
 
 import AllTeamsStanding from '../Teams/AllTeamsStanding';
 import AllTeamsStats from '../Teams/AllTeamsStats';

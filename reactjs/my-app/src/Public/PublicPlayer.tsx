@@ -39,7 +39,6 @@ function PublicPlayer() {
 
   return (
     <div className="public-layout">
-      <h1>Public player</h1>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { player && (

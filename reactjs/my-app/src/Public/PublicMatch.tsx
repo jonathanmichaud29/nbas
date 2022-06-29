@@ -39,7 +39,6 @@ function PublicMatch() {
 
   return (
     <div className="public-layout">
-      <h1>Public match</h1>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && (
