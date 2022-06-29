@@ -47,7 +47,7 @@ function YearStats(props: IYearStatsProps) {
 
   return (
     <div>
-      <h3>Year stats</h3>
+      <h3>Season stats</h3>
       { isLoaded && (
         <Box sx={{ flexGrow: 1, justifyContent: "center"}}>
           <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
@@ -63,7 +63,7 @@ function YearStats(props: IYearStatsProps) {
             <Grid item xs={12} sm={6}>
               <StatBattingPercentage
                 stats={[allStats]}
-                columns={["year long stats"]}
+                columns={["Season Statistics"]}
               />
             </Grid>
           </Grid>

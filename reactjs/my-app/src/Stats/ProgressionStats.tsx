@@ -5,7 +5,9 @@ import { IProgressionStatsProps } from '../Interfaces/stats';
 import { IBattingPercentageStats } from '../Interfaces/stats';
 
 import { createShortDateReadable } from '../utils/dateFormatter';
-import { getStatHits, getStatSlugging } from '../utils/statsAggregation'
+import { getCombinedPlayersStats } from '../utils/statsAggregation'
+
+import { chartColors } from '../utils/colorCodes'
 
 ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend );
 
@@ -15,6 +17,7 @@ function ProgressionStats(props: IProgressionStatsProps){
 
   const options = {
     responsive: true,
+    maintainAspectRatio:false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -39,9 +42,12 @@ function ProgressionStats(props: IProgressionStatsProps){
   matches.forEach((match) => {
     const matchLineup = matchLineups.find((tmpLineup) => tmpLineup.idMatch === match.id);
     if( matchLineup !== undefined) {
+      // TODO: Should be "July 7 against X Team"
       labels.push(createShortDateReadable(match.date));
 
-      const nbHits = getStatHits(matchLineup.single, matchLineup.double, matchLineup.triple, matchLineup.homerun);
+      stats.push(getCombinedPlayersStats([matchLineup])[0])
+
+      /* const nbHits = getStatHits(matchLineup.single, matchLineup.double, matchLineup.triple, matchLineup.homerun);
       const sluggingTotal = getStatSlugging(matchLineup.single, matchLineup.double, matchLineup.triple, matchLineup.homerun);
 
       stats.push({
@@ -49,7 +55,7 @@ function ProgressionStats(props: IProgressionStatsProps){
         sluggingPercentage: sluggingTotal / matchLineup.atBats,
         onBasePercentage: 0.300,
         onBaseSluggingPercentage: 1.700,
-      });
+      }); */
     }
   })
   const data = {
@@ -58,20 +64,34 @@ function ProgressionStats(props: IProgressionStatsProps){
       {
         label: 'Batting Average',
         data: stats.map((stat) => stat.battingAverage),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: chartColors.battingAverage.bkg,
+        backgroundColor: chartColors.battingAverage.bkg,
+      },
+      {
+        label: 'On Base %',
+        data: stats.map((stat) => stat.onBasePercentage),
+        borderColor: chartColors.onBasePercentage.bkg,
+        backgroundColor: chartColors.onBasePercentage.bkg,
       },
       {
         label: 'Slugging %',
         data: stats.map((stat) => stat.sluggingPercentage),
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        borderColor: chartColors.sluggingPercentage.bkg,
+        backgroundColor: chartColors.sluggingPercentage.bkg,
+      },
+      {
+        label: 'On Base Slugging %',
+        data: stats.map((stat) => stat.onBaseSluggingPercentage),
+        borderColor: chartColors.onBaseSluggingPercentage.bkg,
+        backgroundColor: chartColors.onBaseSluggingPercentage.bkg,
       },
     ],
   };
 
   return (
-    <Line options={options} data={data} />
+    <div style={{position:'relative', height:'300px'}}>
+      <Line options={options} data={data} />
+    </div>
   )
 }
 

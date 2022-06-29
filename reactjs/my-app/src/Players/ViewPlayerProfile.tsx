@@ -54,11 +54,13 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
         /> 
       )}
       { isLoaded && (
-        <ProgressionStats
-          key={`progression-player-stat-${player.id}`}
-          matches={listMatches}
-          matchLineups={listMatchLineups}
-        />
+        <Box sx={{ flexGrow: 1, justifyContent: "center"}} style={{ margin:"20px 0px", width:"100%"}}>
+          <ProgressionStats
+            key={`progression-player-stat-${player.id}`}
+            matches={listMatches}
+            matchLineups={listMatchLineups}
+          />
+        </Box>
       )}
       { isLoaded && listMatches && listMatches.map((match: IMatch) => {
         const teamHome = listTeams.find((team) => team.id === match.idTeamHome)

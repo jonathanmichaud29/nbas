@@ -3,6 +3,8 @@ import { Bar } from 'react-chartjs-2';
 
 import { IStatBattingPercentageProps } from '../Interfaces/stats';
 
+import { chartColors } from '../utils/colorCodes'
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
 
 function StatBattingPercentage(props: IStatBattingPercentageProps) {
@@ -37,22 +39,22 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
       {
         label: 'Batting Average',
         data: labelsChart.map((label, index) => stats[index].battingAverage),
-        backgroundColor: 'rgba(0, 255, 0, 1)',
+        backgroundColor: chartColors.battingAverage.bkg,
       },
       {
         label: 'On Base %',
         data: labelsChart.map((label, index) => stats[index].onBasePercentage),
-        backgroundColor: 'rgba(0, 255, 200, 1)',
+        backgroundColor: chartColors.onBasePercentage.bkg,
       },
       {
         label: 'Slugging %',
         data: labelsChart.map((label, index) => stats[index].sluggingPercentage),
-        backgroundColor: 'rgba(0, 180, 255, 1)',
+        backgroundColor: chartColors.sluggingPercentage.bkg,
       },
       {
         label: 'On Base Slugging %',
         data: labelsChart.map((label, index) => stats[index].onBaseSluggingPercentage),
-        backgroundColor: 'rgba(0, 0, 255, 1)',
+        backgroundColor: chartColors.onBaseSluggingPercentage.bkg,
       },
     ],
   };
