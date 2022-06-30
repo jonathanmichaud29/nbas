@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { Alert, Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
 import { fetchTeamMatchLineups, fetchPlayersMatchLineups } from '../ApiCall/matches';
@@ -110,11 +110,11 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && bestStatPlayers.length > 0 && (
-        <>
-          <Typography>
+        <Box>
+          <Typography variant="h5" component="h3">
             {team.name} players
           </Typography>
-          <TableContainer>
+          <TableContainer component={Paper}>
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -134,7 +134,7 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
               </TableBody>
             </Table>
           </TableContainer>
-        </>
+        </Box>
       )} 
     </>
   )
