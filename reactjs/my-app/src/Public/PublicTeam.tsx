@@ -8,6 +8,7 @@ import { ITeam } from "../Interfaces/team";
 import { fetchTeam } from '../ApiCall/teams';
 
 import ViewTeamProfile from '../Teams/ViewTeamProfile';
+import { setMetas } from '../utils/metaTags';
 
 function PublicTeam() {
   let { id } = useParams();
@@ -18,6 +19,12 @@ function PublicTeam() {
 
   const isLoaded = team !== null;
 
+  if( isLoaded ){
+    setMetas({
+      title:`${team.name} Team profile`,
+      description:`NBAS ${team.name} team profile that included its standing, batting stats and each match summary played this season`
+    });
+  }
   
   /**
    * Fetch Match details

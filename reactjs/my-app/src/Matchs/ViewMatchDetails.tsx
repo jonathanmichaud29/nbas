@@ -13,6 +13,9 @@ import { IPlayer } from '../Interfaces/player'
 
 import TeamMatchResume from '../Teams/TeamMatchResume'
 import Scoreboard from './Scoreboard';
+import { createDateReadable } from '../utils/dateFormatter';
+
+import { setMetas } from '../utils/metaTags';
 
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
@@ -26,6 +29,13 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
 
   const isLoaded = listMatchLineups !== null && teamHome !== null && teamAway !== null && listPlayers !== null && standingTeams !== null;
+
+  if( teamHome !== null && teamAway !== null ){
+    setMetas({
+      title:`Match summary - ${teamHome.name} vs ${teamAway.name}`,
+      description:`NBAS match summary ${teamHome.name} vs ${teamAway.name} on date ${createDateReadable(match.date)}`
+    });
+  }
 
   useEffect(() => {
     if( listMatchLineups !== null && teamHome !== null && teamAway !== null ) return;

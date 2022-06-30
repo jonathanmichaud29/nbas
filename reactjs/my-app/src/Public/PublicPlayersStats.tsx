@@ -8,6 +8,7 @@ import { IMatchLineup } from '../Interfaces/match';
 import { fetchPlayers } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';
 
+import { setMetas } from '../utils/metaTags';
 
 import YearStats from '../Stats/YearStats';
 
@@ -19,6 +20,10 @@ function PublicPlayersStats() {
 
   const isLoaded = listPlayers !== null && listMatchesLineups !== null;
 
+  setMetas({
+    title:`Players batting statistics`,
+    description:`League players batting statistics this season`
+  });
   
   /**
    * Fetch Players

@@ -29,8 +29,11 @@ import Login from './Firebase/Login';
 import TeamManager from './Admin/TeamManager';
 import CalendarManager from './Admin/CalendarManager';
 
+import { setDefaultMetas } from './utils/metaTags';
+
 
 function App() {
+  setDefaultMetas();
   return (
     <div className="App">
       <Router>

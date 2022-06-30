@@ -13,6 +13,7 @@ import { fetchStandingTeams, fetchTeams } from '../ApiCall/teams';
 import AllTeamsStanding from '../Teams/AllTeamsStanding';
 import AllTeamsStats from '../Teams/AllTeamsStats';
 
+import {setMetas} from '../utils/metaTags';
 
 function PublicTeamsStats() {
 
@@ -23,6 +24,11 @@ function PublicTeamsStats() {
   const [apiError, changeApiError] = useState("");
 
   const isLoaded = listTeams !== null && listPlayers !== null && listMatchesLineups !== null && standingTeams !== null;
+
+  setMetas({
+    title:`Teams standing this season`,
+    description:`NBAS teams standing this season including team batting statistics`
+  });
 
   /**
    * Fetch Teams

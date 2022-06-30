@@ -1,7 +1,3 @@
-/* 
-import ListTeams from "../Teams/ListTeams";
-import ListPlayers from "../Players/ListPlayers";
-import ListMatches from "../Matchs/ListMatches"; */
 
 import MatchResume from "../Matchs/MatchResume";
 import { Grid } from "@mui/material";

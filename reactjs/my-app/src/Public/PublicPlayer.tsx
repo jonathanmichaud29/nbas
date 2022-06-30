@@ -9,6 +9,8 @@ import { fetchPlayer } from '../ApiCall/players';
 
 import ViewPlayerProfile from '../Players/ViewPlayerProfile';
 
+import { setMetas } from '../utils/metaTags';
+
 function PublicPlayer() {
   let { id } = useParams();
   const idPlayer = id ? parseInt(id, 10) : null;
@@ -18,6 +20,12 @@ function PublicPlayer() {
 
   const isLoaded = player !== null;
 
+  if( isLoaded ){
+    setMetas({
+      title:`${player.name} Player profile`,
+      description:`NBAS ${player.name} profile that included its standing, batting stats and each match summary played this season`
+    });
+  }
   
   /**
    * Fetch Match details
