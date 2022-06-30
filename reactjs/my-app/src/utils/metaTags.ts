@@ -26,6 +26,22 @@ export function setDefaultMetas(){
   }
 }
 
+export function setDefaultAdminMetas() {
+  let el;
+  
+  setDefaultMetas();
+
+  el = document.querySelector('meta[name="robots"]');
+  if( el ) el.setAttribute("content", "noindex,nofollow");
+
+  el = document.querySelector('title');
+  const newTitle = "NBAS management section" + defaultTitleSuffix;
+  if( el ) el.textContent = newTitle;
+
+  el = document.querySelector('meta[property="og:title"]');
+  if( el ) el.setAttribute("content", newTitle);
+}
+
 export function setMetas( params: ISetMeta) {
   const { url, title, description, image, ommitTitleSuffix } = params;
 
@@ -33,7 +49,11 @@ export function setMetas( params: ISetMeta) {
 
   if( title ){
     el = document.querySelector('title');
-    if( el ) el.textContent = title + ( ommitTitleSuffix === true ? '' : defaultTitleSuffix);
+    const newTitle = title + ( ommitTitleSuffix === true ? '' : defaultTitleSuffix);
+    if( el ) el.textContent = newTitle;
+
+    el = document.querySelector('meta[property="og:title"]');
+    if( el ) el.setAttribute("content", newTitle);
   }
 
   if( description ){
