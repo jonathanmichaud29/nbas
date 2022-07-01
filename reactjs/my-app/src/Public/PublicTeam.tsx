@@ -45,8 +45,7 @@ function PublicTeam() {
   }, [idTeam]);
 
   return (
-    <div className="public-layout">
-      <h1>Public team</h1>
+    <Box p={3}>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { team && (
@@ -54,7 +53,7 @@ function PublicTeam() {
           team={team}
         />
       ) }
-    </div>
+    </Box>
   )
 }
 export default PublicTeam;

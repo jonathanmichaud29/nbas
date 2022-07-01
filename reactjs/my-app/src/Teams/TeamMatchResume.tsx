@@ -15,6 +15,8 @@ import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns, defaultDataGridProps } from '../utils/dataGridColumns'
 
+import Scoreboard from "../Matchs/Scoreboard";
+
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   const {team, matchLineups, match, players, teamHome, teamAway, hideHeader} = props;
@@ -54,21 +56,18 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
   }) ) || [];
   
   return (
-    <div>
-      { ! hideHeader && (
-        <>
-          <h3>{dateReadable} : {teamHome.name} VS {teamAway.name}</h3>
-          <p><b>{ match.idTeamWon === team.id ? 'Victory' : 'Defeat'}</b> - {match.teamHomePoints} VS {match.teamAwayPoints}</p>
-        </>
-      )}
-      <h4>{team.name} Stats</h4>
-      { isLoaded && (
-        <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <Typography variant="h6" component="h4" align="center">
-                At Bats results
-              </Typography>
+    <Box p={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Scoreboard
+            match={match}
+            teamHome={teamHome}
+            teamAway={teamAway}
+          />
+        </Grid>
+        { isLoaded && (
+          <>
+            <Grid item xs={12} sm={6}>
               <StatBatResults
                 single={allStats.single}
                 double={allStats.double}
@@ -77,15 +76,17 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
                 out={allStats.out}
               />
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12} sm={6}>
               <StatBattingPercentage
                 stats={[allStats]}
                 columns={["team stats"]}
               />
             </Grid>
-          </Grid>
+          </>
+        )}
 
-          { rows.length > 0 && (
+        { rows.length > 0 && (
+          <Grid item xs={12}>
             <DataGrid
               {...defaultDataGridProps}
               rows={rows}
@@ -96,10 +97,10 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
                 Toolbar: GridToolbar
               }}
             />
-          )}
-        </Box>
-      )}
-    </div>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
   )
 }
 

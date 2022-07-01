@@ -17,11 +17,11 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
   const dateReadable = createDateReadable(match.date);
   const playingForTeam: ITeam = ( playerLineup.idTeam === teamHome.id ? teamHome : teamAway);
   const playerStats = getCombinedPlayersStats([playerLineup])[0];
-  console.log("playerLineup", playerLineup);
+  
   return (
     <Box p={3}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid item xs={12} p={3}>
           <Scoreboard
             match={match}
             teamHome={teamHome}

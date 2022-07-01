@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
 
@@ -49,7 +49,9 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
           { apiError && <Alert severity="error">{apiError}</Alert> }
           <Grid container alignItems="center" justifyContent="center" flexDirection="column">
             <Grid item xs={12} style={{width:"100%"}}>
-              <Typography variant="h2" component="h1" align='center'>{player.name} Profile</Typography>
+              <Typography variant="h3" component="h1" align='center'>
+                {player.name} Profile
+              </Typography>
             </Grid>
         
             { isLoaded && (
@@ -68,8 +70,6 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
                     matches={listMatches}
                     matchLineups={listMatchLineups}
                   />
-                  {/* <Box sx={{ flexGrow: 1, justifyContent: "center"}} style={{ margin:"20px 0px", width:"100%"}}> */}
-                  {/* </Box> */}
                 </Grid>
                 <Divider />
               </>
@@ -78,7 +78,7 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
         </CardContent>
       </Card>
       
-      { isLoaded && listMatches && (
+      { isLoaded && listMatches && listMatches.length > 0 && (
         <Box pt={3}>
           <Card>
             <CardContent>
@@ -88,23 +88,23 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
             </CardContent>
             <CardContent>
               <Grid container>
-                <Grid item  style={{width:'100%'}}>
+                <Grid item style={{width:'100%'}}>
                   { listMatches.map((match: IMatch) => {
                     const teamHome = listTeams.find((team) => team.id === match.idTeamHome)
                     const teamAway = listTeams.find((team) => team.id === match.idTeamAway)
                     const playerLineup = listMatchLineups.find((lineup) => lineup.idMatch === match.id)
                     if( teamHome === undefined || teamAway === undefined || playerLineup === undefined ) return '';
                     return (
-                      <>
+                      <React.Fragment key={`player-match-resume-${match.id}`}>
                         <Divider />
                         <PlayerMatchResume
-                          key={`player-match-resume-${match.id}`}
+                          
                           playerLineup={playerLineup}
                           match={match}
                           teamHome={teamHome}
                           teamAway={teamAway}
                         />  
-                      </>
+                      </React.Fragment>
                     )
                   })}
                 </Grid>

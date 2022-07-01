@@ -88,6 +88,13 @@ export const defaultTheme = createTheme({
           }
         }
       }
+    },
+    MuiDivider:{
+      styleOverrides:{
+        root:{
+          borderBottomWidth:'medium',
+        }
+      }
     }
   },
 });
