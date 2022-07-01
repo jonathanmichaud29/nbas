@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
 
-import { Alert, Box, CircularProgress, Typography } from "@mui/material";
+import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
+import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 
 import { fetchSingleMatch, IFetchSingleMatchParams } from "../ApiCall/matches";
 import { fetchTeams, fetchStandingTeams } from "../ApiCall/teams";
@@ -82,21 +82,34 @@ function MatchResume(props: IMatchResumeProps) {
   }, [match, standingTeams])
 
   return (
-    <>
-      
-      <Typography variant="h4" component="h2">
-        {title}
-      </Typography>
+    <Card>
+      <CardContent>
+        <Grid container spacing={1} alignItems="baseline" justifyContent="center">
+          <Grid item><SportsBaseballIcon color="primary"/></Grid>
+          <Grid item>
+            <Typography variant="h4" component="h2" color="textPrimary">
+              {title}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+
+      <Divider />
+
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
+      
       { isLoaded && (
-        <Scoreboard 
-          teamHome={teamHome}
-          teamAway={teamAway}
-          match={match}
-          standingTeams={standingTeams}
-        /> 
+        <CardContent>
+          <Scoreboard 
+            teamHome={teamHome}
+            teamAway={teamAway}
+            match={match}
+            standingTeams={standingTeams}
+          /> 
+        </CardContent>
       )}
+        
       { isLoaded &&
         <BestStatPlayers 
           match={match}
@@ -110,7 +123,7 @@ function MatchResume(props: IMatchResumeProps) {
         />
       }
 
-    </>
+    </Card>
   )
 }
 

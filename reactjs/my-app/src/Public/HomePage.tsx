@@ -1,23 +1,25 @@
 
 import MatchResume from "../Matchs/MatchResume";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 function HomePage() {
   return (
-    <Grid container spacing={2} justifyContent="center">
-      <Grid item xs={5}>
-        <MatchResume 
-          title="Latest match"
-          isLatestMatch={true}
-        />
+    <Box p={3}>
+      <Grid container spacing={4} justifyContent="space-around">
+        <Grid item sm={12} md={6}  width="100%">
+          <MatchResume 
+            title="Latest match"
+            isLatestMatch={true}
+          />
+        </Grid>
+        <Grid item sm={12} md={6}  width="100%">
+          <MatchResume 
+            title="Upcoming match"
+            isLatestMatch={false}
+          />
+        </Grid>
       </Grid>
-      <Grid item xs={5}>
-        <MatchResume 
-          title="Upcoming match"
-          isLatestMatch={false}
-        />
-      </Grid>
-    </Grid>
+    </Box>
     
   )
 }

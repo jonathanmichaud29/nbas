@@ -39,4 +39,36 @@ export const defaultTheme = createTheme({
       lineHeight: 0.9,
     },
   },
+  components: {
+    MuiLink:{
+      defaultProps:{
+        underline: 'hover',
+      },
+      styleOverrides: {
+        root:{
+          color:"#751e1e",
+        }
+      }
+    },
+    MuiTable:{
+      defaultProps: {
+        // The props to change the default for.
+        size: "small", // No more ripple, on the whole application 💣!
+      },
+    },
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#751e1e',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head:{
+          color:'#fff'
+        }
+      }
+    }
+  },
 });

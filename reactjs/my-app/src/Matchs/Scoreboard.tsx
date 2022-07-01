@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
-
-import { Grid, Paper, Typography } from "@mui/material";
+import { Grid, Paper, Link, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
 import { ITeam, IStandingTeam } from '../Interfaces/team';
@@ -28,30 +26,37 @@ function Scoreboard(props: IScoreboardProps) {
 
   return (
     <Grid container justifyContent="center" alignItems="center" direction="column">
-      <Grid item >
-        <Typography variant="h6" component="h3"><Link to={`/match/${match.id}`}>{tableTitle}</Link></Typography>
+      <Grid item 
+        display="flex" 
+        justifyContent="center" 
+        flexDirection="column" 
+        alignItems="center"
+      >
+        <Typography variant="h6" component="h3"><Link href={`/match/${match.id}`}>{tableTitle}</Link></Typography>
         <Typography variant="subtitle1">{dateReadable}</Typography>
       </Grid>
       <Grid item xs={3}>
         <TableContainer component={Paper}>
-          <Table aria-label={tableTitle}>
+          <Table size="small" aria-label={tableTitle}>
             <TableHead>
               <TableRow>
-                <TableCell align="center">Team</TableCell>
+                <TableCell>Team</TableCell>
                 { match.isCompleted === 1 && <TableCell>Points</TableCell> }
                 { isTeamStandings && (
                   <>
-                    <TableCell>W</TableCell> 
-                    <TableCell>L</TableCell>
-                    <TableCell>N</TableCell>
+                    <TableCell align="center">W</TableCell> 
+                    <TableCell align="center">L</TableCell>
+                    <TableCell align="center">N</TableCell>
                   </>
                 )}
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell><Link to={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
-                { match.isCompleted === 1 && <TableCell align="center">{match.teamHomePoints}</TableCell> }
+                <TableCell><Link href={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
+                { match.isCompleted === 1 && (
+                  <TableCell align="center">{match.teamHomePoints}</TableCell> 
+                )}
                 { isTeamStandings && (
                   <>
                     <TableCell align="center">{teamHomeStanding.nbWins}</TableCell>
@@ -61,8 +66,10 @@ function Scoreboard(props: IScoreboardProps) {
                 )}
               </TableRow>
               <TableRow>
-              <TableCell><Link to={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
-                { match.isCompleted === 1 && <TableCell align="center">{match.teamAwayPoints}</TableCell> }
+              <TableCell><Link href={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
+                { match.isCompleted === 1 && (
+                  <TableCell align="center">{match.teamAwayPoints}</TableCell> 
+                )}
                 { isTeamStandings && (
                   <>
                     <TableCell align="center">{teamAwayStanding.nbWins}</TableCell>

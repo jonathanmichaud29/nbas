@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 
 import { auth } from "../Firebase/firebase";
 
-import { AppBar, Avatar, Box, Button, Drawer, IconButton, Link, List, ListItem, Menu, MenuItem } from "@mui/material";
+import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, Link, List, ListItem, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu"
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -26,23 +26,50 @@ function PublicMenu() {
         label:"Teams Stats",
         url: "/stats/teams",
       },
-      {
+      /* {
         label:"Calendar",
         url: "/stats/calendar",
-      }
+      } */
     ];
 
     return links.map((link, index) => {
-      return (
-        <ListItem key={`public-menu-${index}`}>
-          <Link component={NavLink} to={link.url} sx={{ 
-            color:(theme) => isDrawer ? theme.palette.primary.main : theme.palette.primary.light,
-            textAlign: 'center',
-            whiteSpace:'nowrap'
-          }}
-          >{link.label}</Link>
-        </ListItem>
-      )
+      if( isDrawer ) {
+        return (
+          <ListItem key={`public-menu-${index}`} sx={{
+            padding:0,
+            margin:'5px 0',
+          }}>
+            <Link 
+              component={NavLink} 
+              to={link.url} 
+              onClick={() => setMobileMenuOpen(false)}
+              p={1} 
+              sx={{
+                display:'block',
+                width:'100%',
+                textAlign:'center',
+                '&:hover':{
+                  color:(theme) => theme.palette.primary.light,
+                  backgroundColor:(theme) => theme.palette.primary.main,
+                  textDecoration:"none",
+                }
+              }}
+            >{link.label}</Link>
+          </ListItem>
+        )
+      }
+      else {
+        return (
+          <ListItem key={`public-menu-${index}`}>
+            <Link component={NavLink} to={link.url} sx={{ 
+              color:(theme) => theme.palette.primary.light,
+              textAlign: 'center',
+              whiteSpace:'nowrap',
+            }}
+            >{link.label}</Link>
+          </ListItem>
+        )
+      }
     })
   }
   const renderUserLinks = () => {
@@ -152,7 +179,19 @@ function PublicMenu() {
           }
         }}
       >
-        <List>
+        <Box sx={{
+            textAlign:"center",
+            backgroundColor:(theme) => theme.palette.primary.main,
+            color:(theme) => theme.palette.primary.light
+          }}
+        >
+          <Typography variant="h6" m={1} >NBAS Main Menu</Typography>
+        </Box>
+        <Divider />
+        <List sx={{
+          display:"flex",
+          flexFlow:"column nowrap",
+        }}>
           { renderPublicLinks(true) }
         </List>
       </Drawer>

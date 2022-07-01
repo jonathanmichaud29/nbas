@@ -110,12 +110,12 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && bestStatPlayers.length > 0 && (
-        <Box>
-          <Typography variant="h5" component="h3">
+        <Box m={3}>
+          <Typography variant="h6" component="h3" textAlign="center">
             {team.name} players
           </Typography>
           <TableContainer component={Paper}>
-            <Table size="small">
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Player</TableCell>
