@@ -99,10 +99,7 @@ function PublicTeamsStats() {
   }, [listTeams, standingTeams])
 
   return (
-    <div className="public-layout">
-      <Typography component="h1" variant="h3">
-        League Teams Standing
-      </Typography>
+    <>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && (
@@ -117,7 +114,7 @@ function PublicTeamsStats() {
           matchesLineups={listMatchesLineups}
         />
       ) }
-    </div>
+    </>
   )
 }
 export default PublicTeamsStats;

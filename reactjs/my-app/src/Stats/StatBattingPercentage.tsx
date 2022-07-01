@@ -1,3 +1,5 @@
+import { Box } from '@mui/material';
+
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
@@ -15,12 +17,12 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
     maintainAspectRatio:false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'bottom' as const,
       },
-      title: {
+      /* title: {
         display: true,
         text: 'Batting % Stats',
-      },
+      }, */
       
     },
     scales: {
@@ -60,9 +62,9 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
   };
 
   return (
-    <div style={{position:'relative', height:'300px'}}>
+    <Box style={{position:'relative', height:'300px'}}>
       <Bar options={chartOptionsPercentage} data={dataChartBattingPercentage} />
-    </div>
+    </Box>
   )
 }
 

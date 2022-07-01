@@ -64,25 +64,28 @@ function YearStats(props: IYearStatsProps) {
                 out={allStats.out}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} p={3}>
               <StatBattingPercentage
                 stats={[allStats]}
                 columns={["Season Statistics"]}
               />
             </Grid>
+          
+            { rows.length > 0 && (
+              <Grid item xs={12}>
+                <DataGrid
+                  {...defaultDataGridProps}
+                  rows={rows}
+                  columns={playerExtendedStatsColumns}
+                  getRowId={(row) => row.playerName}
+                  initialState={defaultStateStatsColumns}
+                  components={{
+                    Toolbar: GridToolbar
+                  }}
+                />
+              </Grid>
+            )}
           </Grid>
-          { rows.length > 0 && (
-            <DataGrid
-              {...defaultDataGridProps}
-              rows={rows}
-              columns={playerExtendedStatsColumns}
-              getRowId={(row) => row.playerName}
-              initialState={defaultStateStatsColumns}
-              components={{
-                Toolbar: GridToolbar
-              }}
-            />
-          )}
         </Box>
       )}
     </>

@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
@@ -14,6 +15,11 @@ function StatBatResults(props: IStatBatResultsProps) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio:false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+      },
+    }
   }
   const dataChartAtBats = {
     labels: ['Single', 'Double', 'Triple', 'Homerun', 'Out'],
@@ -41,9 +47,9 @@ function StatBatResults(props: IStatBatResultsProps) {
   };
 
   return (
-    <div style={{position:'relative', height:'300px'}}>
+    <Box style={{position:'relative', height:'300px'}}>
       <Doughnut options={chartOptions} data={dataChartAtBats} />
-    </div>
+    </Box>
   )
 }
 
