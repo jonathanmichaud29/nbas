@@ -4,6 +4,7 @@ import { IPlayer } from './player'
 export interface IYearStatsProps {
   matchLineups:   IMatchLineup[];
   players:        IPlayer[];
+  title:          string;
 }
 
 export interface IBattingPercentageStats {

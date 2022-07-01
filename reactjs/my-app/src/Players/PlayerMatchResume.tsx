@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 
 import { ITeam } from "../Interfaces/team";
 import { IPlayerMatchResumeProps } from '../Interfaces/player';
@@ -19,38 +19,35 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
   const playerStats = getCombinedPlayersStats([playerLineup])[0];
   console.log("playerLineup", playerLineup);
   return (
-    <>
-      <Box sx={{ flexGrow: 1, justifyContent: "center" }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Scoreboard
-              match={match}
-              teamHome={teamHome}
-              teamAway={teamAway}
-            />
-            <Typography>Played with <b>{playingForTeam.name}</b></Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="h6" component="h4" align="center">
-              At Bats results
-            </Typography>
-            <StatBatResults
-              single={playerLineup.single}
-              double={playerLineup.double}
-              triple={playerLineup.triple}
-              homerun={playerLineup.homerun}
-              out={playerLineup.out}
-            />
-          </Grid>
-          <Grid item xs={8}>
-            <StatBattingPercentage
-              stats={[playerStats]}
-              columns={[dateReadable]}
-            />
-          </Grid>
+    <Box p={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Scoreboard
+            match={match}
+            teamHome={teamHome}
+            teamAway={teamAway}
+          />
         </Grid>
-      </Box>
-    </>
+        <Grid item xs={12}>
+          <Typography align="center">Played with <b>{playingForTeam.name}</b></Typography>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <StatBatResults
+            single={playerLineup.single}
+            double={playerLineup.double}
+            triple={playerLineup.triple}
+            homerun={playerLineup.homerun}
+            out={playerLineup.out}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <StatBattingPercentage
+            stats={[playerStats]}
+            columns={[dateReadable]}
+          />
+        </Grid>
+      </Grid>
+    </Box>
   )
 }
 

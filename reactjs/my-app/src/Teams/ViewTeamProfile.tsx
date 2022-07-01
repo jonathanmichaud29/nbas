@@ -58,6 +58,7 @@ function ViewTeamProfile(props: ITeamProfileProps) {
           key={`team-year-stat-${team.id}`}
           matchLineups={listMatchLineups}
           players={listPlayers}
+          title={`${team.name} season batting stats`}
         /> 
       )}
       { isLoaded && listMatches && listMatches.map((match: IMatch) => {

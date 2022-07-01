@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 
-import { Alert, Box, CircularProgress  } from "@mui/material";
+import { Alert, Box, CircularProgress} from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
 
@@ -46,7 +46,7 @@ function PublicPlayer() {
   }, [idPlayer]);
 
   return (
-    <div className="public-layout">
+    <Box p={3}>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { player && (
@@ -54,7 +54,7 @@ function PublicPlayer() {
           player={player}
         />
       ) }
-    </div>
+    </Box>
   )
 }
 export default PublicPlayer;

@@ -18,7 +18,8 @@ export const playerExtendedStatsColumns: GridColDef[] = [
   {
     field: 'playerName',
     headerName: 'Player',
-    width: columnWidth.lg
+    width: columnWidth.lg,
+    hideable:false,
   },
   {
     field: 'atBats',

@@ -14,7 +14,7 @@ import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAg
 
 function YearStats(props: IYearStatsProps) {
 
-  const {matchLineups, players} = props;
+  const {matchLineups, players, title} = props;
 
   const [allStats, setAllStats] = useState<IBattingStatsExtended | null>(null);
   const [allPlayerStats, setAllPlayerStats] = useState<IBattingStatsExtended[] | null>(null);
@@ -53,7 +53,7 @@ function YearStats(props: IYearStatsProps) {
         <Box>
           <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
             <Grid item xs={12}>
-              <Typography component="h2" variant="h6" align='center'>League players average batting stats</Typography>
+              <Typography component="h2" variant="h6" align='center'>{title}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <StatBatResults

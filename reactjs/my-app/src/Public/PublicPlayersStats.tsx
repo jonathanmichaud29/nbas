@@ -75,6 +75,7 @@ function PublicPlayersStats() {
                   key={`year-players-stat`}
                   matchLineups={listMatchesLineups}
                   players={listPlayers}
+                  title={`League batting stats`}
                 /> 
               </Grid>
             )}
