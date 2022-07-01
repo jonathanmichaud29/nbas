@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@mui/material';
 
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
@@ -107,7 +107,7 @@ export const playerExtendedStatsColumns: GridColDef[] = [
           aria-label={`${params.row.playerName} Profile`}
           title={`${params.row.playerName} Profile`}
           >
-          <Link to={`/player/${params.row.id}`}>
+          <Link href={`/player/${params.row.id}`}>
             <AccountBoxIcon />
           </Link>
         </IconButton>

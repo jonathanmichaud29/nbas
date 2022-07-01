@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 import { IBattingStatsExtended, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
@@ -48,11 +48,13 @@ function YearStats(props: IYearStatsProps) {
   }) ) || [];
 
   return (
-    <div>
-      <h3>Season stats</h3>
+    <>
       { isLoaded && (
-        <Box sx={{ flexGrow: 1, justifyContent: "center"}}>
+        <Box>
           <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
+            <Grid item xs={12}>
+              <Typography component="h2" variant="h6" align='center'>League players average batting stats</Typography>
+            </Grid>
             <Grid item xs={12} sm={6}>
               <StatBatResults
                 single={allStats.single}
@@ -83,7 +85,7 @@ function YearStats(props: IYearStatsProps) {
           )}
         </Box>
       )}
-    </div>
+    </>
   )
 }
 

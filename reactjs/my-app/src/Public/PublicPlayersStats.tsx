@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Alert, Box, CircularProgress  } from "@mui/material";
+import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography  } from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
@@ -60,18 +60,28 @@ function PublicPlayersStats() {
   }, [listMatchesLineups]);
 
   return (
-    <div className="public-layout">
-      <h1>League Players Standing</h1>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      { isLoaded && (
-        <YearStats
-          key={`year-players-stat`}
-          matchLineups={listMatchesLineups}
-          players={listPlayers}
-        /> 
-      )}
-    </div>
+    <Box p={3}>
+      <Card>
+        <CardContent>
+          <Grid container alignItems="center" justifyContent="center" flexDirection="column">
+            <Grid item xs={12} style={{width:"100%"}}>
+              <Typography variant="h2" component="h1" align='center'>League Players Standing</Typography>
+            </Grid>
+            { ! isLoaded && <Box><CircularProgress /></Box>}
+            { apiError && <Alert severity="error">{apiError}</Alert> }
+            { isLoaded && (
+              <Grid item xs={12} style={{width:"100%"}} >
+                <YearStats
+                  key={`year-players-stat`}
+                  matchLineups={listMatchesLineups}
+                  players={listPlayers}
+                /> 
+              </Grid>
+            )}
+          </Grid>
+        </CardContent>
+      </Card>
+    </Box>
   )
 }
 export default PublicPlayersStats;

@@ -1,5 +1,7 @@
+import { BoltRounded } from '@mui/icons-material';
 import { createTheme } from '@mui/material';
- 
+import type {} from '@mui/x-data-grid/themeAugmentation';
+
 export const defaultTheme = createTheme({
   breakpoints: {
     values: {
@@ -67,6 +69,23 @@ export const defaultTheme = createTheme({
       styleOverrides: {
         head:{
           color:'#fff'
+        }
+      }
+    },
+    MuiDataGrid: {
+      styleOverrides: {
+        columnHeaders:{
+          backgroundColor: '#751e1e',
+        },
+        columnHeader:{
+          color:'#fff'
+        },
+        sortIcon:{
+          color:'#fff',
+          fontSize:'20px',
+          '&:hover':{
+            opacity:'1'
+          }
         }
       }
     }
