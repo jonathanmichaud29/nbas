@@ -29,37 +29,6 @@ const { is_missing_keys } = require("../utils/validation");
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 
-
-exports.getAllTeams = async (req, res, next) => {
-
-  const resultMainQuery = await mysqlQuery("SELECT * FROM teams", [])
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-
-}; 
-
-/* exports.getTeams = async (req, res, next) => {
-  if (!req.body.listIds) return next(new AppError("No form data found", 404));
-  const values = [req.body.listIds]
-
-  const resultMainQuery = await mysqlQuery("SELECT * FROM teams WHERE id IN (?)", values)
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-
-};  */
-
-exports.getStandingTeams = async (req, res, next) => {
-  if (!req.body.listIds) return next(new AppError("No form data found", 404));
-  const values = [req.body.listIds]
-  const query = "SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls "+
-    "FROM nbas.teams as t "+
-    "INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) "+
-    "WHERE m.isCompleted=1 AND t.id IN (?)"+
-    "GROUP BY t.id"
-  const resultMainQuery = await mysqlQuery(query, values)
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-
-}; 
-
-
 exports.createTeam = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
 
@@ -78,34 +47,6 @@ exports.createTeam = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };
 
-exports.getTeam = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No team id found", 404));
-  }
-
-  const values = [req.params.id];
-  const resultMainQuery = await mysqlQuery("SELECT * FROM teams WHERE id = ?", values)
-
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-};
-
-/* exports.updateTeam = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No team id found", 404));
-  }
-  conn.execute(
-    "UPDATE teams SET name=? WHERE id=?",
-    [req.params.name, req.params.id],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err, 500));
-      res.status(201).json({
-        status: "success",
-        message: "team updated!",
-      });
-    }
-  );
-}; */
-
 exports.deleteTeam = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
@@ -120,6 +61,31 @@ exports.deleteTeam = async (req, res, next) => {
   }
   return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };
+
+
+
+
+
+
+
+/**
+ * uncleaned entry points
+ */
+
+
+
+exports.getStandingTeams = async (req, res, next) => {
+  if (!req.body.listIds) return next(new AppError("No form data found", 404));
+  const values = [req.body.listIds]
+  const query = "SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls "+
+    "FROM nbas.teams as t "+
+    "INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) "+
+    "WHERE m.isCompleted=1 AND t.id IN (?)"+
+    "GROUP BY t.id"
+  const resultMainQuery = await mysqlQuery(query, values)
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+
+}; 
 
 exports.getAllTeamPlayers = async (req, res, next) => {
   
