@@ -10,7 +10,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
-import { fetchTeams, deleteTeam } from "../ApiCall/teams";
+import { fetchTeams, deleteTeam, IApiFetchTeamsParams } from "../ApiCall/teams";
 import { ITeam, ITeamProps } from "../Interfaces/team";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
@@ -95,7 +95,10 @@ function ListTeams(props: ITeamProps) {
   }
 
   useEffect(() => {
-    fetchTeams()
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      allTeams: true
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         dispatch(addTeams(response.data));
       })

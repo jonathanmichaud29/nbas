@@ -4,7 +4,7 @@ import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typogra
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 
 import { fetchSingleMatch, IFetchSingleMatchParams } from "../ApiCall/matches";
-import { fetchTeams, fetchStandingTeams } from "../ApiCall/teams";
+import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams } from "../ApiCall/teams";
 
 import { IMatch, IMatchResumeProps } from '../Interfaces/match'
 import { ITeam, IStandingTeam } from "../Interfaces/team";
@@ -48,7 +48,10 @@ function MatchResume(props: IMatchResumeProps) {
 
   useEffect(() => {
     if( match === null || teamHome !== null || teamAway !== null) return;
-    fetchTeams([match.idTeamHome, match.idTeamAway])
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: [match.idTeamHome, match.idTeamAway]
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         response.data.forEach((team: ITeam) => {
           if ( team.id === match.idTeamHome) {

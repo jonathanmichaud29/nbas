@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Box, CircularProgress } from "@mui/material";
 
 import { fetchMatchLineups } from '../ApiCall/matches';
-import { fetchTeams, fetchStandingTeams } from '../ApiCall/teams';
+import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import { ITeam, IStandingTeam } from '../Interfaces/team'
@@ -49,7 +49,11 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
 
       })
-    fetchTeams([match.idTeamHome, match.idTeamAway])
+    
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: [match.idTeamHome, match.idTeamAway]
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         response.data.forEach((team: ITeam) => {
           if ( team.id === match.idTeamHome) {

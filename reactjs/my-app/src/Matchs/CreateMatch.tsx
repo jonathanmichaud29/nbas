@@ -12,7 +12,7 @@ import { addMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
 import { createMatch } from '../ApiCall/matches';
 
-import { fetchTeams } from '../ApiCall/teams';
+import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 import { ITeam } from '../Interfaces/team';
 
 const defaultValues = {
@@ -66,7 +66,10 @@ function CreateMatch() {
   }
 
   useEffect(() => {
-    fetchTeams()
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      allTeams: true
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         dispatch(addTeams(response.data));
       })

@@ -14,7 +14,7 @@ import { ITeam } from '../Interfaces/team';
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
 import { deleteMatch, fetchMatches } from '../ApiCall/matches'
-import { fetchTeams } from '../ApiCall/teams'
+import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import { createDateReadable } from '../utils/dateFormatter';
@@ -53,7 +53,10 @@ function ListMatches(props: IListMatchProps) {
   
   useEffect(() => {
     
-    fetchTeams()
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      allTeams: true
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         dispatch(addTeams(response.data));
       })

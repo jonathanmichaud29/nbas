@@ -8,7 +8,7 @@ import { ITeam, IStandingTeam } from '../Interfaces/team';
 
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';
-import { fetchStandingTeams, fetchTeams } from '../ApiCall/teams';
+import { fetchStandingTeams, fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import AllTeamsStanding from '../Teams/AllTeamsStanding';
 import AllTeamsStats from '../Teams/AllTeamsStats';
@@ -35,7 +35,10 @@ function PublicTeamsStats() {
    */
    useEffect( () => {
     if ( listTeams !== null ) return;
-    fetchTeams()
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      allTeams: true
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         setListTeams(response.data)
       })

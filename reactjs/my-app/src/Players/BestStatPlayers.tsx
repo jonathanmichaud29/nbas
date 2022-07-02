@@ -114,7 +114,7 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
       { isLoaded && bestStatPlayers.length > 0 && (
         <Box m={3}>
           <Typography variant="h6" component="h3" textAlign="center">
-            {team.name} players
+            Best {team.name} players {match.isCompleted === 1 ? 'this game' : 'this season'}
           </Typography>
           <TableContainer component={Paper}>
             <Table>

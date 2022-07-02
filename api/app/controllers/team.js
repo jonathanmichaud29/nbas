@@ -4,6 +4,32 @@ const { mysqlQuery } = require("../services/db");
 const { getPlayerData, getTeamData } = require("../utils/simpleQueries");
 const { is_missing_keys } = require("../utils/validation");
 
+
+/**
+ * Fetch teams from a list of ID or fetching all teams
+ * TODO: We should add an argument to fetch teams by a specific league
+ */
+ exports.getTeams = async (req, res, next) => {
+  if (!req.body ) return next(new AppError("No form data found", 404));
+
+  let query = '';
+  let values = [];
+  if( req.body.teamIds !== undefined && req.body.teamIds.length > 0 ){
+    query = "SELECT * FROM teams WHERE id IN ?";
+    values = [[req.body.teamIds]];
+  }
+  else if(req.body.allTeams !== undefined && req.body.allTeams ) {
+    query = "SELECT * FROM teams";
+  }
+  else {
+    return appResponse(res, next, true, {}, {});
+  }
+
+  const resultMainQuery = await mysqlQuery(query, values);
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
+
 exports.getAllTeams = async (req, res, next) => {
 
   const resultMainQuery = await mysqlQuery("SELECT * FROM teams", [])
@@ -11,14 +37,14 @@ exports.getAllTeams = async (req, res, next) => {
 
 }; 
 
-exports.getTeams = async (req, res, next) => {
+/* exports.getTeams = async (req, res, next) => {
   if (!req.body.listIds) return next(new AppError("No form data found", 404));
   const values = [req.body.listIds]
 
   const resultMainQuery = await mysqlQuery("SELECT * FROM teams WHERE id IN (?)", values)
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 
-}; 
+};  */
 
 exports.getStandingTeams = async (req, res, next) => {
   if (!req.body.listIds) return next(new AppError("No form data found", 404));

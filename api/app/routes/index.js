@@ -16,57 +16,53 @@ router
 
 router
   .route("/m/player/:id")
-  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
   .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
 
 router
   .route("/r/player/")
   .post(playerControllers.getPlayers)
 
-
-
+/**
+ * Teams routes
+ */
+router
+  .route("/r/team/")
+  .post(teamControllers.getTeams)
 
 router
- .route("/player/")
- /* .get(playerControllers.getAllPlayers) */
- .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
+  .route("/m/team/")
+  .post(teamControllers.createTeam, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/player/:id")
-  /* .get(playerControllers.getPlayer) */
-  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
-  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
+  .route("/m/team/:id")
+  .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
 
-/* router
- .route("/player/list/")
- .post(playerControllers.getSpecificPlayers); */
+/**
+ * Matches routes
+ */
+
+
+
+
+
+
+
+
+/**
+ * OLD ROUTES
+ */
 
 router
  .route("/player-matches/:id")
  .get(playerControllers.getPlayerMatches)
 
- /**
-  * Teams routes
-  */
-
-router
-  .route("/team/")
-  .get(teamControllers.getAllTeams)
-  .post(teamControllers.createTeam, firebaseAuthMiddleware.decodeToken);
-
-router
-  .route("/team/list/")
-  .post(teamControllers.getTeams)
-
+/**
+ * Teams routes
+ */
 router
   .route("/team/standing/")
   .post(teamControllers.getStandingTeams)
 
-router
- .route("/team/:id")
- .get(teamControllers.getTeam)
- /* .put(teamControllers.updateTeam, firebaseAuthMiddleware.decodeToken) */
- .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
 
 router
   .route("/team-players/:id")

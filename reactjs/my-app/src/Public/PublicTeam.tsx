@@ -5,7 +5,7 @@ import { Alert, Box, CircularProgress  } from "@mui/material";
 
 import { ITeam } from "../Interfaces/team";
 
-import { fetchTeam } from '../ApiCall/teams';
+import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import ViewTeamProfile from '../Teams/ViewTeamProfile';
 import { setMetas } from '../utils/metaTags';
@@ -32,7 +32,10 @@ function PublicTeam() {
   useEffect( () => {
     if ( idTeam === null ) return;
 
-    fetchTeam(idTeam)
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: [idTeam]
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         setTeam(response.data[0])
       })

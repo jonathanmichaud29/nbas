@@ -1,8 +1,16 @@
 import { ITeamPlayers } from '../Interfaces/team';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
-export const fetchTeam = async (idTeam: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/${idTeam}`)
+/**
+ * Public calls
+ */
+
+export interface IApiFetchTeamsParams {
+  teamIds?: Array<number>;
+  allTeams?: boolean;
+}
+export const fetchTeams = async (bodyParams: IApiFetchTeamsParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/team/`,bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -11,29 +19,45 @@ export const fetchTeam = async (idTeam: number) => {
     })
 }
 
-export const fetchTeams = async (argIds?: Array<number>) => {
-  if( argIds ){
-    return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/list/`, {
-      listIds: argIds
+/**
+ * Protected calls
+ */
+
+export const createTeam = async (argName: string) => {  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/team/`,{
+    name: argName
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
     })
-      .then(response => {
-        return Promise.resolve(response.data);
-      })
-      .catch(error => {
-        return Promise.reject(error.response.data.message);
-      })
-  }
-  else {
-    return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team/`)
-      .then(response => {
-        return Promise.resolve(response.data);
-      })
-      .catch(error => {
-        return Promise.reject(error.response.data.message);
-      })
-  }
-  
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
 }
+
+export const deleteTeam = async (argId: number) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/team/${argId}`,{
+    
+  })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+
+
+
+
+
+
+
+/**
+ * Uncleaned calls
+ */
+
 
 export const fetchStandingTeams = async (argIds: Array<number>) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/standing/`, {
@@ -57,30 +81,7 @@ export const fetchTeamHistoryMatches = async (id: number) => {
     })
 }
 
-export const createTeam = async (argName: string) => {
-  
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/team/`,{
-    name: argName
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
 
-export const deleteTeam = async (argId: number) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/team/${argId}`,{
-    
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
 
 export const fetchTeamPlayers = async (argId?: number) => {
   if( argId ) {

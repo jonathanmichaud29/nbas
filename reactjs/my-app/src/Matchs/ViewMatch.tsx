@@ -11,7 +11,7 @@ import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { IMatchProps } from "../Interfaces/match";
 import { ITeam } from '../Interfaces/team';
 
-import { fetchTeams } from '../ApiCall/teams';
+import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 import { fetchMatchLineups } from '../ApiCall/matches';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
@@ -38,7 +38,12 @@ function ViewMatch(props: IMatchProps) {
    * Fetch Teams details
    */
   useEffect( () => {
-    fetchTeams([match.idTeamHome, match.idTeamAway])
+    if( teamHome !== null && teamAway !== null) return;
+    
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: [match.idTeamHome, match.idTeamAway]
+    }
+    fetchTeams(paramsFetchTeams)
       .then(response => {
         response.data.forEach((team: ITeam) => {
           if ( team.id === match.idTeamHome) {
@@ -79,7 +84,7 @@ function ViewMatch(props: IMatchProps) {
       .finally(() =>{
         setLoadingPlayers(true);
       })
-  }, [dispatch, match]);
+  }, [dispatch, match, teamAway, teamHome]);
 
 
   /**
