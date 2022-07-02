@@ -1,7 +1,7 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
-const { getTeamsData, getMatchesData } = require("../utils/simpleQueries");
+const { getTeamsData, getMatchesData, getPlayersData } = require("../utils/simpleQueries");
 const { is_missing_keys } = require("../utils/validation");
 
 
@@ -9,10 +9,12 @@ exports.getHistoryMatches = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   let listMatchIds = [];
   let listTeamIds = [];
+  let listPlayerIds = [];
   let customData = {
     matchLineups:[],
     matches:[],
-    teams:[]
+    teams:[],
+    players:[],
   }
 
 
@@ -34,6 +36,7 @@ exports.getHistoryMatches = async (req, res, next) => {
   if( resultMainQuery.status ){
     customData.matchLineups = resultMainQuery.data;
     listMatchIds = resultMainQuery.data.map((row) => row.idMatch);
+    listPlayerIds = resultMainQuery.data.map((row) => row.idPlayer);
   }
 
   if( listMatchIds.length > 0 ){
@@ -51,6 +54,13 @@ exports.getHistoryMatches = async (req, res, next) => {
     const resultTeam = await getTeamsData([...new Set(listTeamIds)]);
     if( resultTeam.status ){
       customData.teams = resultTeam.data;
+    }
+  }
+
+  if( listPlayerIds.length > 0 ){
+    const resultPlayer = await getPlayersData([...new Set(listPlayerIds)]);
+    if( resultPlayer.status ){
+      customData.players = resultPlayer.data;
     }
   }
 

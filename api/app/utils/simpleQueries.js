@@ -9,6 +9,15 @@ exports.getPlayerData = async (id) => {
   }
 }
 
+exports.getPlayersData = async (listIds) => {
+  const result = await mysqlQuery("SELECT * FROM players WHERE id IN ?", [[listIds]]);
+  return {
+    status:result.status,
+    data: result.data,
+    error: result.error
+  }
+}
+
 exports.getTeamData = async (id) => {
   const result = await mysqlQuery("SELECT * FROM teams WHERE id = ?", [id]);
   return {

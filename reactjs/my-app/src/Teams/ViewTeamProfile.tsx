@@ -3,15 +3,16 @@ import React, { useEffect, useState } from 'react';
 
 import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
 
-import { fetchTeamHistoryMatches } from '../ApiCall/teams';
-
 import { ITeamProfileProps, ITeam } from '../Interfaces/team'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
 
+import { fetchHistoryMatches, IApiFetchHistoryMatchesParams } from '../ApiCall/matches';
+
 import StandingTeam from './StandingTeam'
 import TeamMatchResume from './TeamMatchResume'
 import YearStats from '../Stats/YearStats'
+
 
 function ViewTeamProfile(props: ITeamProfileProps) {
 
@@ -26,7 +27,10 @@ function ViewTeamProfile(props: ITeamProfileProps) {
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null && listPlayers !== null;
 
   useEffect(() => {
-    fetchTeamHistoryMatches(team.id)
+    const paramsHistoryMatches: IApiFetchHistoryMatchesParams = {
+      teamId: team.id
+    }
+    fetchHistoryMatches(paramsHistoryMatches)
       .then((response) => {
         setListPlayers(response.data.players);
         setListTeams(response.data.teams);

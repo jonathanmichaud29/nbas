@@ -18,17 +18,6 @@ export const fetchPlayers = async (bodyParams: IApiFetchPlayersParams) => {
     })
 }
 
-export const fetchPlayerHistoryMatches = async (id: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player-matches/${id}`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
-
 /**
  * Protected calls
  */
