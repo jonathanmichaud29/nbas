@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
 
-import { fetchPlayerHistoryMatches } from '../ApiCall/players';
+import { fetchHistoryMatches, IApiFetchHistoryMatchesParams } from '../ApiCall/matches';
 
 import { IPlayerProfileProps } from '../Interfaces/player'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
@@ -12,6 +12,7 @@ import { ITeam } from '../Interfaces/team'
 import PlayerMatchResume from './PlayerMatchResume'
 import YearStats from '../Stats/YearStats';
 import ProgressionStats from '../Stats/ProgressionStats';
+
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
@@ -25,7 +26,10 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null;
 
   useEffect(() => {
-    fetchPlayerHistoryMatches(player.id)
+    const paramsHistoryMatches: IApiFetchHistoryMatchesParams = {
+      playerId: player.id
+    }
+    fetchHistoryMatches(paramsHistoryMatches)
       .then((response) => {
         setListTeams(response.data.teams);
         const allMatches: IMatch[] = response.data.matches.map((match: IMatch) => match);

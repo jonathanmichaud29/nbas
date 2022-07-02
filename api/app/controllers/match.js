@@ -1,8 +1,66 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
+const { getTeamsData, getMatchesData } = require("../utils/simpleQueries");
 const { is_missing_keys } = require("../utils/validation");
 
+
+exports.getHistoryMatches = async (req, res, next) => {
+  if (!req.body ) return next(new AppError("No form data found", 404));
+  let listMatchIds = [];
+  let listTeamIds = [];
+  let customData = {
+    matchLineups:[],
+    matches:[],
+    teams:[]
+  }
+
+
+  let query="SELECT * FROM match_lineup WHERE ";
+  let values=[];
+  if( req.body.teamId !== undefined ){
+    query += "`idTeam`=?";
+    values.push(req.body.teamId)
+  }
+  else if( req.body.playerId !== undefined ){
+    query += "`idPlayer`=?";
+    values.push(req.body.playerId)
+  }
+  else {
+    return appResponse(res, next, true, {}, {});
+  }
+
+  const resultMainQuery = await mysqlQuery(query, values);
+  if( resultMainQuery.status ){
+    customData.matchLineups = resultMainQuery.data;
+    listMatchIds = resultMainQuery.data.map((row) => row.idMatch);
+  }
+
+  if( listMatchIds.length > 0 ){
+    const resultMatch = await getMatchesData(listMatchIds);
+    if( resultMatch.status ){
+      customData.matches = resultMatch.data;
+      resultMatch.data.forEach((row) => {
+        listTeamIds.push(row.idTeamHome);
+        listTeamIds.push(row.idTeamAway);
+      });
+    }
+  }
+
+  if( listTeamIds.length > 0 ){
+    const resultTeam = await getTeamsData([...new Set(listTeamIds)]);
+    if( resultTeam.status ){
+      customData.teams = resultTeam.data;
+    }
+  }
+
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error);
+}
+
+
+/**
+ * uncleaned entry points
+ */
 exports.getAllMatches = async (req, res, next) => {
   const resultMainQuery = await mysqlQuery("SELECT * FROM matches", [])
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);

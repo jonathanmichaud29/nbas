@@ -2,6 +2,39 @@ import { IMatch } from '../Interfaces/match';
 import { IPlayerLineupStats } from '../Interfaces/stats';
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
+/**
+ * Public calls
+ */
+
+export interface IApiFetchHistoryMatchesParams {
+  teamId?: number;
+  playerId?: number;
+}
+export const fetchHistoryMatches = async (bodyParams: IApiFetchHistoryMatchesParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/history-matches/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+/**
+ * Protected calls
+ */
+
+
+
+
+
+
+
+/**
+ * Uncleaned calls
+ */
+
+
 export const fetchMatches = async () => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/`)
     .then(response => {

@@ -49,7 +49,9 @@ router
  * Matches routes
  */
 
-
+ router
+ .route("/r/history-matches/")
+ .post(matchControllers.getHistoryMatches);
 
 
 /**
@@ -85,16 +87,10 @@ router
  * OLD ROUTES
  */
 
-router
- .route("/player-matches/:id")
- .get(playerControllers.getPlayerMatches)
 
 /**
  * Teams routes
  */
-
-
-
 router
   .route("/team-players/:id")
   .get(teamControllers.getTeamPlayers)
