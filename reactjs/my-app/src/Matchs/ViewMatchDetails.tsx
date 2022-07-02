@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Box, CircularProgress } from "@mui/material";
 
 import { fetchMatchLineups } from '../ApiCall/matches';
-import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
+import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import { ITeam, IStandingTeam } from '../Interfaces/team'
@@ -92,7 +92,10 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
 
   useEffect(() => {
     if( standingTeams !== null || match === null) return;
-    fetchStandingTeams([match.idTeamHome, match.idTeamAway])
+    const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
+      teamIds: [match.idTeamHome, match.idTeamAway]
+    }
+    fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
         setStandingTeams(response.data)
       })

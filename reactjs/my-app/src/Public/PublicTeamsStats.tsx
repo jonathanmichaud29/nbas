@@ -8,7 +8,7 @@ import { ITeam, IStandingTeam } from '../Interfaces/team';
 
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';
-import { fetchStandingTeams, fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
+import { fetchStandingTeams, fetchTeams, IApiFetchStandingTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import AllTeamsStanding from '../Teams/AllTeamsStanding';
 import AllTeamsStats from '../Teams/AllTeamsStats';
@@ -89,8 +89,10 @@ function PublicTeamsStats() {
 
   useEffect(() => {
     if( standingTeams !== null || listTeams === null) return;
-    const idTeams = listTeams.map((team) => team.id)
-    fetchStandingTeams(idTeams)
+    const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
+      teamIds: listTeams.map((team) => team.id)
+    }
+    fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
         const newStandingTeams: IStandingTeam[] = response.data;
         newStandingTeams.sort((a,b) => b.nbWins - a.nbWins || a.nbGamePlayed - b.nbGamePlayed );

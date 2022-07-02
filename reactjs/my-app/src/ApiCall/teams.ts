@@ -19,6 +19,20 @@ export const fetchTeams = async (bodyParams: IApiFetchTeamsParams) => {
     })
 }
 
+export interface IApiFetchStandingTeamsParams {
+  teamIds?: Array<number>;
+  allTeams?: boolean;
+}
+export const fetchStandingTeams = async (bodyParams: IApiFetchStandingTeamsParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/standing/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })  
+}
+
 /**
  * Protected calls
  */
@@ -59,17 +73,6 @@ export const deleteTeam = async (argId: number) => {
  */
 
 
-export const fetchStandingTeams = async (argIds: Array<number>) => {
-  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/team/standing/`, {
-    listIds: argIds
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })  
-}
 
 export const fetchTeamHistoryMatches = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/team-matches/${id}`)
