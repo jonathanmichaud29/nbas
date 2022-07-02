@@ -5,7 +5,7 @@ import { Alert, Box, CircularProgress} from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
 
-import { fetchPlayer } from '../ApiCall/players';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import ViewPlayerProfile from '../Players/ViewPlayerProfile';
 
@@ -32,8 +32,10 @@ function PublicPlayer() {
    */
   useEffect( () => {
     if ( idPlayer === null ) return;
-
-    fetchPlayer(idPlayer)
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      playerIds: [idPlayer]
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         setPlayer(response.data[0])
       })

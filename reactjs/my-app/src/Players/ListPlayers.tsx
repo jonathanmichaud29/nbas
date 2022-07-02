@@ -9,7 +9,7 @@ import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/
 import { Delete } from '@mui/icons-material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
-import { deletePlayer, fetchPlayers } from '../ApiCall/players'
+import { deletePlayer, fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/player';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
@@ -46,7 +46,10 @@ function ListPlayers(props: IPlayerProps) {
   }
   
   useEffect(() => {
-    fetchPlayers()
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      allPlayers: true
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         dispatch(addPlayers(response.data));
       })

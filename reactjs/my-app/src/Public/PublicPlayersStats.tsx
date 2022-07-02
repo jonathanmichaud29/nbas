@@ -5,7 +5,7 @@ import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography  } fr
 import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
 
-import { fetchPlayers } from '../ApiCall/players';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';
 
 import { setMetas } from '../utils/metaTags';
@@ -30,7 +30,10 @@ function PublicPlayersStats() {
    */
   useEffect( () => {
     if ( listPlayers !== null ) return;
-    fetchPlayers()
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      allPlayers: true
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         setListPlayers(response.data)
       })

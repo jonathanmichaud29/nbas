@@ -2,6 +2,30 @@ const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
 
+/**
+ * Fetch players from a list of ID or fetching all players
+ * TODO: We should add an argument to fetch players by a specific league
+ */
+exports.getPlayers = async (req, res, next) => {
+  if (!req.body ) return next(new AppError("No form data found", 404));
+
+  let query = '';
+  let values = [];
+  if( req.body.playerIds !== undefined && req.body.playerIds.length > 0 ){
+    query = "SELECT * FROM players WHERE id IN ?";
+    values = [[req.body.playerIds]];
+  }
+  else if(req.body.allPlayers !== undefined && req.body.allPlayers ) {
+    query = "SELECT * FROM players";
+  }
+  else {
+    return appResponse(res, next, true, {}, {});
+  }
+
+  const resultMainQuery = await mysqlQuery(query, values);
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};
+
 exports.getAllPlayers = async (req, res, next) => {
   const resultMainQuery = await mysqlQuery("SELECT * FROM players", [])
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);

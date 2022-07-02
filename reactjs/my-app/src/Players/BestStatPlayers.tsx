@@ -4,7 +4,7 @@ import { Alert, Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
 import { fetchTeamMatchLineups, fetchPlayersMatchLineups } from '../ApiCall/matches';
-import { fetchSpecificPlayers } from '../ApiCall/players';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchTeamPlayers } from '../ApiCall/teams'
 
 import { IMatch, IMatchLineup } from '../Interfaces/match'
@@ -92,8 +92,10 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
    */
   useEffect(() => {
     if( listPlayers !== null || bestStatPlayers === null ) return;
-    const listPlayerIds = bestStatPlayers.map((playerStats) => playerStats.id)
-    fetchSpecificPlayers(listPlayerIds)
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      playerIds: bestStatPlayers.map((playerStats) => playerStats.id)
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         setListPlayers(response.data)
       })

@@ -9,20 +9,37 @@ const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware"
 /**
  * Players routes
  */
-router
- .route("/player/")
- .get(playerControllers.getAllPlayers)
- .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/player/:id")
-  .get(playerControllers.getPlayer)
+  .route("/m/player/")
+  .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/m/player/:id")
   /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
   .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
 
 router
+  .route("/r/player/")
+  .post(playerControllers.getPlayers)
+
+
+
+
+router
+ .route("/player/")
+ /* .get(playerControllers.getAllPlayers) */
+ .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/player/:id")
+  /* .get(playerControllers.getPlayer) */
+  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
+  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
+
+/* router
  .route("/player/list/")
- .post(playerControllers.getSpecificPlayers);
+ .post(playerControllers.getSpecificPlayers); */
 
 router
  .route("/player-matches/:id")

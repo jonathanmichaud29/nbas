@@ -5,7 +5,7 @@ import { Alert, Box, CircularProgress } from "@mui/material";
 
 import { fetchMatchLineups } from '../ApiCall/matches';
 import { fetchTeams, fetchStandingTeams } from '../ApiCall/teams';
-import { fetchSpecificPlayers } from '../ApiCall/players';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import { ITeam, IStandingTeam } from '../Interfaces/team'
 import { IMatchDetailsProps, IMatchLineup } from '../Interfaces/match'
@@ -70,8 +70,11 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
 
   useEffect(() => {
     if( listMatchLineups === null || listPlayers !== null) return;
-    const listPlayerIds = listMatchLineups.map((matchLineup) => matchLineup.idPlayer);
-    fetchSpecificPlayers(listPlayerIds)
+
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      playerIds: listMatchLineups.map((matchLineup) => matchLineup.idPlayer)
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         setListPlayers(response.data)
       })

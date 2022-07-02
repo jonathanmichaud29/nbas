@@ -4,8 +4,12 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
  * Public calls
  */
 
-export const fetchPlayer = async (id: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/${id}`)
+export interface IApiFetchPlayersParams {
+  playerIds?: Array<number>;
+  allPlayers?: boolean;
+}
+export const fetchPlayers = async (bodyParams: IApiFetchPlayersParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/player/`,bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -13,29 +17,6 @@ export const fetchPlayer = async (id: number) => {
       return Promise.reject(error.response.data.message);
     })
 }
-
-export const fetchPlayers = async () => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
-export const fetchSpecificPlayers = async(listIds: Array<number>) => {
-  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/player/list/`, {
-    listIds: listIds
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
 
 export const fetchPlayerHistoryMatches = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player-matches/${id}`)
@@ -55,7 +36,7 @@ export const fetchPlayerHistoryMatches = async (id: number) => {
 
 export const createPlayer = async (argName: string) => {
   
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/player/`,{
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/player/`,{
     name: argName
   })
     .then(response => {
@@ -67,7 +48,7 @@ export const createPlayer = async (argName: string) => {
 }
 
 export const deletePlayer = async (argId: number) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/player/${argId}`,{
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/player/${argId}`,{
     
   })
     .then(response => {

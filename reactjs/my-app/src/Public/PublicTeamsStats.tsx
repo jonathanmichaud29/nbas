@@ -6,7 +6,7 @@ import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
 import { ITeam, IStandingTeam } from '../Interfaces/team';
 
-import { fetchPlayers } from '../ApiCall/players';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchMatchesLineups } from '../ApiCall/matches';
 import { fetchStandingTeams, fetchTeams } from '../ApiCall/teams';
 
@@ -52,7 +52,10 @@ function PublicTeamsStats() {
    */
   useEffect( () => {
     if ( listPlayers !== null ) return;
-    fetchPlayers()
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      allPlayers: true
+    }
+    fetchPlayers(paramsFetchPlayers)
       .then(response => {
         setListPlayers(response.data)
       })
