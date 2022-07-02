@@ -11,10 +11,11 @@ import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperTe
 import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { ITeamPlayers } from '../Interfaces/team'
 
-import { fetchTeamPlayers } from "../ApiCall/teams";
 import { addLineupPlayers } from '../ApiCall/matches';
+import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 
 import styleModal from './styleModal'
+
 
 const defaultValues = {
   players: [] as ITeamPlayers[],
@@ -57,7 +58,10 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
 
   useEffect(() => {
     if ( selectedTeam === null || allMatchPlayers === null ) return;
-    fetchTeamPlayers(selectedTeam.id)
+    const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
+      teamIds: [selectedTeam.id],
+    }
+    fetchTeamsPlayers(paramsFetchTeamsPlayers)
       .then(response => {
         const lineupPlayerIds = allMatchPlayers.lineupPlayers.map((lineupPlayer) => lineupPlayer.idPlayer)
         const listTeamPlayers: ITeamPlayers[] = response.data;

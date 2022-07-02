@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from 
 
 import { fetchTeamMatchLineups, fetchPlayersMatchLineups } from '../ApiCall/matches';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { fetchTeamPlayers } from '../ApiCall/teams'
+import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from '../ApiCall/teamsPlayers';
 
 import { IMatch, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
@@ -14,6 +14,7 @@ import { IBattingStatsExtended } from '../Interfaces/stats'
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats } from '../utils/statsAggregation';
+
 
 interface IBestStatPlayersProps {
   match: IMatch;
@@ -58,7 +59,10 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
    */
   useEffect(() => {
     if( bestStatPlayers !== null || match.isCompleted === 1 ) return;
-    fetchTeamPlayers(team.id)
+    const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
+      teamIds: [team.id],
+    }
+    fetchTeamsPlayers(paramsFetchTeamsPlayers)
       .then(response => {
         const listTeamPlayers: ITeamPlayers[] = response.data;
         const listPlayerIds = listTeamPlayers.map((teamPlayer) => teamPlayer.playerId);

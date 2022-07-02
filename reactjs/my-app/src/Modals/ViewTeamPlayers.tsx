@@ -3,7 +3,7 @@ import { Alert, Box, Modal, Typography, List, ListItem, IconButton } from "@mui/
 import { Delete } from '@mui/icons-material';
 
 import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/team";
-import { fetchTeamPlayers, removeTeamPlayer } from "../ApiCall/teams";
+import { fetchTeamsPlayers, deleteTeamPlayer, IApiFetchTeamsPlayersParams, IApiDeleteTeamPlayerParams } from '../ApiCall/teamsPlayers'
 
 import styleModal from './styleModal'
 
@@ -32,8 +32,11 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
 
   const clickRemoveTeamPlayer = (teamPlayer: ITeamPlayers) => {
     reinitializeApiMessages();
-
-    removeTeamPlayer(teamPlayer)
+    const paramsDeleteTeamPlayer: IApiDeleteTeamPlayerParams = {
+      teamId: teamPlayer.teamId,
+      playerId: teamPlayer.playerId,
+    }
+    deleteTeamPlayer(paramsDeleteTeamPlayer)
       .then((response) =>{
         const newList = listTeamPlayers.filter((tp) => { return tp.playerId !== teamPlayer.playerId && tp.teamId === teamPlayer.teamId; })
         setListTeamPlayers(newList);
@@ -48,18 +51,21 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( isOpen && selectedTeam !== undefined ) {
-      fetchTeamPlayers(selectedTeam.id)
-        .then(response => {
-          setListTeamPlayers(response.data);
-        })
-        .catch(error => {
-          changeApiError(error);
-        })
-        .finally(() => {
-          setModalOpen(true);
-        });
-      }
+    if ( ! isOpen || selectedTeam === undefined ) return;
+
+    const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
+      teamIds: [selectedTeam.id],
+    }
+    fetchTeamsPlayers(paramsFetchTeamsPlayers)
+      .then(response => {
+        setListTeamPlayers(response.data);
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setModalOpen(true);
+      });
   }, [selectedTeam, isOpen]);
 
   return (
@@ -96,7 +102,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
                     secondaryAction={ listActions.map((action) => action) }
                     >{teamPlayer.playerName}</ListItem>
                 )
-                  })}
+              })}
             </List>
           ) : (
             <Alert severity="info">There is no rooster for this team</Alert>

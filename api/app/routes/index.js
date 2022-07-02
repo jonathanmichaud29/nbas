@@ -1,10 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
+const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware");
+
 const teamControllers = require("../controllers/team");
 const playerControllers = require("../controllers/player");
 const matchControllers = require("../controllers/match");
-const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware");
+const teamPlayerControllers = require("../controllers/teamPlayer");
+
+
 
 /**
  * Players routes
@@ -30,6 +34,10 @@ router
   .post(teamControllers.getTeams)
 
 router
+  .route("/r/team/standing/")
+  .post(teamControllers.getStandingTeams)
+
+router
   .route("/m/team/")
   .post(teamControllers.createTeam, firebaseAuthMiddleware.decodeToken);
 
@@ -40,6 +48,31 @@ router
 /**
  * Matches routes
  */
+
+
+
+
+/**
+ * Teams Players routes
+ */
+
+router
+  .route('/r/team-player/')
+  .post(teamPlayerControllers.getTeamsPlayers);
+
+router
+  .route("/r/team-player/unassigned/")
+  .post(teamPlayerControllers.getUnassignedPlayers);
+
+router
+  .route('/m/team-player/')
+  .post(teamPlayerControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route('/m/team-player/:teamId/:playerId')
+  .delete(teamPlayerControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken);
+
+
 
 
 
@@ -59,24 +92,22 @@ router
 /**
  * Teams routes
  */
-router
-  .route("/team/standing/")
-  .post(teamControllers.getStandingTeams)
+
 
 
 router
   .route("/team-players/:id")
   .get(teamControllers.getTeamPlayers)
-  .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken)
+  /* .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken) */
 
-router
+/* router
   .route('/team-player/')
   .get(teamControllers.getAllTeamPlayers)
-  .delete(teamControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken)
+  .delete(teamControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken) */
 
-router
+/* router
  .route("/unassigned-players/")
- .get(teamControllers.getUnassignedPlayers)
+ .get(teamControllers.getUnassignedPlayers) */
 
 /**
  * Matches routes

@@ -4,7 +4,7 @@ import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField }
 
 import { ITeamPlayersProps } from "../Interfaces/team";
 import { IPlayer } from "../Interfaces/player";
-import { addTeamPlayer, fetchUnassignedPlayers } from "../ApiCall/teams";
+import { fetchUnassignedPlayers, addTeamPlayer, IApiAddTeamPlayerParams } from '../ApiCall/teamsPlayers'
 
 import styleModal from './styleModal'
 
@@ -68,7 +68,11 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
     setRequestStatus(true);
     reinitializeApiMessages();
 
-    addTeamPlayer(selectedTeam?.id, data.player.id)
+    const paramsAddTeamPlayer: IApiAddTeamPlayerParams = {
+      teamId: selectedTeam.id,
+      playerId: data.player.id,
+    }
+    addTeamPlayer(paramsAddTeamPlayer)
       .then((response) =>{
         reset()
         setIncrementAcIndex(incrementAcIndex+1);

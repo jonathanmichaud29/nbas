@@ -12,7 +12,7 @@ import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { IPlayer } from "../Interfaces/player";
 import { ITeamPlayers, IOrderPlayers } from '../Interfaces/team'
 
-import { fetchTeamPlayers } from "../ApiCall/teams";
+import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 import { addMatchLineup } from '../ApiCall/matches';
 
 import styleModal from './styleModal'
@@ -61,7 +61,10 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
 
   useEffect(() => {
     if ( selectedTeam === null ) return;
-    fetchTeamPlayers()
+    const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
+      allTeamsPlayers: true,
+    }
+    fetchTeamsPlayers(paramsFetchTeamsPlayers)
       .then(response => {
         setListTeamsPlayers(response.data);
       })
