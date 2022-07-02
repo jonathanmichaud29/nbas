@@ -1,17 +1,11 @@
 import { axiosPublic, axiosProtected } from '../utils/axios'
 
+/**
+ * Public calls
+ */
+
 export const fetchPlayer = async (id: number) => {
   return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player/${id}`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
-export const fetchPlayerHistoryMatches = async (id: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player-matches/${id}`)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -41,6 +35,23 @@ export const fetchSpecificPlayers = async(listIds: Array<number>) => {
       return Promise.reject(error.response.data.message);
     })
 }
+
+
+export const fetchPlayerHistoryMatches = async (id: number) => {
+  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/player-matches/${id}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+
+/**
+ * Protected calls
+ */
+
 
 export const createPlayer = async (argName: string) => {
   

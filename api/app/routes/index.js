@@ -6,6 +6,32 @@ const playerControllers = require("../controllers/player");
 const matchControllers = require("../controllers/match");
 const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware");
 
+/**
+ * Players routes
+ */
+router
+ .route("/player/")
+ .get(playerControllers.getAllPlayers)
+ .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/player/:id")
+  .get(playerControllers.getPlayer)
+  /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
+  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
+
+router
+ .route("/player/list/")
+ .post(playerControllers.getSpecificPlayers);
+
+router
+ .route("/player-matches/:id")
+ .get(playerControllers.getPlayerMatches)
+
+ /**
+  * Teams routes
+  */
+
 router
   .route("/team/")
   .get(teamControllers.getAllTeams)
@@ -15,7 +41,7 @@ router
   .route("/team/list/")
   .post(teamControllers.getTeams)
 
-  router
+router
   .route("/team/standing/")
   .post(teamControllers.getStandingTeams)
 
@@ -26,9 +52,9 @@ router
  .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
 
 router
- .route("/team-players/:id")
- .get(teamControllers.getTeamPlayers)
- .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken)
+  .route("/team-players/:id")
+  .get(teamControllers.getTeamPlayers)
+  .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken)
 
 router
   .route('/team-player/')
@@ -39,24 +65,9 @@ router
  .route("/unassigned-players/")
  .get(teamControllers.getUnassignedPlayers)
 
-router
-  .route("/player/")
-  .get(playerControllers.getAllPlayers)
-  .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
-
-router
- .route("/player/:id")
- .get(playerControllers.getPlayer)
- /* .put(playerControllers.updatePlayer, firebaseAuthMiddleware.decodeToken) */
- .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
-
-router
-  .route("/player/list/")
-  .post(playerControllers.getSpecificPlayers);
-
-router
-  .route("/player-matches/:id")
-  .get(playerControllers.getPlayerMatches)
+/**
+ * Matches routes
+ */
 
 router
   .route("/match/")
