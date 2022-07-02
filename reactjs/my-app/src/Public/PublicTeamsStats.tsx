@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Alert, Box, CircularProgress, Typography  } from "@mui/material";
+import { Alert, Box, CircularProgress } from "@mui/material";
 
 import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
