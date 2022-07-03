@@ -2,8 +2,53 @@ const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
 const { getTeamsData, getMatchesData, getPlayersData } = require("../utils/simpleQueries");
+const { dateFormatShort } = require("../utils/dateFormatter")
 const { is_missing_keys } = require("../utils/validation");
 
+
+exports.getMatches = async (req, res, next) => {
+  if (!req.body) {
+    return next(new AppError("No parameters received to fetch a match", 404));
+  }
+  let values = [];
+  let wheres = [];
+  let orderBy = [];
+  
+  if (req.body.matchIds ){
+    wheres.push('`id` IN ?')
+    values.push([req.body.matchIds]);
+  }
+
+  if( req.body.valueCompleted !== undefined ) {
+    values.push(req.body.valueCompleted);
+    wheres.push('`isCompleted`=?')
+  }
+
+  if (req.body.isPast === true ){
+    const dateCompare = dateFormatShort(Date.now());
+    wheres.push('`date`<?');
+    values.push(dateCompare);
+    orderBy.push('`date` DESC');
+  }
+  else if (req.body.isUpcoming === true ){
+    const dateCompare = dateFormatShort(Date.now());
+    wheres.push('`date`>=?');
+    values.push(dateCompare);
+    orderBy.push('`date` ASC');
+  }
+
+  const query = "SELECT * FROM matches " +
+    ( wheres.length > 0     ? "WHERE " + wheres.join(" AND ") + " "   : '' ) + 
+    ( orderBy.length > 0    ? "ORDER BY " + orderBy.join(", ") + " "  : '' ) +
+    ( req.body.quantity !== undefined ? `LIMIT ${req.body.quantity}`  : '' );
+  const resultMainQuery = await mysqlQuery(query, values)
+
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+
+  /* const resultMainQuery = await mysqlQuery("SELECT * FROM matches", [])
+
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error); */
+};
 
 exports.getHistoryMatches = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));

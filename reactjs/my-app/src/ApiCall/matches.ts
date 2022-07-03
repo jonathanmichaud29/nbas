@@ -6,6 +6,23 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
  * Public calls
  */
 
+export interface IApiFetchMatchesParams {
+  matchIds?: Array<number>;
+  quantity?: number;
+  isPast?: boolean;
+  isUpcoming?: boolean;
+  valueCompleted?: number;
+}
+export const fetchMatches = async (bodyParams: IApiFetchMatchesParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/match/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
 export interface IApiFetchHistoryMatchesParams {
   teamId?: number;
   playerId?: number;
@@ -33,44 +50,6 @@ export const fetchHistoryMatches = async (bodyParams: IApiFetchHistoryMatchesPar
 /**
  * Uncleaned calls
  */
-
-
-export const fetchMatches = async () => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
-export const fetchMatch = async (id: number) => {
-  return await axiosPublic.get(`${process.env.REACT_APP_API_DOMAIN}/match/${id}`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
-
-export interface IFetchSingleMatchParams {
-  idMatch?: number;
-  isLast?: boolean;
-  isUpcoming?: boolean;
-  valueCompleted?: number;
-}
-export const fetchSingleMatch = async (bodyParams: IFetchSingleMatchParams) => {
-  
-  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/single-match/`, bodyParams)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
 
 export const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
   

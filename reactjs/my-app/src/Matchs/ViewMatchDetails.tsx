@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { Alert, Box, CircularProgress } from "@mui/material";
+import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography } from "@mui/material";
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
 
 import { fetchMatchLineups } from '../ApiCall/matches';
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
@@ -10,12 +12,19 @@ import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { ITeam, IStandingTeam } from '../Interfaces/team'
 import { IMatchDetailsProps, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
+import { IBattingStatsExtended, defaultBattingStatsExtended } from '../Interfaces/stats';
 
-import TeamMatchResume from '../Teams/TeamMatchResume'
-import Scoreboard from './Scoreboard';
+import { filterTeamLineups } from '../utils/dataFilter';
 import { createDateReadable } from '../utils/dateFormatter';
-
 import { setMetas } from '../utils/metaTags';
+import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
+import { getPlayerName } from '../utils/dataAssociation';
+import { defaultDataGridProps, playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns';
+
+import Scoreboard from './Scoreboard';
+import StatBatResults from '../Stats/StatBatResults';
+import StatBattingPercentage from '../Stats/StatBattingPercentage';
+
 
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
@@ -24,11 +33,20 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   const [apiError, changeApiError] = useState("");
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
-  const [listPlayers, setListPlayers] = useState<IPlayer[] | null>(null);
-  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[] | null>(null);
+  const [players, setPlayers] = useState<IPlayer[] | null>(null);
+  const [matchLineups, setMatchLineups] = useState<IMatchLineup[] | null>(null);
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
 
-  const isLoaded = listMatchLineups !== null && teamHome !== null && teamAway !== null && listPlayers !== null && standingTeams !== null;
+  const [matchRows, setMatchRows] = useState<Array<{}> | null>(null);
+  const [homeRows, setHomeRows] = useState<Array<{}> | null>(null);
+  const [awayRows, setAwayRows] = useState<Array<{}> | null>(null);
+  
+  const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended | null>(null);
+  const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended | null>(null);
+
+  const isLoaded =  matchLineups !== null && teamHome !== null && teamAway !== null && 
+                    players !== null && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
+                    matchRows !== null && homeRows !== null && awayRows !== null;
 
   if( teamHome !== null && teamAway !== null ){
     setMetas({
@@ -38,10 +56,10 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   }
 
   useEffect(() => {
-    if( listMatchLineups !== null && teamHome !== null && teamAway !== null ) return;
+    if( matchLineups !== null && teamHome !== null && teamAway !== null ) return;
     fetchMatchLineups(match.id)
       .then((response) => {
-        setListMatchLineups(response.data);
+        setMatchLineups(response.data);
       })
       .catch((error) => {
         changeApiError(error);
@@ -70,17 +88,17 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [listMatchLineups, match, teamAway, teamHome])
+  }, [matchLineups, match, teamAway, teamHome])
 
   useEffect(() => {
-    if( listMatchLineups === null || listPlayers !== null) return;
+    if( matchLineups === null || players !== null) return;
 
     const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: listMatchLineups.map((matchLineup) => matchLineup.idPlayer)
+      playerIds: matchLineups.map((matchLineup) => matchLineup.idPlayer)
     }
     fetchPlayers(paramsFetchPlayers)
       .then(response => {
-        setListPlayers(response.data)
+        setPlayers(response.data)
       })
       .catch(error => {
         changeApiError(error);
@@ -88,7 +106,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [listMatchLineups, listPlayers])
+  }, [matchLineups, players])
 
   useEffect(() => {
     if( standingTeams !== null || match === null) return;
@@ -107,46 +125,232 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       });
   }, [match, standingTeams])
 
-  const filterLineups = (matchLineups: IMatchLineup[], idTeam: number) => {
-    return matchLineups.filter((matchLineup) => matchLineup.idTeam === idTeam);
-  }
+
+  useEffect(() => {
+    if( teamHome === null || teamAway === null || matchLineups === null || teamHomeStats !== null || teamAwayStats !== null) return;
+
+    // Add all stats from match lineups
+    const teamHomeLineups = filterTeamLineups(matchLineups, teamHome.id);
+    teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
+
+    const teamAwayLineups = filterTeamLineups(matchLineups, teamAway.id);
+    teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
+
+    const homeStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    setTeamHomeStats(homeStats);
+
+    const awayStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    setTeamAwayStats(awayStats);
+
+    // Reorder lineups by hit Order
+    
+  }, [matchLineups, teamAway, teamAwayStats, teamHome, teamHomeStats])
+
+
+  useEffect(() => {
+    if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
+
+    const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchLineups);
+    /* setMatchStats(allStats); */
+
+    const homeLineups = filterTeamLineups(matchLineups, teamHome.id)
+    const homeStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(homeLineups);
+    /* setPlayersHomeStats(homeStats); */
+
+    const awayLineups = filterTeamLineups(matchLineups, teamAway.id)
+    const awayStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(awayLineups);
+    /* setPlayersHomeStats(awayStats); */
+
+    const matchRows = ( allStats.map((playerStats) => {
+      return {
+        id: playerStats.id,
+        playerName: getPlayerName(playerStats.id, players),
+        atBats: playerStats.atBats,
+        out: playerStats.out,
+        single: playerStats.single,
+        double: playerStats.double,
+        triple: playerStats.triple,
+        homerun: playerStats.homerun,
+        runsBattedIn: playerStats.runsBattedIn,
+        battingAverage: playerStats.battingAverage,
+        onBasePercentage: playerStats.onBasePercentage,
+        sluggingPercentage: playerStats.sluggingPercentage,
+        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
+      }
+    }) );
+
+    const homeRows = ( homeStats.map((playerStats) => {
+      return {
+        id: playerStats.id,
+        playerName: getPlayerName(playerStats.id, players),
+        atBats: playerStats.atBats,
+        out: playerStats.out,
+        single: playerStats.single,
+        double: playerStats.double,
+        triple: playerStats.triple,
+        homerun: playerStats.homerun,
+        runsBattedIn: playerStats.runsBattedIn,
+        battingAverage: playerStats.battingAverage,
+        onBasePercentage: playerStats.onBasePercentage,
+        sluggingPercentage: playerStats.sluggingPercentage,
+        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
+      }
+    }) );
+
+    const awayRows = ( awayStats.map((playerStats) => {
+      return {
+        id: playerStats.id,
+        playerName: getPlayerName(playerStats.id, players),
+        atBats: playerStats.atBats,
+        out: playerStats.out,
+        single: playerStats.single,
+        double: playerStats.double,
+        triple: playerStats.triple,
+        homerun: playerStats.homerun,
+        runsBattedIn: playerStats.runsBattedIn,
+        battingAverage: playerStats.battingAverage,
+        onBasePercentage: playerStats.onBasePercentage,
+        sluggingPercentage: playerStats.sluggingPercentage,
+        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
+      }
+    }) );
+    setMatchRows(matchRows);
+    setHomeRows(homeRows);
+    setAwayRows(awayRows);
+
+  },[matchLineups, players, teamAway, teamHome])
+
+  
 
   return (
     <>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
-      { isLoaded &&  (
-        <Scoreboard 
-          match={match}
-          standingTeams={standingTeams}
-          teamAway={teamAway}
-          teamHome={teamHome}
-        />
-      )}
+      
+        
       { isLoaded && (
-        <>
-          <TeamMatchResume
-            key={`team-home-resume-${match.id}`}
-            team={teamHome}
-            matchLineups={filterLineups(listMatchLineups, teamHome.id)}
-            match={match}
-            players={listPlayers}
-            teamHome={teamHome}
-            teamAway={teamAway}
-            hideHeader={true}
-          />
-          <TeamMatchResume
-            key={`team-away-resume-${match.id}`}
-            team={teamAway}
-            matchLineups={filterLineups(listMatchLineups, teamAway.id)}
-            match={match}
-            players={listPlayers}
-            teamHome={teamHome}
-            teamAway={teamAway}
-            hideHeader={true}
-          />
-        </>
+        <Box p={3}>
+          <Card>
+            <CardContent>
+              <Scoreboard 
+                match={match}
+                standingTeams={standingTeams}
+                teamAway={teamAway}
+                teamHome={teamHome}
+              />
+            </CardContent>
+            { matchRows.length > 0 && (
+              <CardContent>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <DataGrid
+                      {...defaultDataGridProps}
+                      rows={matchRows}
+                      columns={playerExtendedStatsColumns}
+                      getRowId={(row) => row.id + "-match-" + match.id}
+                      initialState={defaultStateStatsColumns}
+                      components={{
+                        Toolbar: GridToolbar
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            )}
+          </Card>
+        </Box>
       )}
+      
+      { isLoaded && (
+        <Box p={3}>
+          <Card>
+            <CardContent>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography component="h3" variant="h5" align="center">
+                    {teamHome.name} Stats
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <StatBatResults
+                    single={teamHomeStats.single}
+                    double={teamHomeStats.double}
+                    triple={teamHomeStats.triple}
+                    homerun={teamHomeStats.homerun}
+                    out={teamHomeStats.out}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <StatBattingPercentage
+                    stats={[teamHomeStats]}
+                    columns={[`${teamHome.name} stats`]}
+                  />
+                </Grid>
+                {homeRows.length > 0 && (
+                  <Grid item xs={12}>
+                    <DataGrid
+                      {...defaultDataGridProps}
+                      rows={homeRows}
+                      columns={playerExtendedStatsColumns}
+                      getRowId={(row) => row.id + "-home-" + match.id}
+                      initialState={defaultStateStatsColumns}
+                      components={{
+                        Toolbar: GridToolbar
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+
+      { isLoaded && (
+        <Box p={3}>
+          <Card>
+            <CardContent>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography component="h3" variant="h5" align="center">
+                    {teamAway.name} Stats
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <StatBatResults
+                    single={teamAwayStats.single}
+                    double={teamAwayStats.double}
+                    triple={teamAwayStats.triple}
+                    homerun={teamAwayStats.homerun}
+                    out={teamAwayStats.out}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <StatBattingPercentage
+                    stats={[teamAwayStats]}
+                    columns={[`${teamAway.name} stats`]}
+                  />
+                </Grid>
+                {awayRows.length > 0 && (
+                  <Grid item xs={12}>
+                    <DataGrid
+                      {...defaultDataGridProps}
+                      rows={awayRows}
+                      columns={playerExtendedStatsColumns}
+                      getRowId={(row) => row.id + "-away-" + match.id}
+                      initialState={defaultStateStatsColumns}
+                      components={{
+                        Toolbar: GridToolbar
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+    
     </>
   )
 }

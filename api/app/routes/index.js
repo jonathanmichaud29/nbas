@@ -24,18 +24,18 @@ router
 
 router
   .route("/r/player/")
-  .post(playerControllers.getPlayers)
+  .post(playerControllers.getPlayers);
 
 /**
  * Teams routes
  */
 router
   .route("/r/team/")
-  .post(teamControllers.getTeams)
+  .post(teamControllers.getTeams);
 
 router
   .route("/r/team/standing/")
-  .post(teamControllers.getStandingTeams)
+  .post(teamControllers.getStandingTeams);
 
 router
   .route("/m/team/")
@@ -49,9 +49,17 @@ router
  * Matches routes
  */
 
- router
- .route("/r/history-matches/")
- .post(matchControllers.getHistoryMatches);
+router
+  .route("/r/match/")
+  .post(matchControllers.getMatches);
+
+router
+  .route("/m/match/")
+  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/r/history-matches/")
+  .post(matchControllers.getHistoryMatches);
 
 
 /**
@@ -91,18 +99,18 @@ router
  * Matches routes
  */
 
-router
+/* router
   .route("/match/")
   .get(matchControllers.getAllMatches)
-  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
+  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken); */
 
-router
+/* router
   .route("/single-match/")
   .post(matchControllers.getSingleMatch)
-
+ */
 router
   .route("/match/:id")
-  .get(matchControllers.getMatch)
+  /* .get(matchControllers.getMatch) */
   .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
 
 router

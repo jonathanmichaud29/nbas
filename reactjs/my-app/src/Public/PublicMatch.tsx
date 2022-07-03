@@ -5,7 +5,7 @@ import { Alert, Box, CircularProgress  } from "@mui/material";
 
 import { IMatch } from "../Interfaces/match";
 
-import { fetchMatch } from '../ApiCall/matches';
+import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches';
 
 import ViewMatchDetails from '../Matchs/ViewMatchDetails';
 
@@ -24,8 +24,10 @@ function PublicMatch() {
    */
   useEffect( () => {
     if ( idMatch === null ) return;
-
-    fetchMatch(idMatch)
+    const paramsFetchMatches: IApiFetchMatchesParams = {
+      matchIds: [idMatch]
+    }
+    fetchMatches(paramsFetchMatches)
       .then(response => {
         setMatch(response.data[0])
       })
@@ -38,7 +40,7 @@ function PublicMatch() {
   }, [idMatch]);
 
   return (
-    <div className="public-layout">
+    <>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { isLoaded && (
@@ -46,7 +48,7 @@ function PublicMatch() {
           match={match}
         />
       ) }
-    </div>
+    </>
   )
 }
 export default PublicMatch;

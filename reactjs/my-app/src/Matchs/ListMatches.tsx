@@ -13,7 +13,7 @@ import { ITeam } from '../Interfaces/team';
 
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
-import { deleteMatch, fetchMatches } from '../ApiCall/matches'
+import { deleteMatch, fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches'
 import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
@@ -66,7 +66,9 @@ function ListMatches(props: IListMatchProps) {
       .finally(() => {
         setIsLoaded(true)
       });
-    fetchMatches()
+
+    const paramsFetchMatches: IApiFetchMatchesParams = {}
+    fetchMatches(paramsFetchMatches)
       .then(response => {
         dispatch(addMatches(response.data));
       })

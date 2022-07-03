@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 
-import { fetchSingleMatch, IFetchSingleMatchParams } from "../ApiCall/matches";
+import { fetchMatches, IApiFetchMatchesParams} from "../ApiCall/matches";
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
 
 import { IMatch, IMatchResumeProps } from '../Interfaces/match'
@@ -27,14 +27,16 @@ function MatchResume(props: IMatchResumeProps) {
   useEffect(() => {
     if( match !== null ) return;
 
-    const queryParams: IFetchSingleMatchParams = isLatestMatch ? {
-      isLast: true,
+    const queryParams: IApiFetchMatchesParams = isLatestMatch ? {
+      isPast: true,
       valueCompleted: 1,
+      quantity: 1,
     } : {
       isUpcoming: true,
       valueCompleted: 0,
+      quantity: 1,
     }
-    fetchSingleMatch(queryParams)
+    fetchMatches(queryParams)
       .then(response => {
         setMatch(response.data[0])
       })

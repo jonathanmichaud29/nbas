@@ -5,7 +5,7 @@ import { Alert, Box, CircularProgress  } from "@mui/material";
 
 import { IMatch } from "../Interfaces/match";
 
-import { fetchMatch } from '../ApiCall/matches';
+import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches';
 
 import ViewMatch from '../Matchs/ViewMatch';
 
@@ -24,8 +24,10 @@ function MatchManager() {
    */
   useEffect( () => {
     if ( idMatch === null ) return;
-
-    fetchMatch(idMatch)
+    const paramsFetchMatches: IApiFetchMatchesParams = {
+      matchIds: [idMatch]
+    }
+    fetchMatches(paramsFetchMatches)
       .then(response => {
         setMatch(response.data[0])
       })
