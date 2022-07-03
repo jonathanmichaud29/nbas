@@ -87,15 +87,6 @@ router
  * OLD ROUTES
  */
 
-
-/**
- * Teams routes
- */
-router
-  .route("/team-players/:id")
-  .get(teamControllers.getTeamPlayers)
-  /* .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken) */
-
 /**
  * Matches routes
  */
