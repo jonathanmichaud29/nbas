@@ -120,7 +120,7 @@ router
 
 router
   .route("/match-lineup/:idMatch/:idTeam")
-  .get(matchControllers.getMatchLineups)
+  .get(matchControllers.getMatchLineups);
 
 router
   .route("/match-lineup/player/:id")
@@ -133,7 +133,7 @@ router
 
 router
   .route("/players-lineups/")
-  .post(matchControllers.getPlayersMatchLineups)
+  .post(matchControllers.getPlayersMatchLineups);
 
 
 module.exports = router;

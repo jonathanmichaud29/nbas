@@ -53,7 +53,7 @@ export const fetchHistoryMatches = async (bodyParams: IApiFetchHistoryMatchesPar
 
 export const createMatch = async (argTeamHome: number, argTeamAway: number, argDate: Date) => {
   
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match/`,{
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/match/`,{
     idTeamHome: argTeamHome,
     idTeamAway: argTeamAway,
     date: argDate,

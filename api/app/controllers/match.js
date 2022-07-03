@@ -298,7 +298,7 @@ exports.deletePlayerLineup = async (req, res, next) => {
 };
 
 exports.updateMatchLineups = async (req, res, next) => {
-  if (!req.params.id) {
+  if (!req.params.idMatch) {
     return next(new AppError("No match id found", 404));
   }
   const bodyRequiredKeys = ["match", "lineups"]
