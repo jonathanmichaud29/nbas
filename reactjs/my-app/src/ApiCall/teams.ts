@@ -36,10 +36,11 @@ export const fetchStandingTeams = async (bodyParams: IApiFetchStandingTeamsParam
  * Protected calls
  */
 
-export const createTeam = async (argName: string) => {  
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/team/`,{
-    name: argName
-  })
+export interface IApiCreateTeamParams {
+  name: string;
+}
+export const createTeam = async (bodyParams: IApiCreateTeamParams) => {  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/team/`, bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -48,8 +49,12 @@ export const createTeam = async (argName: string) => {
     })
 }
 
-export const deleteTeam = async (argId: number) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/team/${argId}`,{
+
+export interface IApiDeleteTeamParams {
+  teamId: number;
+}
+export const deleteTeam = async (bodyParams: IApiDeleteTeamParams) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/team/${bodyParams.teamId}`,{
     
   })
     .then(response => {

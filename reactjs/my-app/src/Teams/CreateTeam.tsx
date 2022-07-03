@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import { AppDispatch } from "../redux/store";
 import { addTeam } from "../redux/teamSlice";
-import { createTeam } from '../ApiCall/teams';
+import { createTeam, IApiCreateTeamParams } from '../ApiCall/teams';
 
 const defaultValues = {
   name: ""
@@ -36,7 +36,10 @@ function CreateTeam() {
     setRequestStatus(true);
     reinitializeApiMessages();
 
-    createTeam(data.name)
+    const paramsCreateTeam: IApiCreateTeamParams = {
+      name: data.name
+    }
+    createTeam(paramsCreateTeam)
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);

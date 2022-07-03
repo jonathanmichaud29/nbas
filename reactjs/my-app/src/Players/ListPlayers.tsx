@@ -9,7 +9,7 @@ import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/
 import { Delete } from '@mui/icons-material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
-import { deletePlayer, fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players'
+import { deletePlayer, fetchPlayers, IApiDeletePlayerParams, IApiFetchPlayersParams } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/player';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
@@ -32,7 +32,11 @@ function ListPlayers(props: IPlayerProps) {
 
   const confirmDeletePlayer = (player: IPlayer) => {
     reinitializeApiMessages()
-    deletePlayer(player.id)
+
+    const paramsDeletePlayer: IApiDeletePlayerParams = {
+      playerId: player.id
+    }
+    deletePlayer(paramsDeletePlayer)
       .then(response => {
         dispatch(removePlayer(player.id));
         changeApiSuccess(response.message)

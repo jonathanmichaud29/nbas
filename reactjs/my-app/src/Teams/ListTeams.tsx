@@ -10,7 +10,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { addTeams, removeTeam } from "../redux/teamSlice";
-import { fetchTeams, deleteTeam, IApiFetchTeamsParams } from "../ApiCall/teams";
+import { fetchTeams, deleteTeam, IApiFetchTeamsParams, IApiDeleteTeamParams } from "../ApiCall/teams";
 import { ITeam, ITeamProps } from "../Interfaces/team";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
@@ -36,7 +36,10 @@ function ListTeams(props: ITeamProps) {
   const confirmDeleteTeam = (team: ITeam) => {
     reinitializeApiMessages();
 
-    deleteTeam(team.id)
+    const paramsDeleteTeam: IApiDeleteTeamParams = {
+      teamId: team.id
+    }
+    deleteTeam(paramsDeleteTeam)
       .then(response => {
         dispatch(removeTeam(team.id));
         changeApiSuccess(response.message);

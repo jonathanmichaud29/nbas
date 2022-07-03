@@ -22,12 +22,12 @@ export const fetchPlayers = async (bodyParams: IApiFetchPlayersParams) => {
  * Protected calls
  */
 
-
-export const createPlayer = async (argName: string) => {
+export interface IApiCreatePlayerParams {
+  name: string;
+}
+export const createPlayer = async (bodyParams: IApiCreatePlayerParams) => {
   
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/player/`,{
-    name: argName
-  })
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/player/`, bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -36,10 +36,11 @@ export const createPlayer = async (argName: string) => {
     })
 }
 
-export const deletePlayer = async (argId: number) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/player/${argId}`,{
-    
-  })
+export interface IApiDeletePlayerParams {
+  playerId: number;
+}
+export const deletePlayer = async (bodyParams: IApiDeletePlayerParams) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/player/${bodyParams.playerId}`)
     .then(response => {
       return Promise.resolve(response.data);
     })

@@ -96,15 +96,6 @@ router
   .get(teamControllers.getTeamPlayers)
   /* .post(teamControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken) */
 
-/* router
-  .route('/team-player/')
-  .get(teamControllers.getAllTeamPlayers)
-  .delete(teamControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken) */
-
-/* router
- .route("/unassigned-players/")
- .get(teamControllers.getUnassignedPlayers) */
-
 /**
  * Matches routes
  */
@@ -145,8 +136,5 @@ router
   .route("/players-lineups/")
   .post(matchControllers.getPlayersMatchLineups)
 
-router
-  .route("/team-matches/:id")
-  .get(teamControllers.getTeamMatches)
 
 module.exports = router;

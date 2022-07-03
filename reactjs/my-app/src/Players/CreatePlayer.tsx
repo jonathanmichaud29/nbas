@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import { AppDispatch } from "../redux/store";
 import { addPlayer } from "../redux/playerSlice";
-import { createPlayer } from '../ApiCall/players';
+import { createPlayer, IApiCreatePlayerParams } from '../ApiCall/players';
 
 const defaultValues = {
   name: ""
@@ -36,7 +36,10 @@ function CreatePlayer() {
     setRequestStatus(true);
     reinitializeApiMessages();
 
-    createPlayer(data.name)
+    const paramsCreatePlayer: IApiCreatePlayerParams = {
+      name: data.name
+    }
+    createPlayer(paramsCreatePlayer)
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);

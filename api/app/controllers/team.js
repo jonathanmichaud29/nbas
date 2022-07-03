@@ -113,7 +113,7 @@ exports.getTeamPlayers = async (req, res, next) => {
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
-
+/* 
 exports.getTeamMatches = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No team id found", 404));
@@ -162,4 +162,4 @@ exports.getTeamMatches = async (req, res, next) => {
   }
 
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
-};
+}; */
