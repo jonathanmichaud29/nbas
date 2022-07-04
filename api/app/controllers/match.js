@@ -1,9 +1,8 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
+const { mysqlQuery } = require("../services/db");
 const { getTeamsData, getMatchesData, getPlayersData } = require("../utils/simpleQueries");
 const { dateFormatShort, dateFormatToDatabase } = require("../utils/dateFormatter")
-const { is_missing_keys } = require("../utils/validation");
 
 
 exports.getMatches = async (req, res, next) => {
@@ -142,106 +141,4 @@ exports.deleteMatch = async (req, res, next) => {
     customMessage = `match deleted!`;
   }
   return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
-};
-
-
-/**
- * uncleaned entry points
- */
-
-
-exports.getMatch = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No match id found", 404));
-  }
-  const values = [req.params.id]
-  const resultMainQuery = await mysqlQuery("SELECT * FROM matches WHERE id=?", values)
-
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-};
-
-exports.createPlayerLineup = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No match id found", 404));
-  }
-
-  const bodyRequiredKeys = ["idPlayers", "idTeam"]
-  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
-    return next(new AppError(`Missing body parameters`, 404));
-  }
-  let values = []
-  const listIds = req.body.idPlayers;
-  listIds.forEach((id) => {
-    values.push([[req.params.id, req.body.idTeam, id]])
-  });
-  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer) VALUES (?)"
-  const resultMainQuery = await mysqlQueryPoolInserts(query, values);
-  
-  let customMessage = '';
-  let customData = {}
-  if( resultMainQuery.status ){
-    customMessage = `added ${resultMainQuery.data.length} player(s) to match lineup!`;
-    const resultLineupQuery = await mysqlQuery("SELECT id, idMatch, idTeam, idPlayer FROM match_lineup WHERE id IN (?)", [resultMainQuery.data]);
-    customData = resultLineupQuery.data;
-  }
-  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
-};
-
-exports.deletePlayerLineup = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No lineup id found", 404));
-  }
-  const values = [req.params.id];
-  const resultMainQuery = await mysqlQuery("DELETE FROM match_lineup WHERE id=?", values);
-  let customMessage = '';
-  if( resultMainQuery.status ){
-    customMessage = `lineup removed from match!`;
-  }
-  return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
-};
-
-exports.updateMatchLineups = async (req, res, next) => {
-  if (!req.params.idMatch) {
-    return next(new AppError("No match id found", 404));
-  }
-  const bodyRequiredKeys = ["match", "lineups"]
-  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
-    return next(new AppError(`Missing body parameters`, 404));
-  }
-  const myMatch = req.body.match;
-  const myLineups = req.body.lineups;
-
-  const idTeamWon = myMatch.teamAwayPoints > myMatch.teamHomePoints ? myMatch.idTeamAway : myMatch.idTeamHome;
-  const idTeamLost = idTeamWon !== myMatch.idTeamAway ? myMatch.idTeamAway : myMatch.idTeamHome;
-
-  let queries = new Array();
-
-  queries.push({
-    query: "UPDATE matches SET isCompleted=?, teamHomePoints=?, teamAwayPoints=?, idTeamWon=?, idTeamLost=? WHERE id=?",
-    values: [myMatch.isCompleted, myMatch.teamHomePoints, myMatch.teamAwayPoints, idTeamWon, idTeamLost, myMatch.id]
-  })
-  const queryLineup = "UPDATE match_lineup SET `hitOrder`=?, `atBats`=?, `single`=?, `double`=?, `triple`=?, `homerun`=?, `out`=?, "+
-    "`hitByPitch`=?, `walk`=?, `strikeOut`=?, `stolenBase`=?, `caughtStealing`=?, `plateAppearance`=?, "+
-    "`sacrificeBunt`=?, `sacrificeFly`=?, `runsBattedIn`=?, `hit`=? "+
-    "WHERE `id`=?"
-  myLineups.every((lineup) => {
-    queries.push({
-      query: queryLineup,
-      values: [
-        lineup.hitOrder, lineup.atBats, lineup.single, lineup.double, lineup.triple, lineup.homerun, lineup.out, 
-        lineup.hitByPitch, lineup.walk, lineup.strikeOut, lineup.stolenBase, lineup.caughtStealing, lineup.plateAppearance, 
-        lineup.sacrificeBunt, lineup.sacrificeFly, lineup.runsBattedIn, lineup.hit, 
-        lineup.lineupId]
-    })
-    return true;
-  })
-  
-  const resultMainQuery = await mysqlQueryPoolMixUpdates(queries);
-  
-  let customMessage = '';
-  let customData = {}
-  if( resultMainQuery.status ){
-    customMessage = `match #${req.body.match.id} updated!`;
-  }
-  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };

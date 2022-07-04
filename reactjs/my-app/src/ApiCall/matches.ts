@@ -87,51 +87,14 @@ export const deleteMatch = async (bodyParams: IApiDeleteMatchParams) => {
 }
 
 
-
-
-
-/**
- * Uncleaned calls
- */
-
-
-
-/* export const fetchTeamMatchLineups = async(argId: number, argTeamId: number) => {
-  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argId}/${argTeamId}`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-} */
-
-/* export const fetchMatchesLineups = async() => {
-  return await axiosProtected.get(`${process.env.REACT_APP_API_DOMAIN}/matches-lineups/`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-} */
-
-/* export const fetchPlayersMatchLineups = async(argPlayerIds: Array<number>) => {
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/players-lineups/`,{
-    listPlayerIds: argPlayerIds
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-} */
-
-export const addMatchLineup = async(argMatchId: number, argTeamId: number, argPlayerId: number) => {
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argMatchId}`, {
-    idTeam: argTeamId,
-    idPlayers: [argPlayerId]
+export interface IApiUpdateMatchLineupParams {
+  match: IMatch;
+  playersLineupsStats: Array<IPlayerLineupStats>;
+}
+export const updateMatchLineup = async(bodyParams: IApiUpdateMatchLineupParams) => {
+  return await axiosProtected.put(`${process.env.REACT_APP_API_DOMAIN}/m/match-lineup/`,{
+    match: bodyParams.match,
+    playersLineupsStats: bodyParams.playersLineupsStats,
   })
     .then(response => {
       return Promise.resolve(response.data);
@@ -141,7 +104,41 @@ export const addMatchLineup = async(argMatchId: number, argTeamId: number, argPl
     })
 }
 
-export const addLineupPlayers = async(argMatchId: number, argTeamId: number, argPlayerIds: Array<number>) => {
+export interface IApiAddMatchLineupsParams {
+  matchId: number;
+  teamId: number;
+  playerIds: Array<number>;
+}
+export const addMatchLineups = async(bodyParams: IApiAddMatchLineupsParams) => {
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/match-lineup/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export interface IApiDeleteMatchLineupParams {
+  matchLineupId: number;
+}
+export const deleteMatchLineup = async(bodyParams: IApiDeleteMatchLineupParams) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/match-lineup/${bodyParams.matchLineupId}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+/**
+ * Uncleaned calls
+ */
+
+
+
+/* export const addLineupPlayers = async(argMatchId: number, argTeamId: number, argPlayerIds: Array<number>) => {
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argMatchId}`, {
     idTeam: argTeamId,
     idPlayers: argPlayerIds
@@ -152,28 +149,7 @@ export const addLineupPlayers = async(argMatchId: number, argTeamId: number, arg
     .catch(error => {
       return Promise.reject(error.response.data.message);
     })
-}
-
-export const deletePlayerLineup = async(argLineupId: number) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/player/${argLineupId}`)
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
+} */
 
 
-export const updateMatchLineup = async(argMatch: IMatch, argLineups: IPlayerLineupStats[]) => {
-  return await axiosProtected.put(`${process.env.REACT_APP_API_DOMAIN}/match-lineup/${argMatch.id}`,{
-    match: argMatch,
-    lineups: argLineups
-  })
-    .then(response => {
-      return Promise.resolve(response.data);
-    })
-    .catch(error => {
-      return Promise.reject(error.response.data.message);
-    })
-}
+

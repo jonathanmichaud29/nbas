@@ -94,28 +94,14 @@ router
  .route("/r/match-lineup/")
  .post(matchLineupControllers.getMatchLineups);
 
-
-
-
-
-
-/**
- * OLD ROUTES
- */
-
-/**
- * Matches routes
- */
-
+router
+  .route("/m/match-lineup/")
+  .post(matchLineupControllers.createMatchLineups, firebaseAuthMiddleware.decodeToken)
+  .put(matchLineupControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/match-lineup/:idMatch")
-  .put(matchControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
-
-router
-  .route("/match-lineup/player/:id")
-  .post(matchControllers.createPlayerLineup, firebaseAuthMiddleware.decodeToken)
-  .delete(matchControllers.deletePlayerLineup, firebaseAuthMiddleware.decodeToken);
+  .route("/m/match-lineup/:matchLineupId")
+  .delete(matchLineupControllers.deleteMatchLineup, firebaseAuthMiddleware.decodeToken);
 
 
 module.exports = router;

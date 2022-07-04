@@ -11,7 +11,7 @@ import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperTe
 import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { ITeamPlayers } from '../Interfaces/team'
 
-import { addLineupPlayers } from '../ApiCall/matches';
+import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 
 import styleModal from './styleModal'
@@ -87,8 +87,12 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
     
     setRequestStatus(true);
     const playerIds = data.players.map((teamPlayer: ITeamPlayers) => teamPlayer.playerId);
-
-    addLineupPlayers(match.id, selectedTeam.id, playerIds)
+    const paramsAddMatchLineup: IApiAddMatchLineupsParams = {
+      matchId: match.id,
+      teamId: selectedTeam.id,
+      playerIds: playerIds,
+    }
+    addMatchLineups(paramsAddMatchLineup)
       .then((response) =>{
         reset()
         let newPlayers = []

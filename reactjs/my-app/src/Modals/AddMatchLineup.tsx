@@ -13,7 +13,7 @@ import { IPlayer } from "../Interfaces/player";
 import { ITeamPlayers, IOrderPlayers } from '../Interfaces/team'
 
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
-import { addMatchLineup } from '../ApiCall/matches';
+import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 
 import styleModal from './styleModal'
 
@@ -110,8 +110,13 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
     if( requestStatus || ! selectedTeam ) return;
     setRequestStatus(true);
     reinitializeApiMessages();
- 
-    addMatchLineup(match.id, selectedTeam.id, data.player.id)
+    
+    const paramsAddMatchLineup: IApiAddMatchLineupsParams = {
+      matchId: match.id,
+      teamId: selectedTeam.id,
+      playerIds: [data.player.id],
+    }
+    addMatchLineups(paramsAddMatchLineup)
       .then((response) =>{
         reset()
         setIncrementAcIndex(incrementAcIndex+1);

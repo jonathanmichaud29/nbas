@@ -12,7 +12,7 @@ import { removeMatchPlayer } from "../redux/matchPlayerSlice"
 
 import { IMatchLineup, ITeamMatchLineupProps } from '../Interfaces/match';
 
-import { deletePlayerLineup } from '../ApiCall/matches';
+import { deleteMatchLineup, IApiDeleteMatchLineupParams } from '../ApiCall/matches';
 
 import AddMatchLineup from '../Modals/AddMatchLineup';
 import AddTeamPlayersLineup from '../Modals/AddTeamPlayersLineup';
@@ -77,7 +77,10 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const confirmDeletePlayerLineup = (lineup: IMatchLineup) => {
     // reinitializeApiMessages();
 
-    deletePlayerLineup(lineup.id)
+    const paramsDeleteMatchLineup: IApiDeleteMatchLineupParams = {
+      matchLineupId: lineup.id,
+    }
+    deleteMatchLineup(paramsDeleteMatchLineup)
       .then(response => {
         dispatch(removeMatchPlayer(match, lineup))
       })
