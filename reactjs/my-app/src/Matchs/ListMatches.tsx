@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
-import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
+import { Alert, AppBar, Box, Card, CardContent, CircularProgress, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
@@ -17,7 +17,7 @@ import { deleteMatch, fetchMatches, IApiDeleteMatchParams, IApiFetchMatchesParam
 import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
-import { createDateReadable } from '../utils/dateFormatter';
+import { createHumanDate } from '../utils/dateFormatter';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,6 +31,9 @@ function ListMatches(props: IListMatchProps) {
   const listMatches = useSelector((state: RootState) => state ).matches
   const listTeams = useSelector((state: RootState) => state ).teams
 
+  const orderedMatches = [...listMatches];
+  orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
   const reinitializeApiMessages = () => {
     changeApiError('');
     changeApiSuccess('');
@@ -99,7 +102,7 @@ function ListMatches(props: IListMatchProps) {
     if( newTeamHome === undefined || newTeamAway === undefined ) {
       return;
     }
-    setDateMatchReadable(createDateReadable(match.date));
+    setDateMatchReadable(createHumanDate(match.date));
     setTeamHome(newTeamHome);
     setTeamAway(newTeamAway);
     setCurrentMatchView(match);
@@ -117,67 +120,96 @@ function ListMatches(props: IListMatchProps) {
     setOpenConfirmDelete(false);
   }
 
-  const htmlMatches = ( listMatches.length > 0 ? (
-    <List>
-      {listMatches.map((match: IMatch) => {
-        let listActions = [];
-        listActions.push(
-          <IconButton 
-            key={`action-view-match-${match.id}`}
-            aria-label={`View Match ${match.id}`}
-            title={`View Match ${match.id}`}
-            >
-            <Link to={`/match/${match.id}`}>
-              <InfoIcon />
-            </Link>
-          </IconButton>
-        );
-        if( isAdmin ) {
-          listActions.push(
-            <IconButton 
-              key={`action-edit-match-${match.id}`}
-              aria-label={`Edit Match ${match.id}`}
-              title={`Edit Match ${match.id}`}
-              >
-              <Link to={`/admin/match/${match.id}`}>
-                <EditIcon />
-              </Link>
-            </IconButton>
-          )
+  const htmlMatches = ( orderedMatches.length > 0 && (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell>Home Team</TableCell>
+            <TableCell>Away Team</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          { orderedMatches.map((match: IMatch) => {
+            let listActions = [];
+            listActions.push(
+              <IconButton 
+                key={`action-view-match-${match.id}`}
+                aria-label={`View Match ${match.id}`}
+                title={`View Match ${match.id}`}
+                >
+                <Link to={`/match/${match.id}`}>
+                  <InfoIcon />
+                </Link>
+              </IconButton>
+            );
+            if( isAdmin ) {
+              listActions.push(
+                <IconButton 
+                  key={`action-edit-match-${match.id}`}
+                  aria-label={`Edit Match ${match.id}`}
+                  title={`Edit Match ${match.id}`}
+                  >
+                  <Link to={`/admin/match/${match.id}`}>
+                    <EditIcon />
+                  </Link>
+                </IconButton>
+              )
 
-          listActions.push(
-            <IconButton 
-              key={`action-delete-match-${match.id}`}
-              aria-label={`Delete Match ${match.id}`}
-              title={`Delete Match ${match.id}`}
-              onClick={ () => handleOpenConfirmDelete(match) }
-              >
-              <Delete />
-            </IconButton>
-          )
-          
-        }
-        const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
-        const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
-        const dateReadable = createDateReadable(match.date);
-        return (
-          <ListItem 
-            key={`match-${match.id}`}
-            secondaryAction={ listActions.map((action) => action) }
-            >{teamHome?.name} VS {teamAway?.name} {dateReadable}</ListItem>
-        )
-      })}
-      
-    </List>
-  ) : '' );
+              listActions.push(
+                <IconButton 
+                  key={`action-delete-match-${match.id}`}
+                  aria-label={`Delete Match ${match.id}`}
+                  title={`Delete Match ${match.id}`}
+                  onClick={ () => handleOpenConfirmDelete(match) }
+                  >
+                  <Delete />
+                </IconButton>
+              )
+              
+            }
+            const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
+            const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
+            const dateReadable = createHumanDate(match.date);
+            if( teamHome === undefined || teamAway === undefined) return "";
+            return (
+              <TableRow key={`match-${match.id}`} hover={true}>
+                <TableCell>{dateReadable}</TableCell>
+                <TableCell>{teamHome?.name}</TableCell>
+                <TableCell>{teamAway?.name}</TableCell>
+                <TableCell>{ listActions.map((action) => action )}</TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  ));
   
   return (
-    <div className="public-layout">
-      <h2>Calendar</h2>
+    <Box p={3}>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
-      { htmlMatches }
+      { isLoaded && (
+        <Card>
+          <CardContent>
+            <Typography component="h1" variant="h3" align="center">
+              Calendar
+            </Typography>
+          </CardContent>
+
+          { listMatches.length > 0 && (
+            <CardContent sx={{maxWidth:'700px'}}>
+              { htmlMatches }
+            </CardContent>
+          )}
+
+        </Card>
+      )}
+
       { isAdmin && currentMatchView && teamHome && teamAway && (
         <ConfirmDelete
           isOpen={isModalOpenConfirmDelete}
@@ -187,7 +219,7 @@ function ListMatches(props: IListMatchProps) {
           description={`Are-you sure you want to delete the match '${teamHome.name}' VS '${teamAway.name}', happening on day '${dateMatchReadable}'?`}
           />
       ) }
-    </div>
+    </Box>
   )
 }
 export default ListMatches;

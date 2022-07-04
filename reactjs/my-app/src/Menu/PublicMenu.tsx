@@ -26,10 +26,10 @@ function PublicMenu() {
         label:"Teams Stats",
         url: "/stats/teams",
       },
-      /* {
+      {
         label:"Calendar",
-        url: "/stats/calendar",
-      } */
+        url: "/calendar",
+      }
     ];
 
     return links.map((link, index) => {

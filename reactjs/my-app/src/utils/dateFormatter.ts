@@ -17,6 +17,36 @@ export const createDateReadable = (argDate: Date): string => {
   });
 }
 
+const dayOfWeekLabel = (argDate: Date): string => {
+  const listValues = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
+  return listValues[argDate.getDay()];
+}
+
+const monthOfYearLabel = (argDate: Date): string => {
+  const listValues = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  return listValues[argDate.getMonth()];
+}
+
+export const createHumanDate = (argDate: Date): string => {
+  const dateObject = new Date(argDate);
+  const dayLabel = dayOfWeekLabel(dateObject);
+  const monthLabel = monthOfYearLabel(dateObject);
+
+  const dateReturn = dateObject.getFullYear() + ", " + monthLabel + " " + dateObject.getDate() + " @ " + 
+    dateObject.getHours().toString().padStart(2, '0') + ":" + dateObject.getMinutes().toString().padStart(2, '0');
+
+  return dateReturn;
+}
+
 export const createShortDateReadable = (argDate: Date): string => {
   const dateObject = new Date(argDate)
   return dateObject.toLocaleDateString("en-CA",{ 

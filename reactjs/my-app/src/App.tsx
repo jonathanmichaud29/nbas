@@ -9,6 +9,7 @@ import {
  */
 import PublicApp from './Public/PublicApp';
 import HomePage from './Public/HomePage'
+import PublicCalendar from "./Public/PublicCalendar";
 import PublicMatch from './Public/PublicMatch'
 import PublicPlayer from './Public/PublicPlayer'
 import PublicPlayersStats from './Public/PublicPlayersStats'
@@ -29,6 +30,7 @@ import CalendarManager from './Admin/CalendarManager';
 import { setDefaultMetas } from './utils/metaTags';
 
 
+
 function App() {
   setDefaultMetas();
   return (
@@ -38,6 +40,7 @@ function App() {
 
           <Route path="/" element={<PublicApp />}>
             <Route path="" element={<HomePage />} />
+            <Route path="calendar" element={<PublicCalendar />} />
             <Route path="player/:id" element={<PublicPlayer />} />
             <Route path="team/:id" element={<PublicTeam />} />
             <Route path="match/:id" element={<PublicMatch />} />
