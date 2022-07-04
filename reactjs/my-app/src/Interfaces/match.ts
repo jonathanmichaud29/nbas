@@ -20,7 +20,7 @@ export interface IMatchProps{
 
 export interface IMatchResumeProps {
   title: string;
-  isLatestMatch: boolean;
+  match: IMatch;
 }
 
 

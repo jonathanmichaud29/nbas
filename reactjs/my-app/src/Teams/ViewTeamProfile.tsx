@@ -100,8 +100,6 @@ function ViewTeamProfile(props: ITeamProfileProps) {
                       <React.Fragment key={`team-match-resume-${match.id}`}>
                         <Divider />
                         <TeamMatchResume
-                          
-                          team={team}
                           matchLineups={matchLineups}
                           match={match}
                           players={listPlayers}

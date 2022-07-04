@@ -66,11 +66,9 @@ export interface IAllTeamsStatsProps {
 }
 
 export interface ITeamMatchResumeProps {
-  team:         ITeam;
   matchLineups: IMatchLineup[];
   match:        IMatch;
   players:      IPlayer[];
   teamHome:     ITeam;
   teamAway:     ITeam;
-  hideHeader?:   boolean;
 }

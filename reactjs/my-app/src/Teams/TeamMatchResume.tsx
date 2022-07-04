@@ -1,9 +1,7 @@
 import { useState, useEffect} from 'react';
 
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { DataGrid, GridToolbar} from '@mui/x-data-grid';
-
-import { createDateReadable } from '../utils/dateFormatter';
 
 import { ITeamMatchResumeProps } from '../Interfaces/team';
 import { IBattingStatsExtended, defaultBattingStatsExtended } from "../Interfaces/stats";
@@ -19,11 +17,9 @@ import Scoreboard from "../Matchs/Scoreboard";
 
 function TeamMatchResume(props: ITeamMatchResumeProps) {
 
-  const {team, matchLineups, match, players, teamHome, teamAway, hideHeader} = props;
+  const {matchLineups, match, players, teamHome, teamAway} = props;
 
   const [allStats, setAllStats] = useState<IBattingStatsExtended | null>(null);
-
-  const dateReadable = createDateReadable(match.date);
 
   const isLoaded = allStats !== null;
 

@@ -14,39 +14,17 @@ import BestStatPlayers from '../Players/BestStatPlayers'
 
 function MatchResume(props: IMatchResumeProps) {
   
-  const { title, isLatestMatch } = props;
+  const { title, match } = props;
 
   const [apiError, changeApiError] = useState("");
-  const [match, setMatch] = useState<IMatch | null>(null);
+  // const [match, setMatch] = useState<IMatch | null>(null);
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
 
-  const isLoaded = match !== null && teamHome !== null && teamAway !== null && standingTeams !== null;
+  const isLoaded = teamHome !== null && teamAway !== null && standingTeams !== null;
 
-  useEffect(() => {
-    if( match !== null ) return;
-
-    const queryParams: IApiFetchMatchesParams = isLatestMatch ? {
-      isPast: true,
-      valueCompleted: 1,
-      quantity: 1,
-    } : {
-      isUpcoming: true,
-      valueCompleted: 0,
-      quantity: 1,
-    }
-    fetchMatches(queryParams)
-      .then(response => {
-        setMatch(response.data[0])
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  },[isLatestMatch, match]);
+  
 
   useEffect(() => {
     if( match === null || teamHome !== null || teamAway !== null) return;
