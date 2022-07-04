@@ -16,6 +16,9 @@ const appResponse = (response, next, status, data, error, customMessage) => {
   }
   else {
     const err_message = transformMysqlErrorCode(error, "team");
+    if( process.env.LOGS_ERROR == 1){
+      console.error("appResponse Error", error)
+    }
     return next(new AppError(err_message, 500));
   }
 }
