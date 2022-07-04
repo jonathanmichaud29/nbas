@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
-import { fetchTeamMatchLineups, fetchPlayersMatchLineups } from '../ApiCall/matches';
+import { IApiFetchMatchLineups, fetchMatchLineups } from '../ApiCall/matches';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from '../ApiCall/teamsPlayers';
 
@@ -36,7 +36,11 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
   useEffect(() => {
     if( bestStatPlayers !== null || match.isCompleted === 0 ) return;
 
-    fetchTeamMatchLineups(match.id, team.id)
+    const paramsMatchLineups: IApiFetchMatchLineups = {
+      matchId: match.id,
+      teamId: team.id,
+    }
+    fetchMatchLineups(paramsMatchLineups)
       .then(response => {
         const listMatchLineups: IMatchLineup[] = response.data;
         const playersStats = getCombinedPlayersStats(listMatchLineups)
@@ -65,8 +69,10 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
     fetchTeamsPlayers(paramsFetchTeamsPlayers)
       .then(response => {
         const listTeamPlayers: ITeamPlayers[] = response.data;
-        const listPlayerIds = listTeamPlayers.map((teamPlayer) => teamPlayer.playerId);
-        fetchPlayersMatchLineups(listPlayerIds)
+        const paramsMatchLineups: IApiFetchMatchLineups = {
+          playerIds: listTeamPlayers.map((teamPlayer) => teamPlayer.playerId),
+        }
+        fetchMatchLineups(paramsMatchLineups)
           .then(response => {
             const listMatchLineups: IMatchLineup[] = response.data;
             const playersStats = getCombinedPlayersStats(listMatchLineups)

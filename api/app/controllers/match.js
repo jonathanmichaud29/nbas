@@ -44,10 +44,6 @@ exports.getMatches = async (req, res, next) => {
   const resultMainQuery = await mysqlQuery(query, values)
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-
-  /* const resultMainQuery = await mysqlQuery("SELECT * FROM matches", [])
-
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error); */
 };
 
 exports.getHistoryMatches = async (req, res, next) => {
@@ -112,21 +108,12 @@ exports.getHistoryMatches = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error);
 }
 
-
-/**
- * uncleaned entry points
- */
-exports.getAllMatches = async (req, res, next) => {
-  const resultMainQuery = await mysqlQuery("SELECT * FROM matches", [])
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-};
-
 exports.createMatch = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const dateObject = new Date(req.body.date);
   const finalDate = dateFormatToDatabase(dateObject);
   const values = [
-    [[req.body.idTeamHome, req.body.idTeamAway, finalDate ]]
+    [[req.body.teamHomeId, req.body.teamAwayId, finalDate ]]
   ];
   const resultMainQuery = await mysqlQuery("INSERT INTO matches (idTeamHome, idTeamAway, date) VALUES ?", values)
 
@@ -140,6 +127,29 @@ exports.createMatch = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };
 
+
+exports.deleteMatch = async (req, res, next) => {
+  if (!req.params.matchId) {
+    return next(new AppError("No match id found", 404));
+  }
+  const values = [req.params.matchId];
+  const resultMainQuery = await mysqlQuery("DELETE FROM matches WHERE id=?", values);
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customData = {
+      id: req.params.matchId
+    };
+    customMessage = `match deleted!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
+};
+
+
+/**
+ * uncleaned entry points
+ */
+
+
 exports.getMatch = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No match id found", 404));
@@ -148,105 +158,6 @@ exports.getMatch = async (req, res, next) => {
   const resultMainQuery = await mysqlQuery("SELECT * FROM matches WHERE id=?", values)
 
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-};
-
-exports.getSingleMatch = async (req, res, next) => {
-  if (!req.body) {
-    return next(new AppError("No parameters received to fetch a match", 404));
-  }
-  let values = [];
-  let wheres = [];
-  let orderBy = [];
-  
-  if (req.body.isLast ){
-    orderBy.push("ORDER BY date DESC");
-  }
-  else{
-    orderBy.push("ORDER BY date ASC");
-  }
-  if (req.body.idMatch ){
-    values.push(req.body.idMatch);
-    wheres.push('`id`=?')
-  }
-  if( req.body.valueCompleted !== undefined ) {
-    values.push(req.body.valueCompleted);
-    wheres.push('`isCompleted`=?')
-  }
-
-  const query = "SELECT * FROM matches "+
-  "WHERE " + wheres.join(" AND ") + " " + 
-  orderBy.join(", ") + " " +
-  "LIMIT 1";
-  const resultMainQuery = await mysqlQuery(query, values)
-
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-};
-
-
-exports.deleteMatch = async (req, res, next) => {
-  if (!req.params.id) {
-    return next(new AppError("No match id found", 404));
-  }
-  const values = [req.params.id];
-  const resultMainQuery = await mysqlQuery("DELETE FROM matches WHERE id=?", values);
-  let customMessage = '';
-  if( resultMainQuery.status ){
-    customData = {
-      id: req.params.id
-    };
-    customMessage = `match deleted!`;
-  }
-  return appResponse(res, next, resultMainQuery.status, {}, resultMainQuery.error, customMessage);
-};
-
-exports.getMatchLineups = async (req, res, next) => {
-  if (!req.params.idMatch) {
-    return next(new AppError("No match id found", 404));
-  }
-  let values = [[req.params.idMatch]]
-  let wheres = ['`idMatch`=?']
-  if (req.params.idTeam !== undefined) {
-    wheres.push('`idTeam`=?')
-    values.push([req.params.idTeam]);
-  }
-  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup WHERE "+wheres.join(" AND "), values);
-  let customMessage = '';
-  if( resultMainQuery.status ){
-    customMessage = `match lineups retrieved!`;
-  }
-  else {
-    console.log(resultMainQuery.error)
-  }
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
-};
-
-exports.getMatchesLineups = async (req, res, next) => {
-  const resultMainQuery = await mysqlQuery("SELECT * FROM match_lineup", []);
-  let customMessage = '';
-  if( resultMainQuery.status ){
-    customMessage = `all matches lineups retrieved`;
-  }
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
-};
-
-exports.getPlayersMatchLineups = async (req, res, next) => {
-  if (!req.body.listPlayerIds) {
-    return next(new AppError("No player ids found", 404));
-  }
-  let values = [req.body.listPlayerIds]
-  
-  const query = "SELECT ml.* FROM match_lineup as ml " +
-    "INNER JOIN matches as m ON (ml.idMatch=m.id AND m.isCompleted=1) " +
-    "WHERE ml.idPlayer IN (?)";
-  const resultMainQuery = await mysqlQuery(query, values);
-  let customMessage = '';
-  if( resultMainQuery.status ){
-    customMessage = `players match lineups retrieved!`;
-  }
-  else {
-    console.log(resultMainQuery.error)
-  }
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error, customMessage);
 };
 
 exports.createPlayerLineup = async (req, res, next) => {

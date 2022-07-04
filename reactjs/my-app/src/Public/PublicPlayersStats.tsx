@@ -6,7 +6,7 @@ import { IPlayer } from "../Interfaces/player";
 import { IMatchLineup } from '../Interfaces/match';
 
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { fetchMatchesLineups } from '../ApiCall/matches';
+import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
 
 import { setMetas } from '../utils/metaTags';
 
@@ -50,7 +50,10 @@ function PublicPlayersStats() {
    */
    useEffect( () => {
     if ( listMatchesLineups !== null ) return;
-    fetchMatchesLineups()
+    const paramsMatchLineups: IApiFetchMatchLineups = {
+      allLineups: true,
+    }
+    fetchMatchLineups(paramsMatchLineups)
       .then(response => {
         setListMatchesLineups(response.data)
       })

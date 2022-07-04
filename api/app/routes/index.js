@@ -7,6 +7,7 @@ const teamControllers = require("../controllers/team");
 const playerControllers = require("../controllers/player");
 const matchControllers = require("../controllers/match");
 const teamPlayerControllers = require("../controllers/teamPlayer");
+const matchLineupControllers = require("../controllers/matchLineup");
 
 
 
@@ -54,13 +55,16 @@ router
   .post(matchControllers.getMatches);
 
 router
+  .route("/r/history-matches/")
+  .post(matchControllers.getHistoryMatches);
+
+router
   .route("/m/match/")
   .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
 
 router
-  .route("/r/history-matches/")
-  .post(matchControllers.getHistoryMatches);
-
+  .route('/m/match/:matchId')
+  .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
 
 /**
  * Teams Players routes
@@ -83,8 +87,12 @@ router
   .delete(teamPlayerControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken);
 
 
-
-
+/**
+ * Match Lineup routes
+ */
+router
+ .route("/r/match-lineup/")
+ .post(matchLineupControllers.getMatchLineups);
 
 
 
@@ -99,41 +107,15 @@ router
  * Matches routes
  */
 
-/* router
-  .route("/match/")
-  .get(matchControllers.getAllMatches)
-  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken); */
-
-/* router
-  .route("/single-match/")
-  .post(matchControllers.getSingleMatch)
- */
-router
-  .route("/match/:id")
-  /* .get(matchControllers.getMatch) */
-  .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
 
 router
   .route("/match-lineup/:idMatch")
-  .get(matchControllers.getMatchLineups)
   .put(matchControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
-
-router
-  .route("/match-lineup/:idMatch/:idTeam")
-  .get(matchControllers.getMatchLineups);
 
 router
   .route("/match-lineup/player/:id")
   .post(matchControllers.createPlayerLineup, firebaseAuthMiddleware.decodeToken)
   .delete(matchControllers.deletePlayerLineup, firebaseAuthMiddleware.decodeToken);
-
-router
-  .route("/matches-lineups/")
-  .get(matchControllers.getMatchesLineups);
-
-router
-  .route("/players-lineups/")
-  .post(matchControllers.getPlayersMatchLineups);
 
 
 module.exports = router;

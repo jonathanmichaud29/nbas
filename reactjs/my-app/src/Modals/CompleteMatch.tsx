@@ -9,7 +9,7 @@ import HelpIcon from '@mui/icons-material/Help';
 
 import { AppDispatch, RootState } from "../redux/store";
 
-import { fetchMatchLineups, updateMatchLineup } from '../ApiCall/matches';
+import { fetchMatchLineups, IApiFetchMatchLineups, updateMatchLineup } from '../ApiCall/matches';
 
 import { IPlayerLineupStats } from "../Interfaces/stats";
 import { ICompleteMatchProps, IMatchLineup } from '../Interfaces/match'
@@ -173,7 +173,11 @@ function CompleteMatch(props: ICompleteMatchProps) {
     updateMatchLineup(updatedMatch, formattedPlayerStats)
       .then((response) =>{
         changeApiSuccess(response.message);
-        fetchMatchLineups(match.id)
+        
+        const paramsMatchLineups: IApiFetchMatchLineups = {
+          matchId: match.id
+        }
+        fetchMatchLineups(paramsMatchLineups)
           .then((response) => {
             dispatch(addMatchPlayers(updatedMatch, response.data))
           })

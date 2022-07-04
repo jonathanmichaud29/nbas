@@ -7,7 +7,7 @@ import { IMatchLineup } from '../Interfaces/match';
 import { ITeam, IStandingTeam } from '../Interfaces/team';
 
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { fetchMatchesLineups } from '../ApiCall/matches';
+import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
 import { fetchStandingTeams, fetchTeams, IApiFetchStandingTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import AllTeamsStanding from '../Teams/AllTeamsStanding';
@@ -75,7 +75,10 @@ function PublicTeamsStats() {
    */
   useEffect( () => {
     if ( listMatchesLineups !== null ) return;
-    fetchMatchesLineups()
+    const paramsMatchLineups: IApiFetchMatchLineups = {
+      allLineups: true,
+    }
+    fetchMatchLineups(paramsMatchLineups)
       .then(response => {
         setListMatchesLineups(response.data)
       })

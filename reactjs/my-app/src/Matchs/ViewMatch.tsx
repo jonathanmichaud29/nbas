@@ -12,7 +12,7 @@ import { IMatchProps } from "../Interfaces/match";
 import { ITeam } from '../Interfaces/team';
 
 import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
-import { fetchMatchLineups } from '../ApiCall/matches';
+import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import TeamMatchLineup from '../Teams/TeamMatchLineup';
@@ -60,7 +60,10 @@ function ViewMatch(props: IMatchProps) {
       .finally(() => {
         
       });
-    fetchMatchLineups(match.id)
+    const paramsMatchLineups: IApiFetchMatchLineups = {
+      matchId: match.id
+    }
+    fetchMatchLineups(paramsMatchLineups)
       .then(response => {
         dispatch(addMatchPlayers(match, response.data));
       })

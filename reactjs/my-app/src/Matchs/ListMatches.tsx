@@ -13,7 +13,7 @@ import { ITeam } from '../Interfaces/team';
 
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
-import { deleteMatch, fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches'
+import { deleteMatch, fetchMatches, IApiDeleteMatchParams, IApiFetchMatchesParams } from '../ApiCall/matches'
 import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
@@ -38,7 +38,11 @@ function ListMatches(props: IListMatchProps) {
 
   const confirmDeleteMatch = (match: IMatch) => {
     reinitializeApiMessages()
-    deleteMatch(match.id)
+
+    const paramsDeleteMatch: IApiDeleteMatchParams = {
+      matchId: match.id
+    }
+    deleteMatch(paramsDeleteMatch)
       .then(response => {
         dispatch(removeMatch(match.id));
         changeApiSuccess(response.message)

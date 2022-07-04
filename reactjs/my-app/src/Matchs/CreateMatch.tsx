@@ -10,7 +10,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
-import { createMatch } from '../ApiCall/matches';
+import { createMatch, IApiCreateMatchParams } from '../ApiCall/matches';
 
 import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
 import { ITeam } from '../Interfaces/team';
@@ -49,8 +49,12 @@ function CreateMatch() {
     console.log("data send", data);
     setRequestStatus(true);
     reinitializeApiMessages();
-
-    createMatch(data.teamHome, data.teamAway, data.date)
+    const paramsCreateMatch: IApiCreateMatchParams = {
+      teamHomeId: data.teamHome,
+      teamAwayId: data.teamAway,
+      date: data.date
+    }
+    createMatch(paramsCreateMatch)
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);

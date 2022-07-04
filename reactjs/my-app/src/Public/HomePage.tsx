@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { Box, Grid } from "@mui/material";
+import { Alert, Box, CircularProgress, Grid } from "@mui/material";
 
-import MatchResume from "../Matchs/MatchResume";
 import { IMatch } from "../Interfaces/match";
+
 import { fetchMatches, IApiFetchMatchesParams } from "../ApiCall/matches";
 
-
+import MatchResume from "../Matchs/MatchResume";
 
 function HomePage() {
 
@@ -14,6 +14,8 @@ function HomePage() {
   const [matchPast, setMatchPast] = useState<IMatch | null>(null);
   const [matchUpcoming, setMatchUpcoming] = useState<IMatch | null>(null);
 
+  const isLoaded = matchPast !== null && matchUpcoming !== null;
+  
   useEffect(() => {
     if( matchPast !== null) return;
 
@@ -58,6 +60,8 @@ function HomePage() {
 
   return (
     <Box p={3}>
+      { ! isLoaded && <Box><CircularProgress /></Box>}
+      { apiError && <Alert severity="error">{apiError}</Alert> }
       <Grid container spacing={4} justifyContent="space-around">
         { matchPast && (
           <Grid item sm={12} md={6}  width="100%">

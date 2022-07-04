@@ -3,10 +3,9 @@ import { useEffect, useState } from "react";
 import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 
-import { fetchMatches, IApiFetchMatchesParams} from "../ApiCall/matches";
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
 
-import { IMatch, IMatchResumeProps } from '../Interfaces/match'
+import { IMatchResumeProps } from '../Interfaces/match'
 import { ITeam, IStandingTeam } from "../Interfaces/team";
 
 import Scoreboard from './Scoreboard';

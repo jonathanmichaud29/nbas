@@ -5,7 +5,7 @@ import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography } fro
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 
-import { fetchMatchLineups } from '../ApiCall/matches';
+import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
@@ -57,7 +57,10 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
 
   useEffect(() => {
     if( matchLineups !== null && teamHome !== null && teamAway !== null ) return;
-    fetchMatchLineups(match.id)
+    const paramsMatchLineups: IApiFetchMatchLineups = {
+      matchId: match.id
+    }
+    fetchMatchLineups(paramsMatchLineups)
       .then((response) => {
         setMatchLineups(response.data);
       })
@@ -226,8 +229,6 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     <>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
-      
-        
       { isLoaded && (
         <Box p={3}>
           <Card>
