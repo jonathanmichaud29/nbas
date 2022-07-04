@@ -2,7 +2,7 @@ const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery, mysqlQueryPoolInserts, mysqlQueryPoolMixUpdates } = require("../services/db");
 const { getTeamsData, getMatchesData, getPlayersData } = require("../utils/simpleQueries");
-const { dateFormatShort } = require("../utils/dateFormatter")
+const { dateFormatShort, dateFormatToDatabase } = require("../utils/dateFormatter")
 const { is_missing_keys } = require("../utils/validation");
 
 
@@ -124,15 +124,7 @@ exports.getAllMatches = async (req, res, next) => {
 exports.createMatch = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
   const dateObject = new Date(req.body.date);
-  const options = { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit', 
-    hourCycle:'h24', 
-    hour: '2-digit', 
-    minute: '2-digit', 
-  };
-  const finalDate = dateObject.toLocaleDateString("en-CA", options);
+  const finalDate = dateFormatToDatabase(dateObject);
   const values = [
     [[req.body.idTeamHome, req.body.idTeamAway, finalDate ]]
   ];
