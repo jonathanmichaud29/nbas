@@ -9,6 +9,20 @@ const matchControllers = require("../controllers/match");
 const teamPlayerControllers = require("../controllers/teamPlayer");
 const matchLineupControllers = require("../controllers/matchLineup");
 
+const userControllers = require("../controllers/user");
+
+/**
+ * User routes
+ */
+router
+  .route("/r/user-leagues/")
+  .post(userControllers.fetchUserLeagues, firebaseAuthMiddleware.decodeToken);
+
+router
+  .route("/m/user/token/")
+  .post(userControllers.userFirebaseToken, firebaseAuthMiddleware.decodeToken);
+
+
 
 
 /**

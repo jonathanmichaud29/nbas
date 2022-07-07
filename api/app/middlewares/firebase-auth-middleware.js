@@ -5,7 +5,7 @@ class FirebaseAuthMiddleware{
     const authToken = req.headers.authorization;
     try{
       const token = authToken.split(" ")[1];
-      const decodeValue = admin.auth().verifyIdToken(token);
+      const decodeValue = await admin.auth().verifyIdToken(token);
       if( decodeValue) {
         return next();
       }

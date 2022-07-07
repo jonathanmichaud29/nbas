@@ -76,7 +76,7 @@ function PublicMenu() {
     if( loading ) return;
     const links = ( user ? [
       {
-        label:"User Profile",
+        label:"Dashboard",
         url: "/admin/dashboard",
       },
       {

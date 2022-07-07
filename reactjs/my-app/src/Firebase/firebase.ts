@@ -9,6 +9,7 @@ import {
 import {
   getFirestore,
 } from "firebase/firestore";
+import { updateAxiosBearer } from "../utils/axios";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
@@ -45,7 +46,6 @@ const logInWithEmailAndPassword = async (email: string, password: string) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return Promise.resolve(result);
   } catch (err: any) {
-    //throw TypeError(generateMessageFromFirebaseErrorCode(err));
     return Promise.reject(generateMessageFromFirebaseErrorCode(err));
   }
 };
@@ -61,7 +61,10 @@ const sendPasswordReset = async (email: string) => {
 };
 
 const logout = () => {
+  window.localStorage.clear();
+  updateAxiosBearer();
   signOut(auth);
+  
 };
 
 export {

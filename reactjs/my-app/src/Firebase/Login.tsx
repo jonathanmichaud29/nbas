@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
+import { Alert, Box, Button, Card, CardContent, CardHeader, Container, Grid } from "@mui/material";
+
 import { auth, logInWithEmailAndPassword } from "./firebase";
-import { Alert, Box, Button } from "@mui/material";
+import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
 
 import FormTextInput from "../Forms/FormTextInput";
 
-/* import './_login.scss'; */
+import { updateAxiosBearer } from "../utils/axios";
 
 const defaultValues = {
   email: "",
@@ -34,10 +36,6 @@ function Login() {
     logInWithEmailAndPassword(data.email, data.password)
       .then(userCredential => {
         changeApiError("");
-        userCredential.user.getIdToken().then(token=>{
-          window.localStorage.setItem('userToken', token);
-        });
-        
       })
       .catch(error => {
         changeApiError(error);
@@ -50,7 +48,22 @@ function Login() {
 
   useEffect(() => {
     if (loading) return;
-    if (user) navigate("/admin/dashboard");
+    if (user) {
+      user.getIdToken().then(token=>{
+        window.localStorage.setItem('userToken', token);
+        const paramsSetUserFirebaseToken: IApiSetUserFirebaseTokenParams = {
+          email: user.email || '',
+          token: token,
+        }
+        setUserFirebaseToken(paramsSetUserFirebaseToken)
+          .then(response => {
+            updateAxiosBearer()
+            navigate("/admin/dashboard");
+          })
+      })
+      
+      
+    }
   }, [user, loading, navigate]);
 
   const checkEnterSubmit = (event: KeyboardEvent<HTMLFormElement>) => {
@@ -61,31 +74,48 @@ function Login() {
   };
 
   return (
-    <Box className="form formLogin">
-      <form onSubmit={handleSubmit(onSubmit)} onKeyDown={(e) => checkEnterSubmit(e)}>
-        <FormProvider {...methods}>
-          <FormTextInput
-            label={`Email address`}
-            controllerName={`email`}
-            type="text"
-            isRequired={true}
-            pattern="email"
-          />
-          <FormTextInput
-            label={`Password`}
-            controllerName={`password`}
-            type="password"
-            isRequired={true}
-          />
-          
-          <Button 
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            >Login</Button>
-
-          { apiError && <Alert severity="error">{apiError}</Alert> }
-        </FormProvider>
-      </form>
+    <Box p={3}>
+      <Container maxWidth="xs">
+        <Card>
+          <CardHeader title="Login" component="h1" sx={{textAlign:"center"}} />
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} onKeyDown={(e) => checkEnterSubmit(e)}>
+              <FormProvider {...methods}>
+                <Grid container direction="column" alignItems="center" justifyContent="center">
+                  <Grid item pb={3} >
+                    <FormTextInput
+                      label={`Email address`}
+                      controllerName={`email`}
+                      type="text"
+                      isRequired={true}
+                      pattern="email"
+                    />
+                  </Grid>
+                  <Grid item pb={3}>
+                    <FormTextInput
+                      label={`Password`}
+                      controllerName={`password`}
+                      type="password"
+                      isRequired={true}
+                    />
+                  </Grid>
+                  <Grid item pb={3}>
+                    <Button 
+                      onClick={handleSubmit(onSubmit)}
+                      variant="contained"
+                      >Login</Button>
+                  </Grid>
+                  { apiError && (
+                    <Grid item pb={3}>
+                      <Alert severity="error">{apiError}</Alert>
+                    </Grid> 
+                  )}
+                </Grid>    
+              </FormProvider>
+            </form>
+          </CardContent>
+        </Card>
+      </Container>
     </Box>
   );
 }

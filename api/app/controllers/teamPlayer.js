@@ -81,9 +81,6 @@ exports.createTeamPlayer = async (req, res, next) => {
     if( resultPlayerData.status && resultTeamData.status ){
       customMessage = `Player '${resultPlayerData.data.name}' added to team '${resultTeamData.data.name}'!`
     }
-    else {
-      console.error("Secondary queries errors", resultPlayerData, resultTeamData);
-    }
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
   

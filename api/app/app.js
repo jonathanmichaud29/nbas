@@ -7,7 +7,9 @@ const cors = require("cors");
 const router = require("./routes");
 const AppError = require("./utils/appError");
 const errorHandler = require("./utils/errorHandler");
+const firebaseSetToken = require("./middlewares/firebase-set-token")
 
+app.use(firebaseSetToken);
 app.use(cors({
   origin: process.env.WEB_DOMAIN
 }));
