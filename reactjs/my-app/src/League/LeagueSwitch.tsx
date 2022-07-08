@@ -7,6 +7,7 @@ import { ILeague } from "../Interfaces/league";
 import { fetchUserLeagues } from "../ApiCall/users";
 
 import { castNumber } from "../utils/castValues";
+import { updateAxiosBearer } from "../utils/axios";
 
 function LeagueSwitch() {
 
@@ -15,6 +16,13 @@ function LeagueSwitch() {
   const [leagues, setLeagues] = useState<ILeague[] | null>(null);
 
   const isLoaded = leagues !== null;
+
+  const selectNewLeague = (league: ILeague) => {
+    setCurrentLeague(league);
+    window.localStorage.setItem("currentLeagueId", league.id.toString());
+    window.localStorage.setItem("currentLeagueName", league.name);
+    updateAxiosBearer();
+  }
 
   useEffect(() => {
     fetchUserLeagues({})
@@ -27,7 +35,7 @@ function LeagueSwitch() {
         else {
           response.data.every((league: ILeague) => {
             if( currentLeagueId === 0  || currentLeagueId === league.id ){
-              setCurrentLeague(league);
+              selectNewLeague(league);
               return false;
             }
             return true;
@@ -36,10 +44,7 @@ function LeagueSwitch() {
       })
   }, [])
 
-  const selectNewLeague = (league: ILeague) => {
-    setCurrentLeague(league);
-    window.localStorage.setItem("currentLeagueId", league.id.toString());
-  }
+  
   
   return (
     <Box p={3}>

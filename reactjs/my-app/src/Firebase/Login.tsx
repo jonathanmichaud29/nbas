@@ -1,16 +1,11 @@
-import { KeyboardEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { KeyboardEvent, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 import { Alert, Box, Button, Card, CardContent, CardHeader, Container, Grid } from "@mui/material";
 
-import { auth, logInWithEmailAndPassword } from "./firebase";
-import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
+import { logInWithEmailAndPassword } from "./firebase";
 
 import FormTextInput from "../Forms/FormTextInput";
-
-import { updateAxiosBearer } from "../utils/axios";
 
 const defaultValues = {
   email: "",
@@ -25,8 +20,6 @@ interface IFormInput {
 
 function Login() {
   
-  const [user, loading] = useAuthState(auth);
-  const navigate = useNavigate();
   const [apiError, changeApiError] = useState("");
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
@@ -45,26 +38,6 @@ function Login() {
       });
     
   } 
-
-  useEffect(() => {
-    if (loading) return;
-    if (user) {
-      user.getIdToken().then(token=>{
-        window.localStorage.setItem('userToken', token);
-        const paramsSetUserFirebaseToken: IApiSetUserFirebaseTokenParams = {
-          email: user.email || '',
-          token: token,
-        }
-        setUserFirebaseToken(paramsSetUserFirebaseToken)
-          .then(response => {
-            updateAxiosBearer()
-            navigate("/admin/dashboard");
-          })
-      })
-      
-      
-    }
-  }, [user, loading, navigate]);
 
   const checkEnterSubmit = (event: KeyboardEvent<HTMLFormElement>) => {
     if (event.code === 'Enter') {

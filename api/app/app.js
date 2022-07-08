@@ -8,8 +8,8 @@ const router = require("./routes");
 const AppError = require("./utils/appError");
 const errorHandler = require("./utils/errorHandler");
 const firebaseSetToken = require("./middlewares/firebase-set-token")
+const { userAccessLeagues } = require("./middlewares/user-access-leagues")
 
-app.use(firebaseSetToken);
 app.use(cors({
   origin: process.env.WEB_DOMAIN
 }));
@@ -19,6 +19,10 @@ app.use(
     extended: true,
   })
 );
+
+app.use(firebaseSetToken);
+app.use(userAccessLeagues);
+
 app.use(router);
 
 app.all("*", (req, res, next) => {

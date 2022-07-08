@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery } = require("../services/db");
+const { mysqlQuery, mysqlQueryPoolMixInserts } = require("../services/db");
+const { is_missing_keys, validateUserLeague } = require("../utils/validation")
 
 /**
  * Fetch players from a list of ID or fetching all players
@@ -28,7 +29,16 @@ exports.getPlayers = async (req, res, next) => {
 
 
 exports.createPlayer = async (req, res, next) => {
+  if( ! validateUserLeague(req) ) return next(new AppError("User does not have access to this league"));
   if (!req.body) return next(new AppError("No form data found", 404));
+
+  const bodyRequiredKeys = ["name"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
+  }
+
+  return next(new AppError(`Force return`, 404));
+
   const values = [req.body.name];
   const resultMainQuery = await mysqlQuery("INSERT INTO players (name) VALUES(?)", values)
 

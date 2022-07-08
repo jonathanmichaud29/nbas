@@ -28,7 +28,7 @@ export interface IApiSetUserFirebaseTokenParams {
   email: string;
 }
 export const setUserFirebaseToken = async (bodyParams: IApiSetUserFirebaseTokenParams) => {
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/user/token/`, bodyParams)
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/user-token/`, bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })

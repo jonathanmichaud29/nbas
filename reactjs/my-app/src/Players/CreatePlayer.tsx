@@ -1,15 +1,15 @@
 import { useState }  from 'react';
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, Paper, Button, TextField } from "@mui/material";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+
+import { Alert, Button, Grid } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { addPlayer } from "../redux/playerSlice";
+
 import { createPlayer, IApiCreatePlayerParams } from '../ApiCall/players';
 
-const defaultValues = {
-  name: ""
-}
+import FormTextInput from '../Forms/FormTextInput';
 
 interface IFormInput {
   name: string;
@@ -21,6 +21,10 @@ function CreatePlayer() {
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
 
+  const defaultValues = {
+    name: "",
+  }
+
   const dispatch = useDispatch<AppDispatch>();
 
   const reinitializeApiMessages = () => {
@@ -29,7 +33,7 @@ function CreatePlayer() {
   }
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
-  const { handleSubmit, control, reset, formState: { errors } } = methods;
+  const { handleSubmit, reset } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
 
@@ -55,34 +59,36 @@ function CreatePlayer() {
   }
 
   return (
-    <div>
-      <h3>Create new Player</h3>
-      <Paper>
-        { apiError && <Alert severity="error">{apiError}</Alert> }
-        { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
-        <Controller
-            name={"name"}
-            control={control}
-            rules={{ 
-              required: "This is required",
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextField 
-                onChange={onChange} 
-                value={value} 
-                label={"Player Name"} 
-                error={errors.name ? true : false}
-                helperText={errors.name ? errors.name.message : '' }
-              />
-            )}
-          />
+    <FormProvider {...methods}>
+      <Grid container direction="column" flexWrap="nowrap" alignItems="center">
+        { apiError && (
+          <Grid item>
+            <Alert severity="error">{apiError}</Alert>
+          </Grid> 
+        )}
+        { apiSuccess && (
+          <Grid item>
+            <Alert security="success">{apiSuccess}</Alert>
+          </Grid>
+        )}
 
+        <Grid item pb={3}>
+          <FormTextInput
+            label={`New player name`}
+            controllerName={`name`}
+            type="text"
+            isRequired={true}
+          />
+        </Grid>
+        
+        <Grid item>
           <Button 
             onClick={handleSubmit(onSubmit)}
             variant="contained"
-            >Submit</Button>
-      </Paper>
-    </div>
+            >Add new player</Button>
+        </Grid>
+      </Grid>
+    </FormProvider>
   );
 }
 

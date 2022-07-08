@@ -16,11 +16,11 @@ const userControllers = require("../controllers/user");
  */
 router
   .route("/r/user-leagues/")
-  .post(userControllers.fetchUserLeagues, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, userControllers.fetchUserLeagues);
 
 router
-  .route("/m/user/token/")
-  .post(userControllers.userFirebaseToken, firebaseAuthMiddleware.decodeToken);
+  .route("/m/user-token/")
+  .post(firebaseAuthMiddleware.decodeToken, userControllers.userFirebaseToken);
 
 
 
@@ -31,11 +31,11 @@ router
 
 router
   .route("/m/player/")
-  .post(playerControllers.createPlayer, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, playerControllers.createPlayer);
 
 router
   .route("/m/player/:id")
-  .delete(playerControllers.deletePlayer, firebaseAuthMiddleware.decodeToken);
+  .delete(firebaseAuthMiddleware.decodeToken, playerControllers.deletePlayer);
 
 router
   .route("/r/player/")
@@ -54,11 +54,11 @@ router
 
 router
   .route("/m/team/")
-  .post(teamControllers.createTeam, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, teamControllers.createTeam);
 
 router
   .route("/m/team/:id")
-  .delete(teamControllers.deleteTeam, firebaseAuthMiddleware.decodeToken);
+  .delete(firebaseAuthMiddleware.decodeToken, teamControllers.deleteTeam);
 
 /**
  * Matches routes
@@ -74,11 +74,11 @@ router
 
 router
   .route("/m/match/")
-  .post(matchControllers.createMatch, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, matchControllers.createMatch);
 
 router
   .route('/m/match/:matchId')
-  .delete(matchControllers.deleteMatch, firebaseAuthMiddleware.decodeToken);
+  .delete(firebaseAuthMiddleware.decodeToken, matchControllers.deleteMatch);
 
 /**
  * Teams Players routes
@@ -94,11 +94,11 @@ router
 
 router
   .route('/m/team-player/')
-  .post(teamPlayerControllers.createTeamPlayer, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, teamPlayerControllers.createTeamPlayer);
 
 router
   .route('/m/team-player/:teamId/:playerId')
-  .delete(teamPlayerControllers.deleteTeamPlayer, firebaseAuthMiddleware.decodeToken);
+  .delete(firebaseAuthMiddleware.decodeToken, teamPlayerControllers.deleteTeamPlayer);
 
 
 /**
@@ -110,12 +110,12 @@ router
 
 router
   .route("/m/match-lineup/")
-  .post(matchLineupControllers.createMatchLineups, firebaseAuthMiddleware.decodeToken)
-  .put(matchLineupControllers.updateMatchLineups, firebaseAuthMiddleware.decodeToken);
+  .post(firebaseAuthMiddleware.decodeToken, matchLineupControllers.createMatchLineups)
+  .put(firebaseAuthMiddleware.decodeToken, matchLineupControllers.updateMatchLineups);
 
 router
   .route("/m/match-lineup/:matchLineupId")
-  .delete(matchLineupControllers.deleteMatchLineup, firebaseAuthMiddleware.decodeToken);
+  .delete(firebaseAuthMiddleware.decodeToken, matchLineupControllers.deleteMatchLineup);
 
 
 module.exports = router;

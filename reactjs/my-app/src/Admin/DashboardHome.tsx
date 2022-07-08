@@ -1,21 +1,10 @@
-import { useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useNavigate } from "react-router-dom";
-
 import { Box, Button, Card, CardContent, CardHeader, Container, Grid } from "@mui/material";
 
-import { auth, logout } from "../Firebase/firebase";
+import { logout } from "../Firebase/firebase";
 import LeagueSwitch from "../League/LeagueSwitch";
 
 function DashboardHome() {
-  const [user, loading] = useAuthState(auth);
-  const navigate = useNavigate();
   
-  useEffect(() => {
-    if (loading) return;
-    if (!user) navigate("/admin/login");
-  }, [user, loading, navigate]);
-
   return (
     <>
       <Box p={3}>
