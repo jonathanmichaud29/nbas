@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 import { Alert, Button, Box, Card, CardHeader, Container, Grid } from "@mui/material";
 
@@ -6,10 +7,15 @@ import { ILeague } from "../Interfaces/league";
 
 import { fetchUserLeagues } from "../ApiCall/users";
 
-import { castNumber } from "../utils/castValues";
+import { AppDispatch } from "../redux/store";
+import { resetPlayers } from '../redux/playerSlice';
+import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
+
 import { updateAxiosBearer } from "../utils/axios";
+import { getStorageLeagueId } from "../utils/localStorage";
 
 function LeagueSwitch() {
+  const dispatch = useDispatch<AppDispatch>();
 
   const [messageError, setMessageError] = useState('');
   const [selectedLeague, setCurrentLeague] = useState<ILeague | null>(null);
@@ -22,13 +28,15 @@ function LeagueSwitch() {
     window.localStorage.setItem("currentLeagueId", league.id.toString());
     window.localStorage.setItem("currentLeagueName", league.name);
     updateAxiosBearer();
+    dispatch(resetPlayers());
+    dispatch(resetLeaguePlayers());
   }
 
   useEffect(() => {
     fetchUserLeagues({})
       .then(response => {
         setLeagues(response.data);
-        const currentLeagueId = castNumber(window.localStorage.getItem("currentLeagueId"));
+        const currentLeagueId = getStorageLeagueId();
         if ( response.data.length === 0) {
           setMessageError("There is no league assigned to your profile. Please advised the admin");
         }

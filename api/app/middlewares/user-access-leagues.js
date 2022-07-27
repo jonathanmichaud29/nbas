@@ -12,8 +12,8 @@ exports.userAccessLeagues = async(req, res, next) =>{
   "WHERE u.`firebaseToken`=?";
   const values = [req.userToken];
   const resultMainQuery = await mysqlQuery(query, values);
-  const leagueIds = resultMainQuery.data.map((league) => league.id)
-  req.userAccessLeagues = leagueIds;
+  const leagues = resultMainQuery.data.map((league) => league)
+  req.userAccessLeagues = leagues;
   return next();
 }
 

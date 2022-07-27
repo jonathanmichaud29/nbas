@@ -4,26 +4,32 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addPlayers, removePlayer } from "../redux/playerSlice";
+import { addLeaguePlayers, removeLeaguePlayer } from "../redux/leaguePlayerSlice";
 
-import { Alert, Box, CircularProgress, IconButton, List, ListItem  } from "@mui/material";
+import { Alert, Box, CircularProgress, IconButton, List, ListItem, Typography  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
-import { deletePlayer, fetchPlayers, IApiDeletePlayerParams, IApiFetchPlayersParams } from '../ApiCall/players'
+import { deleteLeaguePlayer, fetchLeaguePlayers, fetchPlayers, IApiDeleteLeaguePlayerParams, IApiFetchLeaguePlayersParams, IApiFetchPlayersParams } from '../ApiCall/players'
 import { IPlayer, IPlayerProps } from '../Interfaces/player';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
+import { ILeaguePlayer } from '../Interfaces/league';
 
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLeaguePlayersLoaded, setIsLeaguePlayersLoaded] = useState(false);
+  const [isPlayersLoaded, setIsPlayersLoaded] = useState(false);
 
   const { isAdmin } = props;
 
   const listPlayers = useSelector((state: RootState) => state.players )
+  const listLeaguePlayers = useSelector((state: RootState) => state.leaguePlayers )
+
+  const isLoaded = isLeaguePlayersLoaded && isPlayersLoaded;
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -33,12 +39,17 @@ function ListPlayers(props: IPlayerProps) {
   const confirmDeletePlayer = (player: IPlayer) => {
     reinitializeApiMessages()
 
-    const paramsDeletePlayer: IApiDeletePlayerParams = {
-      playerId: player.id
+    const paramsDeletePlayer: IApiDeleteLeaguePlayerParams = {
+      idPlayer: player.id
     }
-    deletePlayer(paramsDeletePlayer)
+    deleteLeaguePlayer(paramsDeletePlayer)
       .then(response => {
-        dispatch(removePlayer(player.id));
+        dispatch(removePlayer(response.data.playerId));
+        const leaguePlayerToRemove: ILeaguePlayer = {
+          idPlayer: response.data.idPlayer,
+          idLeague: response.data.idLeague,
+        }
+        dispatch(removeLeaguePlayer(leaguePlayerToRemove));
         changeApiSuccess(response.message)
       })
       .catch(error => {
@@ -50,8 +61,27 @@ function ListPlayers(props: IPlayerProps) {
   }
   
   useEffect(() => {
+    const paramsFetchLeaguePlayers: IApiFetchLeaguePlayersParams = {
+      
+    }
+    fetchLeaguePlayers(paramsFetchLeaguePlayers)
+      .then(response => {
+        dispatch(addLeaguePlayers(response.data));
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setIsLeaguePlayersLoaded(true);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if( ! isLeaguePlayersLoaded || isPlayersLoaded ) return;
+    
+    const playerIds = listLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
     const paramsFetchPlayers: IApiFetchPlayersParams = {
-      allPlayers: true
+      playerIds: playerIds
     }
     fetchPlayers(paramsFetchPlayers)
       .then(response => {
@@ -61,9 +91,9 @@ function ListPlayers(props: IPlayerProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLoaded(true)
+        setIsPlayersLoaded(true);
       });
-  }, [dispatch])
+  }, [dispatch, isLeaguePlayersLoaded, isPlayersLoaded, listLeaguePlayers])
 
   /**
    * Handle multiples modals
@@ -87,13 +117,13 @@ function ListPlayers(props: IPlayerProps) {
     setOpenConfirmDelete(false);
   }
 
-  const htmlPlayers = ( listPlayers.length > 0 ? (
+  const htmlPlayers = ( listPlayers && listPlayers.length > 0 ? (
     <List>
       {listPlayers.map((player: IPlayer) => {
         let listActions = [];
         listActions.push(
           <IconButton 
-            key={`action-view-player-${player.id}`}
+            key={`action-view-leaguePlayer-${player.id}`}
             aria-label={`${player.name} Profile`}
             title={`${player.name} Profile`}
             >
@@ -123,12 +153,15 @@ function ListPlayers(props: IPlayerProps) {
         )
       })}
       
+    
     </List>
   ) : '' );
   
   return (
-    <div className="public-layout">
-      <h2>Player List</h2>
+    <>
+      <Typography variant="h4" align="center">
+        Player List
+      </Typography>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
@@ -142,7 +175,7 @@ function ListPlayers(props: IPlayerProps) {
           description={`Are-you sure you want to delete the player '${currentPlayerView.name}'?`}
           />
       ) }
-    </div>
+    </>
   )
 }
 export default ListPlayers;

@@ -5,11 +5,14 @@ const express = require("express");
 const app = express()
 const cors = require("cors");
 const router = require("./routes");
+
 const AppError = require("./utils/appError");
 const errorHandler = require("./utils/errorHandler");
+
 const firebaseSetToken = require("./middlewares/firebase-set-token")
 const { userAccessLeagues } = require("./middlewares/user-access-leagues")
 
+// Start building App 
 app.use(cors({
   origin: process.env.WEB_DOMAIN
 }));

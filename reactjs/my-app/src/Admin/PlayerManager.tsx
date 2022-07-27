@@ -1,9 +1,10 @@
 import { Box, Card, CardContent, CardHeader, Container, Grid } from '@mui/material';
 import CreatePlayer from '../Players/CreatePlayer';
 import ListPlayers from '../Players/ListPlayers';
+import { getStorageLeagueName } from '../utils/localStorage';
 
 function PlayerManager() {
-
+  const currentLeagueName = getStorageLeagueName();
   return (
     <>
       <Box p={3}>
@@ -11,7 +12,7 @@ function PlayerManager() {
           <Card>
             <Grid container direction="column" alignItems="center">
               <Grid item>
-                <CardHeader title={`${window.localStorage.getItem("currentLeagueName")} Players`} component="h1"/>
+                <CardHeader title={`${currentLeagueName} Players`} component="h1"/>
               </Grid>
               <Grid item>
                 <CardContent>

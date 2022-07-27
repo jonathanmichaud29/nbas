@@ -9,6 +9,21 @@ exports.getPlayerData = async (id) => {
   }
 }
 
+exports.getSystemPlayersByName = async (name) => {
+  const query = "SELECT `p`.id as playerId, p.name as playerName, `l`.id as leagueId, l.name as leagueName " +
+    "FROM players as `p` " +
+    "LEFT JOIN player_league AS `pl` ON (`p`.`id`=pl.idPlayer) " +
+    "LEFT JOIN leagues AS `l` ON (pl.idLeague=l.id)" +
+    "WHERE `p`.`name` = ? ";
+  
+  const result = await mysqlQuery(query, [name]);
+  return {
+    status:result.status,
+    data: result.data,
+    error: result.error
+  }
+}
+
 exports.getPlayersData = async (listIds) => {
   const result = await mysqlQuery("SELECT * FROM players WHERE id IN ?", [[listIds]]);
   return {

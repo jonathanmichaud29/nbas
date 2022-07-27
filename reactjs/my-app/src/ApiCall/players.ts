@@ -18,16 +18,11 @@ export const fetchPlayers = async (bodyParams: IApiFetchPlayersParams) => {
     })
 }
 
-/**
- * Protected calls
- */
-
-export interface IApiCreatePlayerParams {
-  name: string;
-}
-export const createPlayer = async (bodyParams: IApiCreatePlayerParams) => {
+export interface IApiFetchLeaguePlayersParams {
   
-  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/player/`, bodyParams)
+}
+export const fetchLeaguePlayers = async (bodyParams: IApiFetchPlayersParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/player-league/`,bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })
@@ -36,11 +31,30 @@ export const createPlayer = async (bodyParams: IApiCreatePlayerParams) => {
     })
 }
 
-export interface IApiDeletePlayerParams {
-  playerId: number;
+/**
+ * Protected calls
+ */
+
+export interface IApiCreatePlayerParams {
+  name: string;
+  existingPlayer?: number;
 }
-export const deletePlayer = async (bodyParams: IApiDeletePlayerParams) => {
-  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/player/${bodyParams.playerId}`)
+export const createPlayer = async (bodyParams: IApiCreatePlayerParams) => {
+  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/player/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data);
+    })
+}
+
+export interface IApiDeleteLeaguePlayerParams {
+  idPlayer: number;
+}
+export const deleteLeaguePlayer = async (bodyParams: IApiDeleteLeaguePlayerParams) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/player-league/${bodyParams.idPlayer}`)
     .then(response => {
       return Promise.resolve(response.data);
     })

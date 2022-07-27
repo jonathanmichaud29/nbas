@@ -20,6 +20,11 @@ const configPoolDB = {
 const conn = mysql.createConnection(configDB);
 const connPool = mysql.createPool(configPoolDB);
 
+exports.mysqlGetConnPool = async() => {
+  const promisePool = connPool.promise();
+  return await promisePool.getConnection()
+}
+
 exports.mysqlQueryPoolInserts = async(query, values) => {
   let success = true;
   let data = [];

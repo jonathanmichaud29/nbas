@@ -32,9 +32,12 @@ const playerSlice = createSlice({
       const index = state.findIndex((player) => player.id === action.payload);
       state.splice(index, 1);
     },
+    resetPlayers(state) {
+      state = initialState
+    }
   }
 });
 
-export const { addPlayers, addPlayer, removePlayer } = playerSlice.actions;
+export const { addPlayers, addPlayer, removePlayer, resetPlayers } = playerSlice.actions;
 
 export default playerSlice.reducer;

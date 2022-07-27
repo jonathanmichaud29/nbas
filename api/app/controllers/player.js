@@ -1,7 +1,10 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery, mysqlQueryPoolMixInserts } = require("../services/db");
-const { is_missing_keys, validateUserLeague } = require("../utils/validation")
+const appResponseActions = require("../utils/appResponseActions");
+
+const { mysqlQuery, mysqlGetConnPool } = require("../services/db");
+const { is_missing_keys, castNumber } = require("../utils/validation")
+const { getSystemPlayersByName } = require("../utils/simpleQueries");
 
 /**
  * Fetch players from a list of ID or fetching all players
@@ -9,37 +12,111 @@ const { is_missing_keys, validateUserLeague } = require("../utils/validation")
  */
 exports.getPlayers = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
+  const selectedLeagueId = castNumber(req.headers.idleague);
+  let customData = [];
 
   let query = '';
   let values = [];
-  if( req.body.playerIds !== undefined && req.body.playerIds.length > 0 ){
-    query = "SELECT * FROM players WHERE id IN ?";
-    values = [[req.body.playerIds]];
+  if( req.body.playerIds !== undefined ){
+    query = "SELECT p.* FROM players as p INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?) WHERE p.id IN ?";
+    const listPlayerIds = req.body.playerIds.length > 0 ? req.body.playerIds : [0];
+    values = [selectedLeagueId, [listPlayerIds]];
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
   else if(req.body.allPlayers !== undefined && req.body.allPlayers ) {
-    query = "SELECT * FROM players";
+    query = "SELECT p.* FROM players as p INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?) ";
+    values = [selectedLeagueId]
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
   else {
     return appResponse(res, next, true, {}, {});
   }
-
-  const resultMainQuery = await mysqlQuery(query, values);
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  
 };
 
 
 exports.createPlayer = async (req, res, next) => {
-  if( ! validateUserLeague(req) ) return next(new AppError("User does not have access to this league"));
   if (!req.body) return next(new AppError("No form data found", 404));
 
   const bodyRequiredKeys = ["name"]
   if( is_missing_keys(bodyRequiredKeys, req.body) ) {
     return next(new AppError(`Missing body parameters`, 404));
   }
+  const selectedLeagueId = castNumber(req.headers.idleague);
+
+  if( req.body.existingPlayer === undefined ){
+    const resultPlayers = await getSystemPlayersByName(req.body.name);
+    if( resultPlayers.data.length > 0 ){
+      /* const playersLeague = resultPlayers.data.filter((resultPlayer) => resultPlayer.leagueId !== selectedLeagueId) */
+      const customData = {
+        players: resultPlayers.data
+      }
+      return appResponseActions(res, next, false, customData, `${req.body.name} exists in the system. What do you want to do?`, 'playerExists');
+    }
+  }
+
+  // Prepare queries
+  let success = true;
+  let data = [];
+  let error = {}; 
+
+  const promiseConn = await mysqlGetConnPool()
+  await promiseConn.beginTransaction();
+
+  let playerId = 0;
+  if( req.body.existingPlayer === undefined || castNumber(req.body.existingPlayer) === 0){
+    const resultPlayer = await promiseConn.execute("INSERT INTO players (name) VALUES(?)", [req.body.name])
+      .then( ([rows]) => {
+        playerId = rows.insertId;
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        success = false;
+        return Promise.reject(err);
+      })
+  }
+  else{
+    playerId = req.body.existingPlayer
+  }
+  
+  try{
+    await promiseConn.query("INSERT INTO player_league (idLeague, idPlayer) VALUES ?", [[[selectedLeagueId, playerId]]])
+      .then( () => {
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        success = false;
+        return Promise.reject(err);
+      })
+  } catch( e ){
+    console.log("e", e);
+  }
+
+  if( success ){
+    await promiseConn.commit();
+    const customData = {
+      playerId: playerId,
+      playerName: req.body.name,
+      leagueId: selectedLeagueId,
+      leagueName: req.userAccessLeagues.find((league) => league.id === selectedLeagueId).name
+    }
+    const customMessage = `player '${req.body.name}' created!`
+    return appResponse(res, next, success, customData, null, customMessage);
+  }
+  else {
+    console.log("rollback")
+    await promiseConn.rollback();
+    return appResponse(res, next, success, null, error);
+  }
+  
 
   return next(new AppError(`Force return`, 404));
 
-  const values = [req.body.name];
+  /* const values = [req.body.name];
   const resultMainQuery = await mysqlQuery("INSERT INTO players (name) VALUES(?)", values)
 
   let customMessage = ''
@@ -51,7 +128,7 @@ exports.createPlayer = async (req, res, next) => {
     }
     customMessage = `player '${req.body.name}' created!`
   }
-  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage); */
 };
 
 
@@ -59,15 +136,17 @@ exports.deletePlayer = async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("No player id found", 404));
   }
+  const selectedLeagueId = castNumber(req.headers.idleague);
   const values = [req.params.id];
   const resultMainQuery = await mysqlQuery("DELETE FROM players WHERE id=?", values);
   let customData = {}
   let customMessage = '';
   if( resultMainQuery.status ){
     customData = {
-      id: req.params.id
+      playerId: req.params.id,
+      leagueId: selectedLeagueId
     };
-    customMessage = `player deleted!`;
+    customMessage = `player deleted from this league!`;
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };

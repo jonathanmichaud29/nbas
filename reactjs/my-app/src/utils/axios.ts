@@ -1,25 +1,34 @@
 import axios from 'axios';
-import { castNumber } from './castValues';
+
+import { getStorageLeagueId, getStorageUserToken } from './localStorage';
 
 const axiosPublic = axios.create();
 const axiosProtected = axios.create();
 
-const userToken = window.localStorage.getItem("userToken");
+const userToken = getStorageUserToken();
 if( userToken !== null){
   axiosPublic.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
   axiosProtected.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
 }
 
-const idLeague = castNumber(window.localStorage.getItem("currentLeagueId"));
-axiosProtected.defaults.headers.post['idleague'] = idLeague;
+const idLeague = getStorageLeagueId();
+if( idLeague !== 0 ){
+  axiosPublic.defaults.headers.post['idleague'] = idLeague;
+  axiosProtected.defaults.headers.post['idleague'] = idLeague;
+  axiosProtected.defaults.headers.delete['idleague'] = idLeague;
+}
 
 export const updateAxiosBearer = () => {
-  const userToken = window.localStorage.getItem("userToken");
+  // Firebase User Token
+  const userToken = getStorageUserToken();
   axiosPublic.defaults.headers.common['Authorization'] = `Bearer ${userToken || ''}`;
   axiosProtected.defaults.headers.common['Authorization'] = `Bearer ${userToken || ''}`;
 
-  const idLeague = castNumber(window.localStorage.getItem("currentLeagueId"));
+  // Current League
+  const idLeague = getStorageLeagueId();
+  axiosPublic.defaults.headers.post['idleague'] = idLeague;
   axiosProtected.defaults.headers.post['idleague'] = idLeague;
+  axiosProtected.defaults.headers.delete['idleague'] = idLeague;
 }
 
 export { axiosPublic, axiosProtected }
