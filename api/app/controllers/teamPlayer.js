@@ -2,7 +2,7 @@ const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
 const { getPlayerData, getTeamData } = require("../utils/simpleQueries");
-const { is_missing_keys } = require("../utils/validation");
+const { is_missing_keys, castNumber } = require("../utils/validation")
 
 
 exports.getTeamsPlayers = async (req, res, next) => {
@@ -44,13 +44,31 @@ exports.getTeamsPlayers = async (req, res, next) => {
 
 
 exports.getUnassignedPlayers = async (req, res, next) => {
+  const selectedLeagueId = castNumber(req.headers.idleague);
+  // Find all league players
+  const queryPlayers = "SELECT idPlayer FROM player_league WHERE idLeague=?"
+  const resultPlayers = await mysqlQuery(queryPlayers, [selectedLeagueId])
+  const listPlayerIds = resultPlayers.data.map((row)=>row.idPlayer);
 
-  const query = "SELECT p.* "+
-    "FROM players as p  " +
-    "LEFT JOIN team_player as tp ON (tp.idPlayer=p.id) " +
-    "WHERE tp.idTeam IS NULL";
-  const resultMainQuery = await mysqlQuery(query, [])
+  // Find all league teams
+  const queryTeams = "SELECT idTeam FROM team_league WHERE idLeague=?"
+  const resultTeams = await mysqlQuery(queryTeams, [selectedLeagueId])
+  const listTeamIds = resultTeams.data.map((row)=>row.idTeam);
 
+  // Find all players attached to a team in this league
+  const queryTeamPlayers = "SELECT idPlayer FROM team_player WHERE idTeam IN ? AND idPlayer IN ?"
+  const resultTeamPlayers = await mysqlQuery(queryTeamPlayers, [[listTeamIds], [listPlayerIds]])
+  const listTeamPlayerIds = resultTeamPlayers.data.map((row)=>row.idPlayer);
+
+  // Player IDs that are active in this league without being associated to a team
+  let listPlayerIdsWithoutTeam = listPlayerIds.filter(x => !listTeamPlayerIds.includes(x));
+  if( listPlayerIdsWithoutTeam.length === 0 ){
+    listPlayerIdsWithoutTeam = [0];
+  }
+
+  // Final Query
+  const query = "SELECT p.* FROM players as p WHERE p.id IN ?";
+  const resultMainQuery = await mysqlQuery(query, [[listPlayerIdsWithoutTeam]])
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 

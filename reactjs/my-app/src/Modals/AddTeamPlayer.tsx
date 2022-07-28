@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+
 import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
 
 import { ITeamPlayersProps } from "../Interfaces/team";
 import { IPlayer } from "../Interfaces/player";
+
 import { fetchUnassignedPlayers, addTeamPlayer, IApiAddTeamPlayerParams } from '../ApiCall/teamsPlayers'
 
 import styleModal from './styleModal'
@@ -42,19 +44,19 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( isOpen ) {
-      fetchUnassignedPlayers()
-        .then(response => {
-          setUnassignedPlayers(response.data);
-        })
-        .catch(error => {
-          changeApiError(error);
-        })
-        .finally(() => {
-          setModalOpen(true);
-        });
-      }
-  }, [selectedTeam, isOpen]);
+    if ( ! isOpen ) return;
+
+    fetchUnassignedPlayers()
+      .then(response => {
+        setUnassignedPlayers(response.data);
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setModalOpen(true);
+      });
+  }, [isOpen]);
 
   
   /**
