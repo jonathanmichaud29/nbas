@@ -35,9 +35,7 @@ const leaguePlayerSlice = createSlice({
         payload: leaguePlayer,
       })
     },
-    resetLeaguePlayers(state) {
-      state = initialState
-    }
+    resetLeaguePlayers: () => initialState
   }
 });
 

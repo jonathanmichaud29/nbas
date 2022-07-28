@@ -6,14 +6,10 @@ const { mysqlQuery, mysqlGetConnPool } = require("../services/db");
 const { is_missing_keys, castNumber } = require("../utils/validation")
 const { getSystemPlayersByName } = require("../utils/simpleQueries");
 
-/**
- * Fetch players from a list of ID or fetching all players
- * TODO: We should add an argument to fetch players by a specific league
- */
+
 exports.getPlayers = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   const selectedLeagueId = castNumber(req.headers.idleague);
-  let customData = [];
 
   let query = '';
   let values = [];
@@ -49,7 +45,6 @@ exports.createPlayer = async (req, res, next) => {
   if( req.body.existingPlayer === undefined ){
     const resultPlayers = await getSystemPlayersByName(req.body.name);
     if( resultPlayers.data.length > 0 ){
-      /* const playersLeague = resultPlayers.data.filter((resultPlayer) => resultPlayer.leagueId !== selectedLeagueId) */
       const customData = {
         players: resultPlayers.data
       }
@@ -113,22 +108,6 @@ exports.createPlayer = async (req, res, next) => {
     return appResponse(res, next, success, null, error);
   }
   
-
-  return next(new AppError(`Force return`, 404));
-
-  /* const values = [req.body.name];
-  const resultMainQuery = await mysqlQuery("INSERT INTO players (name) VALUES(?)", values)
-
-  let customMessage = ''
-  let customData = {}
-  if( resultMainQuery.status ) {
-    customData = {
-      id: resultMainQuery.data.insertId,
-      name: req.body.name
-    }
-    customMessage = `player '${req.body.name}' created!`
-  }
-  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage); */
 };
 
 
