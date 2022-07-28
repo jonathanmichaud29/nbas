@@ -34,9 +34,10 @@ const teamSlice = createSlice({
       const index = state.findIndex((team) => team.id === action.payload);
       state.splice(index, 1);
     },
+    resetTeams: () => initialState
   }
 });
 
-export const { addTeams, addTeam, removeTeam } = teamSlice.actions;
+export const { addTeams, addTeam, removeTeam, resetTeams } = teamSlice.actions;
 
 export default teamSlice.reducer;

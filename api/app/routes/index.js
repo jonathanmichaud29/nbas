@@ -3,11 +3,16 @@ const router = express.Router();
 
 const firebaseAuthMiddleware = require("../middlewares/firebase-auth-middleware");
 const { validateUserLeague } = require("../utils/validation")
+
 const teamControllers = require("../controllers/team");
+const teamLeagueControllers = require("../controllers/teamLeague");
+
 const playerControllers = require("../controllers/player");
 const playerLeagueControllers = require("../controllers/playerLeague");
-const matchControllers = require("../controllers/match");
+
 const teamPlayerControllers = require("../controllers/teamPlayer");
+
+const matchControllers = require("../controllers/match");
 const matchLineupControllers = require("../controllers/matchLineup");
 
 const userControllers = require("../controllers/user");
@@ -50,6 +55,19 @@ router
 router
   .route("/r/player/")
   .post(playerControllers.getPlayers);
+
+
+/**
+ * Team League routes
+ */
+ router
+ .route("/r/team-league/")
+ .post(teamLeagueControllers.getLeagueTeams);
+
+router
+ .route("/m/team-league/:idTeam")
+ .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.deleteLeagueTeam);
+
 
 /**
  * Teams routes

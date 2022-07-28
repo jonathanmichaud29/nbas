@@ -3,16 +3,19 @@ import { useDispatch } from "react-redux";
 
 import { Alert, Button, Box, Card, CardHeader, Container, Grid } from "@mui/material";
 
+import { AppDispatch } from "../redux/store";
+import { resetPlayers } from '../redux/playerSlice';
+import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
+import { resetLeagueTeams } from "../redux/leagueTeamSlice";
+import { resetTeams } from "../redux/teamSlice";
+
 import { ILeague } from "../Interfaces/league";
 
 import { fetchUserLeagues } from "../ApiCall/users";
 
-import { AppDispatch } from "../redux/store";
-import { resetPlayers } from '../redux/playerSlice';
-import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
-
 import { updateAxiosBearer } from "../utils/axios";
 import { getStorageLeagueId } from "../utils/localStorage";
+
 
 function LeagueSwitch() {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,9 +33,13 @@ function LeagueSwitch() {
     updateAxiosBearer();
     dispatch(resetPlayers());
     dispatch(resetLeaguePlayers());
+    dispatch(resetTeams());
+    dispatch(resetLeagueTeams());
   }
 
   useEffect(() => {
+    if( leagues !== null ) return;
+
     fetchUserLeagues({})
       .then(response => {
         setLeagues(response.data);
@@ -50,7 +57,7 @@ function LeagueSwitch() {
           })
         }
       })
-  }, [])
+  })
 
   
   

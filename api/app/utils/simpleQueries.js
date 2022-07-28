@@ -51,6 +51,21 @@ exports.getTeamsData = async (listIds) => {
   }
 }
 
+exports.getLeagueTeamByName = async (name, idLeague) => {
+  const query = "SELECT `t`.id as teamId, t.name as teamName, `l`.id as leagueId, l.name as leagueName " +
+    "FROM teams as `t` " +
+    "INNER JOIN team_league AS `tl` ON (`t`.`id`=tl.idTeam AND tl.idLeague=?) " +
+    "INNER JOIN leagues AS `l` ON (tl.idLeague=l.id)" +
+    "WHERE `t`.`name` = ? ";
+  
+  const result = await mysqlQuery(query, [idLeague, name]);
+  return {
+    status:result.status,
+    data: result.data,
+    error: result.error
+  }
+}
+
 exports.getMatchData = async (id) => {
   const result = await mysqlQuery("SELECT * FROM matches WHERE id = ?", [id]);
   return {

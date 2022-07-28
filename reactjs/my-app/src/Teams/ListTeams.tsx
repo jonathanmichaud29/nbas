@@ -1,32 +1,40 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../redux/store";
 
-import { Alert, Box, CircularProgress, IconButton, List, ListItem } from "@mui/material";
+import { AppDispatch, RootState } from "../redux/store";
+import { addTeams, removeTeam } from "../redux/teamSlice";
+import { addLeagueTeams, removeLeagueTeam } from "../redux/leagueTeamSlice";
+
+import { Alert, Box, CircularProgress, IconButton, List, ListItem, Typography } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
-import { addTeams, removeTeam } from "../redux/teamSlice";
-import { fetchTeams, deleteTeam, IApiFetchTeamsParams, IApiDeleteTeamParams } from "../ApiCall/teams";
 import { ITeam, ITeamProps } from "../Interfaces/team";
+
+import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, IApiFetchLeagueTeamsParams, deleteLeagueTeam, IApiDeleteLeagueTeamParams } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
 import ConfirmDelete from "../Modals/ConfirmDelete";
+import { ILeagueTeam } from '../Interfaces/league';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLeagueTeamsLoaded, setIsLeagueTeamsLoaded] = useState(false);
+  const [isTeamsLoaded, setIsTeamsLoaded] = useState(false);
 
   const {isAdmin, isAddPlayers, isViewPlayers } = props;
 
   const listTeams = useSelector((state: RootState) => state.teams )
+  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+
+  const isLoaded = isLeagueTeamsLoaded && isTeamsLoaded;
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -36,12 +44,17 @@ function ListTeams(props: ITeamProps) {
   const confirmDeleteTeam = (team: ITeam) => {
     reinitializeApiMessages();
 
-    const paramsDeleteTeam: IApiDeleteTeamParams = {
-      teamId: team.id
+    const paramsDeleteLeagueTeam: IApiDeleteLeagueTeamParams = {
+      idTeam: team.id
     }
-    deleteTeam(paramsDeleteTeam)
+    deleteLeagueTeam(paramsDeleteLeagueTeam)
       .then(response => {
         dispatch(removeTeam(team.id));
+        const leagueTeamToRemove: ILeagueTeam = {
+          idTeam: response.data.idTeam,
+          idLeague: response.data.idLeague,
+        }
+        dispatch(removeLeagueTeam(leagueTeamToRemove));
         changeApiSuccess(response.message);
       })
       .catch(error => {
@@ -98,9 +111,29 @@ function ListTeams(props: ITeamProps) {
   }
 
   useEffect(() => {
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      allTeams: true
+    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
+      
     }
+    fetchLeagueTeams(paramsFetchLeagueTeams)
+      .then(response => {
+        dispatch(addLeagueTeams(response.data));
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setIsLeagueTeamsLoaded(true);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if( ! isLeagueTeamsLoaded || isTeamsLoaded ) return;
+
+    const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: teamIds
+    }
+
     fetchTeams(paramsFetchTeams)
       .then(response => {
         dispatch(addTeams(response.data));
@@ -109,9 +142,9 @@ function ListTeams(props: ITeamProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLoaded(true)
+        setIsTeamsLoaded(true)
       });
-  }, [dispatch])
+  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
 
   const htmlTeams = ( listTeams.length > 0 ? (
     <List>
@@ -177,8 +210,10 @@ function ListTeams(props: ITeamProps) {
   
 
   return (
-    <div className="public-layout">
-      <h2>Team List</h2>
+    <>
+      <Typography variant="h4" align="center">
+        Team List
+      </Typography>
       { ! isLoaded && <Box><CircularProgress /></Box>}
       { apiError && <Alert severity="error">{apiError}</Alert> }
       { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
@@ -207,7 +242,7 @@ function ListTeams(props: ITeamProps) {
           description={`Are-you sure you want to delete the team '${currentTeamView?.name}'?`}
           />
       ) }
-    </div>
+    </>
   )
 }
 export default ListTeams;

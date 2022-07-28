@@ -20,3 +20,16 @@ export interface ILeaguePlayerDetails {
   leagueId: number;
   leagueName: string;
 }
+
+export interface ILeagueTeam {
+  idTeam: number;
+  idLeague: number;
+}
+
+
+export interface ILeagueTeamDetails {
+  teamId: number;
+  teamName: string;
+  leagueId: number;
+  leagueName: string;
+}

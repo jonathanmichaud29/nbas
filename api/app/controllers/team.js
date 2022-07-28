@@ -1,48 +1,98 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
-const { mysqlQuery } = require("../services/db");
+const { mysqlQuery, mysqlGetConnPool } = require("../services/db");
+const { is_missing_keys, castNumber } = require("../utils/validation")
+const { getLeagueTeamByName } = require('../utils/simpleQueries');
 
 
-/**
- * Fetch teams from a list of ID or fetching all teams
- * TODO: We should add an argument to fetch teams by a specific league
- */
- exports.getTeams = async (req, res, next) => {
+exports.getTeams = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
+  const selectedLeagueId = castNumber(req.headers.idleague);
 
   let query = '';
   let values = [];
-  if( req.body.teamIds !== undefined && req.body.teamIds.length > 0 ){
-    query = "SELECT * FROM teams WHERE id IN ?";
-    values = [[req.body.teamIds]];
+  if( req.body.teamIds !== undefined ){
+    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague=?) WHERE t.id IN ?";
+    const listPlayerIds = req.body.teamIds.length > 0 ? req.body.teamIds : [0];
+    values = [selectedLeagueId, [listPlayerIds]];
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
-  else if(req.body.allTeams !== undefined && req.body.allTeams ) {
-    query = "SELECT * FROM teams";
+  else if(req.body.allPlayers !== undefined && req.body.allPlayers ) {
+    query = "SELECT t.* FROM teams as t INNER JOIN team_league as pl ON (t.id=tl.idTeam AND tl.idLeague=?) ";
+    values = [selectedLeagueId]
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
   else {
     return appResponse(res, next, true, {}, {});
   }
 
-  const resultMainQuery = await mysqlQuery(query, values);
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 };
 
 exports.createTeam = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
-
-  const values = [req.body.name];
-  const resultMainQuery = await mysqlQuery("INSERT INTO teams (name) VALUES(?)", values)
-
-  let customData = {}
-  let customMessage = ''
-  if( resultMainQuery.status ) {
-    customMessage = `The team '${req.body.name}' is created`;
-    customData = {
-      id: resultMainQuery.data.insertId,
-      name: req.body.name
-    }
+  
+  const bodyRequiredKeys = ["name"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
   }
-  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+  const selectedLeagueId = castNumber(req.headers.idleague);
+
+  const resultTeams = await getLeagueTeamByName(req.body.name, selectedLeagueId);
+  if( resultTeams.data.length > 0 ){
+    return appResponse(res, next, false, {}, `Team '${req.body.name}' already exists in this league`);
+  }
+
+  // Prepare queries
+  let success = true;
+  let data = [];
+  let error = {}; 
+
+  const promiseConn = await mysqlGetConnPool()
+  await promiseConn.beginTransaction();
+
+  let teamId = 0;
+  const resultTeam = await promiseConn.execute("INSERT INTO teams (name) VALUES(?)", [req.body.name])
+    .then( ([rows]) => {
+      teamId = rows.insertId;
+      return Promise.resolve(true);
+    })
+    .catch( (err) => {
+      error = err;
+      success = false;
+      return Promise.reject(err);
+    })
+
+  try{
+    await promiseConn.query("INSERT INTO team_league (idLeague, idTeam) VALUES ?", [[[selectedLeagueId, teamId]]])
+      .then( () => {
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        success = false;
+        return Promise.reject(err);
+      })
+  } catch( e ){
+    console.log("e", e);
+  }
+
+  if( success ){
+    await promiseConn.commit();
+    const customData = {
+      teamId: teamId,
+      teamName: req.body.name,
+      leagueId: selectedLeagueId,
+      leagueName: req.userAccessLeagues.find((league) => league.id === selectedLeagueId).name
+    }
+    const customMessage = `Team '${req.body.name}' created!`
+    return appResponse(res, next, success, customData, null, customMessage);
+  }
+  else {
+    await promiseConn.rollback();
+    return appResponse(res, next, success, null, error);
+  }
 };
 
 exports.deleteTeam = async (req, res, next) => {

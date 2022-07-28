@@ -1,27 +1,38 @@
 import { useState }  from 'react';
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, Paper, Button, TextField } from "@mui/material";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+
+import { Alert,Button, Grid } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { addTeam } from "../redux/teamSlice";
+import { addLeagueTeam } from '../redux/leagueTeamSlice';
+
+import { ILeagueTeam } from '../Interfaces/league';
+import { ITeam } from '../Interfaces/team';
+
 import { createTeam, IApiCreateTeamParams } from '../ApiCall/teams';
 
-const defaultValues = {
-  name: ""
-}
+import FormTextInput from '../Forms/FormTextInput';
+
+
+
 
 interface IFormInput {
   name: string;
 }
 
 function CreateTeam() {
-  
+  const dispatch = useDispatch<AppDispatch>();
+
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
+ 
 
-  const dispatch = useDispatch<AppDispatch>();
+  const defaultValues = {
+    name: ""
+  }
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -29,7 +40,7 @@ function CreateTeam() {
   }
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
-  const { handleSubmit, control, reset, formState: { errors } } = methods;
+  const { handleSubmit, reset } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
 
@@ -43,7 +54,16 @@ function CreateTeam() {
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);
-        dispatch(addTeam(response.data));
+        const dataTeam: ITeam = {
+          id: response.data.teamId,
+          name: response.data.teamName,
+        }
+        const dataLeagueTeam: ILeagueTeam = {
+          idTeam: response.data.teamId,
+          idLeague: response.data.leagueId,
+        }
+        dispatch(addTeam(dataTeam));
+        dispatch(addLeagueTeam(dataLeagueTeam));
       })
       .catch(error => {
         changeApiError(error);
@@ -56,34 +76,35 @@ function CreateTeam() {
 
 
   return (
-    <div>
-      <h3>Create new Team</h3>
-      <Paper>
-        { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
-        { apiError && <Alert severity="error">{apiError}</Alert> }
-        <Controller
-            name={"name"}
-            control={control}
-            rules={{ 
-              required: "This is required",
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextField 
-                onChange={onChange} 
-                value={value} 
-                label={"Team Name"} 
-                error={errors.name ? true : false}
-                helperText={errors.name ? errors.name.message : '' }
-              />
-            )}
+    <FormProvider {...methods}>
+      <Grid container direction="column" flexWrap="nowrap" alignItems="center">
+        { apiError && (
+          <Grid item pb={3}>
+            <Alert severity="error">{apiError}</Alert>
+          </Grid> 
+        )}
+        { apiSuccess && (
+          <Grid item pb={3}>
+            <Alert severity="success">{apiSuccess}</Alert>
+          </Grid>
+        )}
+        <Grid item pb={3}>
+          <FormTextInput
+            label={`New team name`}
+            controllerName={`name`}
+            type="text"
+            isRequired={true}
           />
-
+        </Grid>
+        
+        <Grid item>
           <Button 
             onClick={handleSubmit(onSubmit)}
             variant="contained"
-            >Submit</Button>
-      </Paper>
-    </div>
+            >Add new team</Button>
+        </Grid>
+      </Grid>
+    </FormProvider>
   );
 }
 

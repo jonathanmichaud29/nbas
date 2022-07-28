@@ -15,7 +15,7 @@ const appResponse = (response, next, status, data, error, customMessage) => {
     response.status(200).json(jsonData)
   }
   else {
-    const err_message = transformMysqlErrorCode(error, "team");
+    const err_message = (typeof(error) === 'string' ? error : transformMysqlErrorCode(error, "team"));
     if( process.env.LOGS_ERROR == 1){
       console.error("appResponse Error", error)
     }
