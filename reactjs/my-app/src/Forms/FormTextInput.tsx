@@ -1,5 +1,8 @@
 import { Controller, useFormContext } from "react-hook-form";
+
 import { TextField } from "@mui/material";
+
+import { patterns } from '../utils/validation';
 
 interface IFormTextInputProps {
   label: string;
@@ -8,13 +11,6 @@ interface IFormTextInputProps {
   controllerKey?: string;
   isRequired?: boolean;
   pattern?: string;
-}
-
-const patterns: any = {
-  "email": {
-    value: /\S+@\S+\.\S+/, 
-    message: "Entered value does not match email format"
-  }
 }
 
 function FormTextInput(props: IFormTextInputProps) {

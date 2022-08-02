@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../redux/store";
 
-import { Alert, AppBar, Box, Card, CardContent, CircularProgress, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography  } from "@mui/material";
+import { Alert, Box, Card, CardContent, CircularProgress, IconButton, Typography  } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
@@ -11,13 +11,18 @@ import InfoIcon from '@mui/icons-material/Info';
 import { IMatch, IListMatchProps } from '../Interfaces/match';
 import { ITeam } from '../Interfaces/team';
 
+import { AppDispatch, RootState } from "../redux/store";
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
+import { addLeagueTeams } from '../redux/leagueTeamSlice';
+
 import { deleteMatch, fetchMatches, IApiDeleteMatchParams, IApiFetchMatchesParams } from '../ApiCall/matches'
-import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams'
+import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
+
 import { createHumanDate } from '../utils/dateFormatter';
+
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,11 +30,14 @@ function ListMatches(props: IListMatchProps) {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLeagueTeamsLoaded, setIsLeagueTeamsLoaded] = useState(false);
+  const [isTeamsLoaded, setIsTeamsLoaded] = useState(false);
 
   const { isAdmin } = props;
 
-  const listMatches = useSelector((state: RootState) => state ).matches
-  const listTeams = useSelector((state: RootState) => state ).teams
+  const listMatches = useSelector((state: RootState) => state.matches )
+  const listTeams = useSelector((state: RootState) => state.teams )
+  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
 
   const orderedMatches = [...listMatches];
   orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -59,10 +67,29 @@ function ListMatches(props: IListMatchProps) {
   }
   
   useEffect(() => {
-    
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      allTeams: true
+    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
+      
     }
+    fetchLeagueTeams(paramsFetchLeagueTeams)
+      .then(response => {
+        dispatch(addLeagueTeams(response.data));
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        setIsLeagueTeamsLoaded(true);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if( ! isLeagueTeamsLoaded || isTeamsLoaded ) return;
+
+    const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: teamIds
+    }
+
     fetchTeams(paramsFetchTeams)
       .then(response => {
         dispatch(addTeams(response.data));
@@ -71,9 +98,12 @@ function ListMatches(props: IListMatchProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLoaded(true)
+        setIsTeamsLoaded(true)
       });
+  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
 
+  useEffect(() => {
+    if( ! isLeagueTeamsLoaded || ! isTeamsLoaded ) return;
     const paramsFetchMatches: IApiFetchMatchesParams = {}
     fetchMatches(paramsFetchMatches)
       .then(response => {
@@ -85,7 +115,7 @@ function ListMatches(props: IListMatchProps) {
       .finally(() => {
         setIsLoaded(true)
       });
-  }, [dispatch])
+  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded])
 
   /**
    * Handle multiples modals
