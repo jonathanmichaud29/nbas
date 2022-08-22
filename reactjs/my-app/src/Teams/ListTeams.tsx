@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
-import { Alert, Box, CircularProgress, Divider, Grid, IconButton, Typography } from "@mui/material";
+import { Alert, Box, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -19,6 +19,8 @@ import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, IApiFetchLeagueTeam
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
 import ConfirmDelete from "../Modals/ConfirmDelete";
+import InfoDialog from '../Generic/InfoDialog';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,6 +41,9 @@ function ListTeams(props: ITeamProps) {
     changeApiError('');
     changeApiSuccess('');
   }
+  const clearMsgSuccess = () => {
+    changeApiSuccess('');
+  }
 
   const confirmDeleteTeam = (team: ITeam) => {
     reinitializeApiMessages();
@@ -55,6 +60,7 @@ function ListTeams(props: ITeamProps) {
         }
         dispatch(removeLeagueTeam(leagueTeamToRemove));
         changeApiSuccess(response.message);
+        setTimeout(clearMsgSuccess, 1500);
       })
       .catch(error => {
         changeApiError(error);
@@ -146,77 +152,91 @@ function ListTeams(props: ITeamProps) {
   }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
 
   const nbTeams = listTeams.length;
-  const htmlTeams = ( nbTeams > 0 ? (
-    <Grid container alignItems='center' flexDirection="column">
-      { listTeams.map((team: ITeam, index:number) => {
-        let listActions = [];
-        listActions.push(
+  const htmlTeams = ( nbTeams > 0 ? listTeams.map((team: ITeam, index:number) => {
+    let listActions = [];
+    let actionLabel=`${team.name} Profile`;
+    listActions.push(
+      <Tooltip title={actionLabel} key={`action-view-team-${team.id}`}>
+        <IconButton color="primary"
+          aria-label={actionLabel}
+          href={`/team/${team.id}`}
+          >
+          <QueryStatsIcon />
+        </IconButton>
+      </Tooltip>
+    )
+    if( isViewPlayers ) {
+      actionLabel=`View ${team.name} players`;
+      listActions.push(
+        <Tooltip title={actionLabel} key={`action-view-team-${team.id}`}>
           <IconButton color="primary"
-            key={`action-view-team-${team.id}`}
-            aria-label={`${team.name} Profile`}
-            title={`${team.name} Profile`}
-            href={`/team/${team.id}`}
+            key={`action-view-players-${team.id}`}
+            aria-label={actionLabel}
+            onClick={ () => handleOpenListPlayers(team)}
             >
-            <QueryStatsIcon />
+            <PeopleIcon />
           </IconButton>
-        )
-        if( isViewPlayers ) {
-          listActions.push(
-            <IconButton color="primary"
-              key={`action-view-players-${team.id}`}
-              aria-label={`View ${team.name} players`}
-              title={`View ${team.name} players`}
-              onClick={ () => handleOpenListPlayers(team)}
-              >
-              <PeopleIcon />
-            </IconButton>
-          );
-        }
-        if( isAddPlayers ) {
-          listActions.push(
-            <IconButton color="primary"
-              key={`action-add-player-${team.id}`}
-              aria-label={`Add Player to ${team.name}`}
-              title={`Add Player to ${team.name}`}
-              onClick={ () => handleOpenAddPlayerToTeam(team)}
-              >
-              <GroupAddIcon />
-            </IconButton>
-          )
-        }
-        if( isAdmin ) {
-          listActions.push(
-            <IconButton color="primary"
-              key={`action-delete-team-${team.id}`}
-              aria-label={`Delete Team ${team.name}`}
-              title={`Delete Team ${team.name}`}
-              onClick={ () => handleOpenConfirmDeleteTeam(team) }
-              >
-              <Delete />
-            </IconButton>
-          )
-        }
-        return (
-          <>
-            <Grid item /* xs={12} */ textAlign="center">{team.name}</Grid>
-            <Grid item /* xs={12} */ textAlign="center">{ listActions.map((action) => action) }</Grid>
-            {nbTeams > index && (<Grid item xs={12} p={1}><Divider flexItem={true} orientation="horizontal" /></Grid>)}
-          </>
-        )
-      })}
-    </Grid>
-  ) : '' );
+        </Tooltip>
+        
+      );
+    }
+    if( isAddPlayers ) {
+      actionLabel=`Add Player to ${team.name}`;
+      listActions.push(
+        <Tooltip title={actionLabel} key={`action-add-player-${team.id}`}>
+          <IconButton color="primary"
+            aria-label={actionLabel}
+            onClick={ () => handleOpenAddPlayerToTeam(team)}
+            >
+            <GroupAddIcon />
+          </IconButton>
+        </Tooltip>
+      )
+    }
+    if( isAdmin ) {
+      actionLabel=`Delete Team ${team.name}`
+      listActions.push(
+        <Tooltip title={actionLabel} key={`action-delete-team-${team.id}`}>
+          <IconButton color="primary"
+            aria-label={actionLabel}
+            onClick={ () => handleOpenConfirmDeleteTeam(team) }
+            >
+            <Delete />
+          </IconButton>
+        </Tooltip>
+      )
+    }
+    return (
+      <Grid key={`team-row-${team.id}`} container columnSpacing={1} pt={1} pb={1} alignItems="center" flexWrap="nowrap" justifyContent="space-between"
+        sx={{
+          flexDirection:{xs:"column", sm:"row"},
+          '&:hover':{
+            backgroundColor:'#f1f1f1'
+          }
+        }}>
+        <Grid item textAlign="center">{team.name}</Grid>
+        <Grid item textAlign="center">{ listActions.map((action) => action) }</Grid>
+      </Grid>
+    )
+  }) : (
+    <Alert severity='info'>No team found this season</Alert>
+  ));
   
 
   return (
-    <>
-      <Typography variant="h4" align="center">
-        Team List
-      </Typography>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
-      { htmlTeams }
+    <Paper component={Box} p={3} m={3}>
+      <Stack spacing={3} alignItems="center" pb={3}>
+        <Typography variant="h2">League Teams</Typography>
+        <LoaderInfo
+          isLoading={isLoaded}
+          msgError={apiError}
+        />
+        <InfoDialog
+          msgSuccess={apiSuccess}
+        />
+        { htmlTeams }
+      </Stack>
+
       { currentTeamView && isViewPlayers && (
         <ViewTeamPlayers
           isOpen={isModalOpenViewTeamPlayers}
@@ -241,7 +261,7 @@ function ListTeams(props: ITeamProps) {
           description={`Are-you sure you want to delete the team '${currentTeamView?.name}'?`}
           />
       ) }
-    </>
+    </Paper>
   )
 }
 export default ListTeams;

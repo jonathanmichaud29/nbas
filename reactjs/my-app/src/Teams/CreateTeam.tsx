@@ -2,7 +2,7 @@ import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 
-import { Alert,Button, Grid } from "@mui/material";
+import { Box,Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { addTeam } from "../redux/teamSlice";
@@ -14,8 +14,9 @@ import { ITeam } from '../Interfaces/team';
 import { createTeam, IApiCreateTeamParams } from '../ApiCall/teams';
 
 import FormTextInput from '../Forms/FormTextInput';
+import LoaderInfo from '../Generic/LoaderInfo';
 
-
+import { getStorageLeagueName } from '../utils/localStorage';
 
 
 interface IFormInput {
@@ -24,6 +25,7 @@ interface IFormInput {
 
 function CreateTeam() {
   const dispatch = useDispatch<AppDispatch>();
+  const currentLeagueName = getStorageLeagueName();
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -76,35 +78,38 @@ function CreateTeam() {
 
 
   return (
-    <FormProvider {...methods}>
-      <Grid container direction="column" flexWrap="nowrap" alignItems="center">
-        { apiError && (
-          <Grid item pb={3}>
-            <Alert severity="error">{apiError}</Alert>
-          </Grid> 
-        )}
-        { apiSuccess && (
-          <Grid item pb={3}>
-            <Alert severity="success">{apiSuccess}</Alert>
-          </Grid>
-        )}
-        <Grid item pb={3}>
+    <Paper component={Box} p={3} m={3}>
+      <Stack spacing={1} alignItems="center" pb={3}>
+        <Typography variant="h1">{currentLeagueName}</Typography>
+        <Typography variant="subtitle1">Add new team to league</Typography>
+        <LoaderInfo
+          msgError={apiError}
+        />
+      </Stack>
+
+      <FormProvider {...methods}>
+        <Stack spacing={2} alignItems="center">
           <FormTextInput
             label={`New team name`}
             controllerName={`name`}
             type="text"
             isRequired={true}
           />
-        </Grid>
-        
-        <Grid item>
           <Button 
             onClick={handleSubmit(onSubmit)}
             variant="contained"
-            >Add new team</Button>
-        </Grid>
-      </Grid>
-    </FormProvider>
+            disabled={requestStatus}
+            startIcon={requestStatus && (
+              <CircularProgress size={14}/>
+            )}
+          >{requestStatus ? 'Request Sent' : 'Add new team'}</Button>
+
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+          />
+        </Stack>
+      </FormProvider>
+    </Paper>
   );
 }
 

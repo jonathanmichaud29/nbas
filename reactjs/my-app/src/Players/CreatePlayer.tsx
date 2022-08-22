@@ -169,7 +169,7 @@ function CreatePlayer() {
             startIcon={requestStatus && (
               <CircularProgress size={14}/>
             )}
-          >Add new player</Button>
+          >{requestStatus ? 'Request Sent' : 'Add Player'}</Button>
 
         </Stack>
       </FormProvider>
