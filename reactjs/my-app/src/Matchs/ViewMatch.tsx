@@ -28,7 +28,6 @@ function ViewMatch(props: IMatchProps) {
   const {match, isAdmin} = props;
 
   const [apiError, changeApiError] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
 
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
@@ -125,14 +124,15 @@ function ViewMatch(props: IMatchProps) {
             </Typography>
           )}
           { isLoaded && (
-            <Button variant="contained" startIcon={<FactCheckIcon />} onClick={ () => handleOpenCompleteMatch() }>
-              Complete match statistics
-            </Button>
+            <Button 
+              variant="contained" 
+              startIcon={<FactCheckIcon />} 
+              onClick={ () => handleOpenCompleteMatch() }
+            >Complete match statistics</Button>
           )}
           <LoaderInfo
             isLoading={isLoaded}
             msgError={apiError}
-            msgSuccess={apiSuccess}
           />
         </Stack>
       </Paper>

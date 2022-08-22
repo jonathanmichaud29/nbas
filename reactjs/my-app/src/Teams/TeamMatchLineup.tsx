@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
-import { Alert, IconButton, List, ListItem  } from "@mui/material";
+import { Alert, Button, IconButton, List, ListItem, Paper, Stack, Typography  } from "@mui/material";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete } from '@mui/icons-material';
-import PeopleIcon from '@mui/icons-material/People';
-import GroupsIcon from '@mui/icons-material/Groups';
 
 import { AppDispatch, RootState } from "../redux/store";
 import { removeMatchPlayer } from "../redux/matchPlayerSlice"
@@ -14,15 +13,17 @@ import { IMatchLineup, ITeamMatchLineupProps } from '../Interfaces/match';
 
 import { deleteMatchLineup, IApiDeleteMatchLineupParams } from '../ApiCall/matches';
 
+import { getPlayerName } from '../utils/dataAssociation';
+
 import AddMatchLineup from '../Modals/AddMatchLineup';
 import AddTeamPlayersLineup from '../Modals/AddTeamPlayersLineup';
 import ConfirmDelete from "../Modals/ConfirmDelete";
+import LoaderInfo from '../Generic/LoaderInfo';
 
-import { getPlayerName } from '../utils/dataAssociation';
 
 function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAdmin, match, isHomeTeam, team, allPlayers } = props;
+  const { isAdmin, match, /* isHomeTeam, */ team, allPlayers } = props;
 
   const [apiError, changeApiError] = useState("");
   const [lineupTeam, setLineupTeam] = useState<IMatchLineup[] | null>(null);
@@ -44,7 +45,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const [currentLineup, setCurrentLineup] = useState<IMatchLineup | null>(null);
   const [currentPlayerName, setCurrentPlayerName] = useState("");
 
-  const handleOpenAddTeamPlayersLineup = () => {
+  const handleOpenAddTeamPlayersLineup = () => {
     setOpenModalAddTeamPlayersLineup(true);
   }
   const cbCloseAddTeamPlayersLineup = () => {
@@ -102,35 +103,37 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
 
   return (
     <>
-      <h3>{team.name} : { isHomeTeam ? 'Home' : 'Away'} Team</h3>
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      <IconButton 
-        key={`action-add-match-lineup-${match.id}-${team.id}`}
-        aria-label={`Add Player to ${team.name} lineup`}
-        title={`Add Player to ${team.name} lineup`}
-        onClick={ () => handleOpenAddMatchLineup() }
-        >
-        <PeopleIcon />
-      </IconButton>
-      <IconButton 
-        key={`action-add-team-lineup-${match.id}-${team.id}`}
-        aria-label={`Add all ${team.name} Players to lineup`}
-        title={`Add all ${team.name} Players to lineup`}
-        onClick={ () => handleOpenAddTeamPlayersLineup() }
-        >
-        <GroupsIcon />
-      </IconButton>
+      <Stack component={Paper} p={3} mb={3} justifyContent="center" spacing={2} alignItems="center">
+        <Typography variant="h3">
+          {team.name}
+        </Typography>
 
-      { lineupTeam && lineupTeam.length > 0 ? (
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} >
+          <Button 
+            variant="contained" 
+            startIcon={<AddCircleIcon />}
+            onClick={ () => handleOpenAddTeamPlayersLineup() }
+          >Rooster</Button>
+
+          <Button 
+            variant="contained" 
+            startIcon={<AddCircleIcon />} 
+            onClick={ () => handleOpenAddMatchLineup() }
+          >Sub</Button>
+        </Stack>
+
+        { lineupTeam && lineupTeam.length > 0 ? (
           <List>
             { lineupTeam.map((lineup: IMatchLineup) => {
               let listActions = [];
+              let actionLabel;
               if( isAdmin ) {
+                actionLabel = `Remove player from lineup`;
                 listActions.push(
                   <IconButton 
                     key={`action-delete-lineup-${lineup.id}`}
-                    aria-label={`Remove player from lineup`}
-                    title={`Remove player from lineup`}
+                    aria-label={actionLabel}
+                    title={actionLabel}
                     onClick={ () => handleDeletePlayerLineup(lineup)}
                     >
                     <Delete />
@@ -145,8 +148,14 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
               )
             })}
           </List>
-      ) : 'No lineup' }
-
+        ) : (
+          <Alert severity="info">No Rooster defined</Alert>
+        )}
+        <LoaderInfo
+          msgError={apiError}
+        />
+      </Stack>
+      
       { isAdmin && isModalOpenAddMatchLineup && (
         <AddMatchLineup
           key={`match-lineup-${match.id}-${team.id}`}
@@ -163,7 +172,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
           isOpen={isModalOpenConfirmDeleteLineup}
           callbackCloseModal={cbCloseModalDelete}
           callbackConfirmDelete={cbCloseConfirmDelete}
-          title={`Confirm lineup delete`}
+          title={`Remove Player from lineup`}
           description={`Are-you sure you want to remove the player '${currentPlayerName}' from this lineup?`}
           />
       ) }

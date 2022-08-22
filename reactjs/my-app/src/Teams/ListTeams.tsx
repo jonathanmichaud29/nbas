@@ -1,25 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 
-import { AppDispatch, RootState } from "../redux/store";
-import { addTeams, removeTeam } from "../redux/teamSlice";
-import { addLeagueTeams, removeLeagueTeam } from "../redux/leagueTeamSlice";
-
-import { Alert, Box, CircularProgress, IconButton, List, ListItem, Typography } from "@mui/material";
+import { Alert, Box, CircularProgress, Divider, Grid, IconButton, Typography } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
+import { AppDispatch, RootState } from "../redux/store";
+import { addTeams, removeTeam } from "../redux/teamSlice";
+import { addLeagueTeams, removeLeagueTeam } from "../redux/leagueTeamSlice";
+
 import { ITeam, ITeamProps } from "../Interfaces/team";
+import { ILeagueTeam } from '../Interfaces/league';
 
 import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, IApiFetchLeagueTeamsParams, deleteLeagueTeam, IApiDeleteLeagueTeamParams } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
 import ConfirmDelete from "../Modals/ConfirmDelete";
-import { ILeagueTeam } from '../Interfaces/league';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -146,37 +145,24 @@ function ListTeams(props: ITeamProps) {
       });
   }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
 
-  const htmlTeams = ( listTeams.length > 0 ? (
-    <List>
-      {listTeams.map((team: ITeam) => {
+  const nbTeams = listTeams.length;
+  const htmlTeams = ( nbTeams > 0 ? (
+    <Grid container alignItems='center' flexDirection="column">
+      { listTeams.map((team: ITeam, index:number) => {
         let listActions = [];
         listActions.push(
-          <IconButton 
+          <IconButton color="primary"
             key={`action-view-team-${team.id}`}
             aria-label={`${team.name} Profile`}
             title={`${team.name} Profile`}
+            href={`/team/${team.id}`}
             >
-            <Link to={`/team/${team.id}`}>
-              <QueryStatsIcon />
-            </Link>
+            <QueryStatsIcon />
           </IconButton>
         )
-        if( isAdmin ) {
-          listActions.push(
-            <IconButton 
-              key={`action-delete-team-${team.id}`}
-              aria-label={`Delete Team ${team.name}`}
-              title={`Delete Team ${team.name}`}
-              /* onClick={ () => clickDeleteTeam(team)} */
-              onClick={ () => handleOpenConfirmDeleteTeam(team) }
-              >
-              <Delete />
-            </IconButton>
-          )
-        }
         if( isViewPlayers ) {
           listActions.push(
-            <IconButton 
+            <IconButton color="primary"
               key={`action-view-players-${team.id}`}
               aria-label={`View ${team.name} players`}
               title={`View ${team.name} players`}
@@ -188,7 +174,7 @@ function ListTeams(props: ITeamProps) {
         }
         if( isAddPlayers ) {
           listActions.push(
-            <IconButton 
+            <IconButton color="primary"
               key={`action-add-player-${team.id}`}
               aria-label={`Add Player to ${team.name}`}
               title={`Add Player to ${team.name}`}
@@ -198,14 +184,27 @@ function ListTeams(props: ITeamProps) {
             </IconButton>
           )
         }
+        if( isAdmin ) {
+          listActions.push(
+            <IconButton color="primary"
+              key={`action-delete-team-${team.id}`}
+              aria-label={`Delete Team ${team.name}`}
+              title={`Delete Team ${team.name}`}
+              onClick={ () => handleOpenConfirmDeleteTeam(team) }
+              >
+              <Delete />
+            </IconButton>
+          )
+        }
         return (
-          <ListItem 
-            key={`team-${team.id}`}
-            secondaryAction={ listActions.map((action) => action) }
-            >{team.name}</ListItem>
+          <>
+            <Grid item /* xs={12} */ textAlign="center">{team.name}</Grid>
+            <Grid item /* xs={12} */ textAlign="center">{ listActions.map((action) => action) }</Grid>
+            {nbTeams > index && (<Grid item xs={12} p={1}><Divider flexItem={true} orientation="horizontal" /></Grid>)}
+          </>
         )
       })}
-    </List>
+    </Grid>
   ) : '' );
   
 

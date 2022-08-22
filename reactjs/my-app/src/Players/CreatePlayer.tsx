@@ -2,7 +2,7 @@ import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 
-import { Alert, Button, Grid } from "@mui/material";
+import { Box, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { addPlayer } from '../redux/playerSlice';
@@ -14,10 +14,11 @@ import { ILeaguePlayer, ILeaguePlayerDetails } from '../Interfaces/league';
 import { IPlayer } from '../Interfaces/player';
 import { IFieldPlayerExistsActions } from '../Interfaces/forms';
 
+import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
+
 import FormTextInput from '../Forms/FormTextInput';
 import FormRadioButtons from '../Forms/FormRadioButtons';
-
-import { getStorageLeagueId } from '../utils/localStorage';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 
 
@@ -29,6 +30,7 @@ interface IFormInput {
 
 function CreatePlayer() {
   const dispatch = useDispatch<AppDispatch>();
+  const currentLeagueName = getStorageLeagueName();
   
   const [apiInfo, changeApiInfo] = useState("");
   const [apiError, changeApiError] = useState("");
@@ -131,54 +133,47 @@ function CreatePlayer() {
   }
 
   return (
-    <FormProvider {...methods}>
-      <Grid container direction="column" flexWrap="nowrap" alignItems="center">
-        { apiError && (
-          <Grid item pb={3}>
-            <Alert severity="error">{apiError}</Alert>
-          </Grid> 
-        )}
-        { apiWarning && (
-          <Grid item pb={3}>
-            <Alert severity="warning">{apiWarning}</Alert>
-          </Grid>
-        )}
-        { apiInfo && (
-          <Grid item pb={3}>
-            <Alert severity="info">{apiInfo}</Alert>
-          </Grid>
-        )}
-        { apiSuccess && (
-          <Grid item pb={3}>
-            <Alert severity="success">{apiSuccess}</Alert>
-          </Grid>
-        )}
+    <Paper component={Box} p={3} m={3}>
+      <Stack spacing={1} alignItems="center" pb={3}>
+        <Typography variant="h1">{`${currentLeagueName}`}</Typography>
+        <Typography variant="subtitle1">Add new player to league</Typography>
+        <LoaderInfo
+          msgError={apiError}
+          msgWarning={apiWarning}
+          msgInfo={apiInfo}
+          msgSuccess={apiSuccess}
+        />
+      </Stack>
 
-        <Grid item pb={3}>
+      <FormProvider {...methods}>
+        <Stack spacing={2} alignItems="center">
           <FormTextInput
             label={`New player name`}
             controllerName={`name`}
             type="text"
             isRequired={true}
           />
-        </Grid>
-        { playerExistsActions && playerExistsActions.length > 0 && (
-          <Grid item p={3}>
+
+          { playerExistsActions && playerExistsActions.length > 0 && (
             <FormRadioButtons
               listValues={playerExistsActions}
               controllerName={`existingPlayer`}
               isRequired={true}
             />
-          </Grid>
-        )}
-        <Grid item>
+          )}
+
           <Button 
             onClick={handleSubmit(onSubmit)}
             variant="contained"
-            >Add new player</Button>
-        </Grid>
-      </Grid>
-    </FormProvider>
+            disabled={requestStatus}
+            startIcon={requestStatus && (
+              <CircularProgress size={14}/>
+            )}
+          >Add new player</Button>
+
+        </Stack>
+      </FormProvider>
+    </Paper>
   );
 }
 
