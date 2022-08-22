@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 
-import { Alert, Box, CircularProgress  } from "@mui/material";
-
 import { IMatch } from "../Interfaces/match";
 
 import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches';
 
 import ViewMatch from '../Matchs/ViewMatch';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 function MatchManager() {
   let { id } = useParams();
@@ -40,17 +39,18 @@ function MatchManager() {
   }, [idMatch]);
 
   return (
-    <div>
-      <h2>Match Manager</h2>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
+    <>
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+      />
       { match && (
         <ViewMatch
           match={match}
           isAdmin={true}
         />
       ) }
-    </div>
+    </>
   )
 }
 

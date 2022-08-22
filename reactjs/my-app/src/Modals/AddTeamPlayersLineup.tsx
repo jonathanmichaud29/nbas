@@ -3,10 +3,10 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
+import { Button, Checkbox, FormGroup, FormControlLabel, FormHelperText, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
-
-import { Alert, Button, Box, Checkbox, FormGroup, FormControlLabel, FormHelperText, Modal, Paper, Typography } from "@mui/material";
 
 import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { ITeamPlayers } from '../Interfaces/team'
@@ -14,7 +14,7 @@ import { ITeamPlayers } from '../Interfaces/team'
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 
-import styleModal from './styleModal'
+import LoaderInfo from "../Generic/LoaderInfo";
 
 
 const defaultValues = {
@@ -143,64 +143,64 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   };
 
   return (
-    <>
-      <Modal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-      >
-        <Box sx={styleModal}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add <b>{selectedTeam?.name}</b> players to match lineup 
-          </Typography>
-          
-          <Paper>
-            { listTeamsPlayers && (
-              <FormGroup>
-                {errors.players && ( <FormHelperText error={true}>{(errors.players as any).message}</FormHelperText> ) }
+    
+    <Dialog
+      open={isModalOpen}
+    >
+      <DialogTitle>Add <b>{selectedTeam?.name}</b> rooster players</DialogTitle>
+      <DialogContent>
+        <Stack pt={1} pb={1} spacing={3}>
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+            msgError={apiError}
+          />
+          { listTeamsPlayers && (
+            <FormGroup>
+              {errors.players && ( <FormHelperText error={true}>{(errors.players as any).message}</FormHelperText> ) }
+              
+              <Controller
+                name={"players"}
+                control={control}
+                rules={{ 
+                  required: "Check at least one player",
+                }}
                 
-                <Controller
-                  name={"players"}
-                  control={control}
-                  rules={{ 
-                    required: "Check at least one player",
-                  }}
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    { listTeamsPlayers.map((teamPlayer: ITeamPlayers) => {
+                      
+                      return (
+                        <FormControlLabel 
+                          key={`player-checkbox-${teamPlayer.playerId}`} 
+                          label={`${teamPlayer.playerName}`}
+                          control={
+                            <Checkbox 
+                              value={teamPlayer}
+                              onChange={() => onChange(handleCheckPlayer(teamPlayer))}
+                            />
+                          }  
+                        />
+                      )
+                    })}
+                  </>
                   
-                  render={({ field: { onChange, value } }) => (
-                    <>
-                      { listTeamsPlayers.map((teamPlayer: ITeamPlayers) => {
-                        
-                        return (
-                          <FormControlLabel 
-                            key={`player-checkbox-${teamPlayer.playerId}`} 
-                            label={`${teamPlayer.playerName}`}
-                            control={
-                              <Checkbox 
-                                value={teamPlayer}
-                                onChange={() => onChange(handleCheckPlayer(teamPlayer))}
-                              />
-                            }  
-                          />
-                        )
-                      })}
-                    </>
-                    
-                  )}
-                />
-              </FormGroup>
-            )}
-            <Button 
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              >Add players to lineup</Button>
-
-            { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
-            { apiError && <Alert severity="error">{apiError}</Alert> }
-
-          </Paper>
-        </Box>
-      </Modal>
-    </>
+                )}
+              />
+            </FormGroup>
+          )}
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>
+        <Button
+          onClick={handleModalClose}
+          variant="outlined"
+        >Close</Button>
+        <Button 
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          >Add players to lineup</Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 export default AddTeamPlayersLineup;

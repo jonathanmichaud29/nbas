@@ -6,8 +6,8 @@ import { auth } from "../Firebase/firebase";
 
 import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, Link, List, ListItem, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu"
-
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 function PublicMenu() {
@@ -61,20 +61,24 @@ function PublicMenu() {
       else {
         return (
           <ListItem key={`public-menu-${index}`}>
-            <Link component={NavLink} to={link.url} sx={{ 
-              color:(theme) => theme.palette.primary.light,
-              textAlign: 'center',
-              whiteSpace:'nowrap',
-            }}
+            <Link 
+              component={NavLink} 
+              to={link.url} 
+              sx={{ 
+                color:(theme) => theme.palette.primary.light,
+                textAlign: 'center',
+                whiteSpace:'nowrap',
+              }}
             >{link.label}</Link>
           </ListItem>
         )
       }
     })
   }
-  const renderUserLinks = () => {
-    if( loading ) return;
-    const links = ( user ? [
+  
+  const getUserLinks = () => {
+    if( loading ) return [];
+    return ( user ? [
       {
         label:"Dashboard",
         url: "/admin/dashboard",
@@ -98,12 +102,6 @@ function PublicMenu() {
         url: "/admin/login",
       }
     ]);
-    
-    return links.map((link, index) => (
-      <MenuItem key={`user-menu-${index}`}>
-        <Link component={NavLink} to={link.url}>{link.label}</Link>
-      </MenuItem>
-    ))
   }
 
   
@@ -156,7 +154,15 @@ function PublicMenu() {
                 </Avatar>
               </Button>
               <Menu {...bindMenu(popupState)}>
-                { renderUserLinks() }
+                { getUserLinks().map((link, index) => (
+                  <MenuItem key={`user-menu-${index}`}>
+                    <Link 
+                      component={NavLink} 
+                      to={link.url}
+                      onClick={popupState.close}
+                    >{link.label}</Link>
+                  </MenuItem>
+                ))}
               </Menu>
             </>
           )}

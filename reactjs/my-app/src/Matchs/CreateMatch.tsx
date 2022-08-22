@@ -7,9 +7,10 @@ import { addMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
 import { addLeagueTeams } from '../redux/leagueTeamSlice';
 
-import { Alert, Button, Box, CircularProgress, Grid } from "@mui/material";
+import { Button, Box, CircularProgress, Stack, Typography, Paper } from "@mui/material";
 
 import { ITeam } from '../Interfaces/team';
+import { ILeagueTeam } from '../Interfaces/league';
 
 import { createMatch, IApiCreateMatchParams } from '../ApiCall/matches';
 import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
@@ -17,6 +18,8 @@ import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeam
 import FormSelect from '../Forms/FormSelect';
 import FormDateTimePicker from '../Forms/FormDateTimePicker';
 
+import { getStorageLeagueName } from '../utils/localStorage';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 const dateNow = new Date();
 const defaultValues = {
@@ -31,9 +34,13 @@ interface IFormInput {
   date: Date;
 }
 
+
+
 function CreateMatch() {
   const dispatch = useDispatch<AppDispatch>();
-  
+
+  const currentLeagueName = getStorageLeagueName();
+
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
@@ -71,7 +78,7 @@ function CreateMatch() {
   const { handleSubmit, reset, watch, setError, clearErrors } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus || customDateError ) return;
-
+    
     setRequestStatus(true);
     reinitializeApiMessages();
 
@@ -114,7 +121,7 @@ function CreateMatch() {
   useEffect(() => {
     if( ! isLeagueTeamsLoaded || isTeamsLoaded ) return;
 
-    const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+    const teamIds = listLeagueTeams.map((leagueTeam: ILeagueTeam) => leagueTeam.idTeam);
     const paramsFetchTeams: IApiFetchTeamsParams = {
       teamIds: teamIds
     }
@@ -132,85 +139,89 @@ function CreateMatch() {
   }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
 
   return (
-    <FormProvider {...methods}>
-      <Grid container direction="column" flexWrap="nowrap" alignItems="center">
-        { ! isLoaded && (
-          <Grid item pb={3}><Box><CircularProgress /></Box></Grid>
-        )}
-        { apiError && (
-          <Grid item pb={3}><Alert severity="error">{apiError}</Alert></Grid> 
-        )}
-        { apiSuccess && (
-          <Grid item pb={3}><Alert severity="success">{apiSuccess}</Alert></Grid>
-        )}
-        <Grid item pb={3}>
-          <FormSelect
-            label='Home team'
-            controllerName='teamHome'
-            isRequired={true}
-            fieldMinValue={1}
-            fieldMinValueMessage={`Select an home team`}
-            options={listTeams.map((team: ITeam)=> {
-              return {
-                value:team.id, 
-                label:team.name
-              }
-            })}
-            optionKeyPrefix={`home-team-`}
-            defaultOptions={[{
-              value: 0,
-              label: "-- Home Team --"
-            }]}
-          />
-        </Grid>
+    
+    <Paper component={Box} p={3} m={3}>
+      <Stack spacing={1} alignItems="center" pb={3}>
+        <Typography variant="h1">{currentLeagueName}</Typography>
+        <Typography variant="subtitle1">Add new match to calendar</Typography>
+        <LoaderInfo
+          isLoading={isLoaded}
+          msgError={apiError}
+        />
+      </Stack>
 
-        <Grid item pb={3}>
-          <FormSelect
-            label='Away team'
-            controllerName='teamAway'
-            isRequired={true}
-            fieldMinValue={1}
-            fieldMinValueMessage={`Select an away team`}
-            options={listTeams.map((team: ITeam)=> {
-              return {
-                value:team.id, 
-                label:team.name
-              }
-            })}
-            optionKeyPrefix={`away-team-`}
-            defaultOptions={[{
-              value: 0,
-              label: "-- Away Team --"
-            }]}
-            validateWatchNumber={(value: number) => {
-              if( watch('teamHome') === value ) {
-                return "Teams should not be the same";
-              }
-            }}
-          />
-        </Grid>
-              
-        <Grid item pb={3}>
-          <FormDateTimePicker
-            label="Match Date"
-            callbackError={cbSetDateError}
-            controllerName='date'
-            isRequired={true}
-            inputFormat={"yyyy-MM-dd hh:mm a"}
-            minutesStep={5}
-            minDate={new Date('2022-05-01')} // TODO: We should get Season first date
-            maxDate={new Date('2022-10-31')} // TODO: We should get Season last date
-          />
-        </Grid>
+      {isLoaded && (
+        <FormProvider {...methods}>
+          <Stack spacing={2} alignItems="center">
+            <FormSelect
+              label='Home team'
+              controllerName='teamHome'
+              isRequired={true}
+              fieldMinValue={1}
+              fieldMinValueMessage={`Select an home team`}
+              options={listTeams.map((team: ITeam)=> {
+                return {
+                  value:team.id, 
+                  label:team.name
+                }
+              })}
+              optionKeyPrefix={`home-team-`}
+              defaultOptions={[{
+                value: 0,
+                label: "-- Home Team --"
+              }]}
+            />
+            <FormSelect
+              label='Away team'
+              controllerName='teamAway'
+              isRequired={true}
+              fieldMinValue={1}
+              fieldMinValueMessage={`Select an away team`}
+              options={listTeams.map((team: ITeam)=> {
+                return {
+                  value:team.id, 
+                  label:team.name
+                }
+              })}
+              optionKeyPrefix={`away-team-`}
+              defaultOptions={[{
+                value: 0,
+                label: "-- Away Team --"
+              }]}
+              validateWatchNumber={(value: number) => {
+                if( watch('teamHome') === value ) {
+                  return "Teams should not be the same";
+                }
+              }}
+            />
+            <FormDateTimePicker
+              label="Match Date"
+              callbackError={cbSetDateError}
+              controllerName='date'
+              isRequired={true}
+              inputFormat={"yyyy-MM-dd hh:mm a"}
+              minutesStep={5}
+              minDate={new Date('2022-05-01')} // TODO: We should get Season first date
+              maxDate={new Date('2022-10-31')} // TODO: We should get Season last date
+            />
+            <Button 
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              disabled={requestStatus}
+              startIcon={requestStatus && (
+                <CircularProgress size={14}/>
+              )}
+              >{requestStatus ? 'Request Sent' : 'Create match'}</Button>
 
-        <Grid item>
-          <Button 
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            >Create match</Button>
-        </Grid>
-      </Grid>
-    </FormProvider>
+            <LoaderInfo
+              msgSuccess={apiSuccess}
+            />
+            
+          </Stack>
+        </FormProvider>
+      )}
+      
+    </Paper>
   );
 }
 

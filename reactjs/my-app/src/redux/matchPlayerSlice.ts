@@ -10,7 +10,7 @@ const matchPlayerSlice = createSlice({
   reducers: {
     addMatchPlayers: {
       reducer: (state, action: PayloadAction<IMatchPlayers>) => {
-        const indexState = state.findIndex(element => element.match.id === action.payload.match.id)
+        const indexState = state.findIndex((element: IMatchPlayers) => element.match.id === action.payload.match.id)
         if ( indexState === -1 ){
           state.push(action.payload);
         }

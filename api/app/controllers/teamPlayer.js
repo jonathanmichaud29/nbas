@@ -7,30 +7,33 @@ const { is_missing_keys, castNumber } = require("../utils/validation")
 
 exports.getTeamsPlayers = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
-  
+  const selectedLeagueId = castNumber(req.headers.idleague);
+
   let query = '';
   let values = [];
 
   if( req.body.allTeamsPlayers !== undefined && req.body.allTeamsPlayers) {
-    query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
-      "FROM team_player as tp " +
-      "INNER JOIN teams as t ON (tp.idTeam=t.id) " +
-      "INNER JOIN players AS p ON (tp.idPlayer=p.id) ";
+    query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
+      FROM team_player as tp 
+      INNER JOIN teams as t ON (tp.idTeam=t.id) 
+      INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague=?) 
+      INNER JOIN players AS p ON (tp.idPlayer=p.id)`;
+      values = [selectedLeagueId];
   }
   else if( req.body.teamIds !== undefined && req.body.teamIds.length > 0) {
-    query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
-      "FROM team_player as tp " +
-      "INNER JOIN teams as t ON (tp.idTeam=t.id) " +
-      "INNER JOIN players AS p ON (tp.idPlayer=p.id) " +
-      "WHERE tp.idTeam IN ?";
+    query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
+      FROM team_player as tp 
+      INNER JOIN teams as t ON (tp.idTeam=t.id) 
+      INNER JOIN players AS p ON (tp.idPlayer=p.id) 
+      WHERE tp.idTeam IN ?`;
     values = [[req.body.teamIds]];
   }
   else if( req.body.playerIds !== undefined && req.body.playerIds.length > 0) {
-    query = "SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName "+
-      "FROM team_player as tp " +
-      "INNER JOIN teams as t ON (tp.idTeam=t.id) " +
-      "INNER JOIN players AS p ON (tp.idPlayer=p.id) " +
-      "WHERE tp.idPlayer IN ?";
+    query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
+      "FROM team_player as tp 
+      "INNER JOIN teams as t ON (tp.idTeam=t.id) 
+      "INNER JOIN players AS p ON (tp.idPlayer=p.id) 
+      "WHERE tp.idPlayer IN ?`;
     values = [[req.body.playerIds]];
   }
   else {

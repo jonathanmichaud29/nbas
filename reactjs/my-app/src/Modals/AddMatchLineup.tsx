@@ -3,10 +3,10 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
+import { Button, Autocomplete, TextField, DialogActions, Dialog, DialogContent, DialogTitle, Stack } from "@mui/material";
+
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayer } from "../redux/matchPlayerSlice";
-
-import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
 
 import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { IPlayer } from "../Interfaces/player";
@@ -15,7 +15,7 @@ import { ITeamPlayers, IOrderPlayers } from '../Interfaces/team'
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 
-import styleModal from './styleModal'
+import LoaderInfo from "../Generic/LoaderInfo";
 
 const defaultValues = {
   player: {},
@@ -159,62 +159,62 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
   }
 
   return (
-    <>
-      <Modal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-      >
-        <Box sx={styleModal}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add player to <b>{selectedTeam?.name}</b> match lineup 
-          </Typography>
-          
-          <Paper>
-            { orderPlayersByTeam && (
-              <Controller
-                name={"player"}
-                control={control}
-                rules={{ 
-                  required: "This is required",
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Autocomplete 
-                    id={"player-autocomplete"}
-                    disablePortal
-                    onChange={(_, data) => {
-                      onChange(data);
-                      return data;
-                    }}
-                    key={`playcer-ac-${incrementAcIndex}`}
-                    options={orderPlayersByTeam}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id }
-                    groupBy={(option) => option.currentTeamName }
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Available Players" 
-                        error={errors.player ? true : false} 
-                        helperText={errors.player ? (errors.player as any).message : '' }
-                      />
-                    )}
-                  />
-                )}
-              />
-            )}
-            <Button 
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              >Add player to team</Button>
-
-            { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
-            { apiError && <Alert severity="error">{apiError}</Alert> }
-
-          </Paper>
-        </Box>
-      </Modal>
-    </>
+    <Dialog
+      open={isModalOpen}
+    >
+      <DialogTitle>Add <b>{selectedTeam?.name}</b> sub players</DialogTitle>
+      <DialogContent>
+        <Stack pt={1} pb={1} spacing={3}>
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+            msgError={apiError}
+          />
+          { orderPlayersByTeam && (
+            <Controller
+              name={"player"}
+              control={control}
+              rules={{ 
+                required: "This is required",
+              }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete 
+                  id={"player-autocomplete"}
+                  disablePortal={false}
+                  onChange={(_, data) => {
+                    onChange(data);
+                    return data;
+                  }}
+                  key={`playcer-ac-${incrementAcIndex}`}
+                  options={orderPlayersByTeam}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value.id }
+                  groupBy={(option) => option.currentTeamName }
+                  renderInput={(params) => (
+                    <TextField 
+                      {...params} 
+                      label="Available Players" 
+                      error={errors.player ? true : false} 
+                      helperText={errors.player ? (errors.player as any).message : '' }
+                    />
+                  )}
+                />
+              )}
+            />
+          )}
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>
+        <Button
+          onClick={handleModalClose}
+          variant="outlined"
+        >Close</Button>
+        <Button 
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+        >Add player to team</Button>
+      </DialogActions>
+    </Dialog>
+    
   )
 }
 export default AddMatchLineup;
