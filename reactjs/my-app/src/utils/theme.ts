@@ -1,4 +1,3 @@
-import { BoltRounded } from '@mui/icons-material';
 import { createTheme } from '@mui/material';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
@@ -29,16 +28,22 @@ export const defaultTheme = createTheme({
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '4rem',
-      fontWeight: 300,
-      lineHeight: 1.2,
+      fontSize: '2.5rem',
     },
     h2: {
-      fontSize: '3.5rem',
-      lineHeight: 1.1,
+      fontSize: '2.25rem',
     },
     h3: {
-      lineHeight: 0.9,
+      fontSize: '2rem',
+    },
+    h4: {
+      fontSize: '1.75rem',
+    },
+    h5: {
+      fontSize: '1.5rem',
+    },
+    h6: {
+      fontSize: '1.25rem',
     },
   },
   components: {
@@ -95,6 +100,13 @@ export const defaultTheme = createTheme({
           borderBottomWidth:'medium',
         }
       }
-    }
+    },
+    MuiCardHeader:{
+      styleOverrides:{
+        title:{
+          textAlign:'center'
+        }
+      }
+    },
   },
 });

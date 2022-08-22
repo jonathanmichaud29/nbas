@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Button, Box, Modal, Typography, ButtonGroup, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Button, Typography, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 
 import { IConfirmDeleteProps } from "../Interfaces/generic";
 
-import styleModal from './styleModal'
 
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
