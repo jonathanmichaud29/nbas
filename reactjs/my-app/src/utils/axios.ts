@@ -26,9 +26,8 @@ export const updateAxiosBearer = () => {
 
   // Current League
   const idLeague = getStorageLeagueId();
-  axiosPublic.defaults.headers.post['idleague'] = idLeague;
-  axiosProtected.defaults.headers.post['idleague'] = idLeague;
-  axiosProtected.defaults.headers.delete['idleague'] = idLeague;
+  axiosPublic.defaults.headers.common['idleague'] = idLeague;
+  axiosProtected.defaults.headers.common['idleague'] = idLeague;
 }
 
 export { axiosPublic, axiosProtected }

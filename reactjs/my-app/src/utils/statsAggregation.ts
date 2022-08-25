@@ -1,5 +1,5 @@
-import { IMatchLineup } from '../Interfaces/match';
-import { IBattingStatsExtended } from '../Interfaces/stats'
+import { EBatResult, IMatchLineup, IPlayerBatResult } from '../Interfaces/match';
+import { defaultPlayerLineupStats, IBattingStatsExtended, IPlayerLineupStats } from '../Interfaces/stats'
 
 export const getStatHits = (single: number, double: number, triple: number, homerun: number) => {
   return single + double + triple + homerun;
@@ -151,4 +151,69 @@ export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {
 
     return true;
   })
+}
+
+export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) => {
+  let combinedLineupStats: IPlayerLineupStats[] = [];
+
+  playerBatResults.every((playerBatResult: IPlayerBatResult) => {
+    
+    let indexCombinedLineup = combinedLineupStats.findIndex((combineLineupStat) => combineLineupStat.lineupId === playerBatResult.lineupId)
+    
+    if( indexCombinedLineup === -1 ){
+      indexCombinedLineup = combinedLineupStats.push(Object.assign({},defaultPlayerLineupStats));
+      indexCombinedLineup--;
+      combinedLineupStats[indexCombinedLineup].lineupId = playerBatResult.lineupId;
+    }
+    const combinedStats = combinedLineupStats[indexCombinedLineup];
+
+    combinedStats.plateAppearance++;
+    switch(playerBatResult.batResults){
+      case EBatResult.single:
+        combinedStats.single++;
+        combinedStats.atBats++;
+        combinedStats.hit++;
+        break;
+      case EBatResult.double:
+        combinedStats.double++;
+        combinedStats.atBats++;
+        combinedStats.hit++;
+        break;
+      case EBatResult.triple:
+        combinedStats.triple++;
+        combinedStats.atBats++;
+        combinedStats.hit++;
+        break;
+      case EBatResult.homerun:
+        combinedStats.homerun++;
+        combinedStats.atBats++;
+        combinedStats.hit++;
+        break;
+      case EBatResult.sacrificeBunt:
+        combinedStats.sacrificeBunt++;
+        /* combinedStats.out++; */
+        break;
+      case EBatResult.sacrificeFly:
+        combinedStats.sacrificeFly++;
+        /* combinedStats.out++; */
+        break;
+      case EBatResult.out:
+        combinedStats.atBats++;
+        combinedStats.out++;
+        break;
+      case EBatResult.strikeOut:
+        combinedStats.atBats++;
+        combinedStats.strikeOut++;
+        break;
+      case EBatResult.hitByPitch:
+        combinedStats.hitByPitch++;
+        break;
+      case EBatResult.walk:
+        combinedStats.walk++;
+        break;
+    }
+    return true;
+  })
+  /* console.log(combinedLineupStats); */
+  return combinedLineupStats;
 }

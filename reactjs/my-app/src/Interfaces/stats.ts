@@ -81,6 +81,27 @@ export interface IPlayerLineupStats {
   hit: number;
 }
 
+export const defaultPlayerLineupStats:IPlayerLineupStats = {
+  lineupId: 0,
+  atBats: 0,
+  single: 0,
+  double: 0,
+  triple: 0,
+  homerun: 0,
+  out: 0,
+  hitOrder: 0,
+  hitByPitch: 0,
+  walk: 0,
+  strikeOut: 0,
+  stolenBase: 0,
+  caughtStealing: 0,
+  plateAppearance: 0,
+  sacrificeBunt: 0,
+  sacrificeFly: 0,
+  runsBattedIn: 0,
+  hit: 0,
+}
+
 export interface IStatBatResultsProps {
   single: number;
   double: number;

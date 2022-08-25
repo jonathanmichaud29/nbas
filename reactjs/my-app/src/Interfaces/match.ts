@@ -89,3 +89,36 @@ export interface ICompleteMatchProps{
   teamAway: ITeam;
   allPlayers: Array<IPlayer>;
 }
+
+export interface IPlayerBatResult {
+  lineupId: number;
+  batResults:EBatResult;
+}
+
+export enum EBatResult {
+  none = "None",
+  single = "Single",
+  double = "Double",
+  triple = "Triple",
+  homerun = "Homerun",
+  out = "Out",
+  hitByPitch = "Hit By Pitch",
+  walk = "Walk",
+  strikeOut = "Strike Out",
+  sacrificeBunt = "Sacrifice Bunt",
+  sacrificeFly = "Sacrifice Fly"
+}
+
+export const batResultOptions = [
+  {value:EBatResult.none, label:"-- None --"},
+  {value:EBatResult.single, label:"Single"},
+  {value:EBatResult.double, label:"Double"},
+  {value:EBatResult.triple, label:"Triple"},
+  {value:EBatResult.homerun, label:"Homerun"},
+  {value:EBatResult.out, label:"Out"},
+  {value:EBatResult.hitByPitch, label:"Hit By Pitch"},
+  {value:EBatResult.walk, label:"Walk"},
+  {value:EBatResult.strikeOut, label:"Strike Out"},
+  {value:EBatResult.sacrificeBunt, label:"Sacrifice Bunt"},
+  {value:EBatResult.sacrificeFly, label:"Sacrifice Fly"}
+]

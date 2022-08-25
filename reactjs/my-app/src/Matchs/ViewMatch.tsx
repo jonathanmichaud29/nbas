@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
 import FactCheckIcon from '@mui/icons-material/FactCheck';
+import PageviewIcon from '@mui/icons-material/Pageview';
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
@@ -129,6 +130,13 @@ function ViewMatch(props: IMatchProps) {
               startIcon={<FactCheckIcon />} 
               onClick={ () => handleOpenCompleteMatch() }
             >Complete match statistics</Button>
+          )}
+          { match.isCompleted && (
+            <Button 
+              variant="outlined"
+              startIcon={<PageviewIcon />} 
+              href={`/match/${match.id}`}
+            >View match details</Button>
           )}
           <LoaderInfo
             isLoading={isLoaded}

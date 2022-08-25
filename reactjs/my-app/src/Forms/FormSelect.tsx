@@ -17,13 +17,16 @@ interface IFormSelectProps {
   fieldMinValue?: number;
   fieldMinValueMessage?: string;
   fieldMaxValue?: number;
+  fieldValueIsNot?: string;
+  fieldValueIsNotMessage?: string;
   validateWatchNumber?: (value: number) => string | undefined;
 }
 
 function FormSelect(props: IFormSelectProps) {
   const { 
     label, controllerName, controllerKey, 
-    isRequired, fieldMinValue, fieldMinValueMessage, fieldMaxValue, validateWatchNumber,
+    isRequired, fieldMinValue, fieldMinValueMessage, fieldMaxValue, validateWatchNumber, 
+    fieldValueIsNot, fieldValueIsNotMessage,
     options, defaultOptions, optionKeyPrefix } = props;
   const { control } = useFormContext();
 
@@ -46,6 +49,9 @@ function FormSelect(props: IFormSelectProps) {
   if( validateWatchNumber ) {
     listRules.validate = validateWatchNumber;
   }
+  if( fieldValueIsNot ){
+    listRules.validate = (v:string) => fieldValueIsNot !== v ? true : fieldValueIsNotMessage;
+  }
 
   return (
     <Controller
@@ -56,6 +62,7 @@ function FormSelect(props: IFormSelectProps) {
       render={({ field: { onChange, value }, fieldState: { error }  }) => (
         <TextField
           select
+          size="small"
           onChange={onChange} 
           value={value} 
           label={label}

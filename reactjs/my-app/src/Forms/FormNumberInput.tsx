@@ -39,6 +39,7 @@ function FormNumberInput(props: IFormNumberInputProps) {
       rules={listRules}
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <TextField 
+          size="small"
           onChange={onChange} 
           value={value} 
           type="number"
