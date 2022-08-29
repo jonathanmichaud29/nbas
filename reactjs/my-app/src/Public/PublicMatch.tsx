@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'
-
-import { Alert, Box, CircularProgress  } from "@mui/material";
+import { useParams} from 'react-router-dom'
 
 import { IMatch } from "../Interfaces/match";
 
 import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches';
 
 import ViewMatchDetails from '../Matchs/ViewMatchDetails';
+import LoaderInfo from '../Generic/LoaderInfo';
+
+
 
 function PublicMatch() {
   let { id } = useParams();
@@ -15,7 +16,7 @@ function PublicMatch() {
 
   const [match, setMatch] = useState<IMatch | null>(null);
   const [apiError, changeApiError] = useState("");
-
+  
   const isLoaded = match !== null;
 
   
@@ -41,8 +42,10 @@ function PublicMatch() {
 
   return (
     <>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+      />
       { isLoaded && (
         <ViewMatchDetails 
           match={match}

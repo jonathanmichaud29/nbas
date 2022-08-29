@@ -1,9 +1,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography } from "@mui/material";
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-
+import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
 
 import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
@@ -19,17 +18,21 @@ import { createDateReadable } from '../utils/dateFormatter';
 import { setMetas } from '../utils/metaTags';
 import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { getPlayerName } from '../utils/dataAssociation';
-import { defaultDataGridProps, playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns';
+import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns';
 
 import Scoreboard from './Scoreboard';
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
+import LoaderInfo from '../Generic/LoaderInfo';
+import CustomDataGrid from '../Generic/CustomDataGrid';
+import { useAdminData } from '../Public/PublicApp';
 
 
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
   const { match } = props;
-
+  
+  const {isAdmin} = useAdminData();
   const [apiError, changeApiError] = useState("");
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
@@ -154,15 +157,12 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
 
     const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchLineups);
-    /* setMatchStats(allStats); */
-
+    
     const homeLineups = filterTeamLineups(matchLineups, teamHome.id)
-    const homeStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(homeLineups);
-    /* setPlayersHomeStats(homeStats); */
-
     const awayLineups = filterTeamLineups(matchLineups, teamAway.id)
+
+    const homeStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(homeLineups);
     const awayStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(awayLineups);
-    /* setPlayersHomeStats(awayStats); */
 
     const matchRows = ( allStats.map((playerStats) => {
       return {
@@ -181,6 +181,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
         onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
       }
     }) );
+    setMatchRows(matchRows);
 
     const homeRows = ( homeStats.map((playerStats) => {
       return {
@@ -199,6 +200,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
         onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
       }
     }) );
+    setHomeRows(homeRows);
 
     const awayRows = ( awayStats.map((playerStats) => {
       return {
@@ -217,139 +219,120 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
         onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
       }
     }) );
-    setMatchRows(matchRows);
-    setHomeRows(homeRows);
     setAwayRows(awayRows);
 
   },[matchLineups, players, teamAway, teamHome])
 
-  
 
   return (
     <>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+        hasWrapper={true}
+      />
+      
       { isLoaded && (
-        <Box p={3}>
-          <Card>
-            <CardContent>
-              <Scoreboard 
-                match={match}
-                standingTeams={standingTeams}
-                teamAway={teamAway}
-                teamHome={teamHome}
-              />
-            </CardContent>
-            { matchRows.length > 0 && (
-              <CardContent>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <DataGrid
-                      {...defaultDataGridProps}
-                      rows={matchRows}
-                      columns={playerExtendedStatsColumns}
-                      getRowId={(row) => row.id + "-match-" + match.id}
-                      initialState={defaultStateStatsColumns}
-                      components={{
-                        Toolbar: GridToolbar
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </CardContent>
+        <Paper component={Box} p={3} m={3}>
+          <Stack spacing={3} alignItems="center" >
+            <Scoreboard 
+              match={match}
+              standingTeams={standingTeams}
+              teamAway={teamAway}
+              teamHome={teamHome}
+              titleLevel={'h1'}
+            />
+            { isAdmin && (
+              <Button 
+                variant="contained" 
+                startIcon={<EditIcon />} 
+                href={`/admin/match/${match.id}`}
+              >Edit match</Button>
             )}
-          </Card>
-        </Box>
+            { matchRows.length > 0 && (
+              <CustomDataGrid
+                pageSize={5}
+                rows={matchRows}
+                columns={playerExtendedStatsColumns}
+                initialState={defaultStateStatsColumns}
+                getRowId={(row:any) => row.id + "-match-" + match.id}
+              />
+            )}
+          </Stack>
+        </Paper>
       )}
       
       { isLoaded && (
-        <Box p={3}>
-          <Card>
-            <CardContent>
-              <Grid container>
-                <Grid item xs={12}>
-                  <Typography component="h3" variant="h5" align="center">
-                    {teamHome.name} Stats
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <StatBatResults
-                    single={teamHomeStats.single}
-                    double={teamHomeStats.double}
-                    triple={teamHomeStats.triple}
-                    homerun={teamHomeStats.homerun}
-                    out={teamHomeStats.out}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <StatBattingPercentage
-                    stats={[teamHomeStats]}
-                    columns={[`${teamHome.name} stats`]}
-                  />
-                </Grid>
-                {homeRows.length > 0 && (
-                  <Grid item xs={12}>
-                    <DataGrid
-                      {...defaultDataGridProps}
-                      rows={homeRows}
-                      columns={playerExtendedStatsColumns}
-                      getRowId={(row) => row.id + "-home-" + match.id}
-                      initialState={defaultStateStatsColumns}
-                      components={{
-                        Toolbar: GridToolbar
-                      }}
-                    />
-                  </Grid>
-                )}
+        <Paper component={Box} p={3} m={3}>
+          <Stack spacing={3} alignItems="center" >
+            <Typography variant="h5" align="center">
+              {teamHome.name} Stats
+            </Typography>
+            <Grid container>
+              <Grid item xs={12} md={6}>
+                <StatBatResults
+                  single={teamHomeStats.single}
+                  double={teamHomeStats.double}
+                  triple={teamHomeStats.triple}
+                  homerun={teamHomeStats.homerun}
+                  out={teamHomeStats.out}
+                />
               </Grid>
-            </CardContent>
-          </Card>
-        </Box>
+              <Grid item xs={12} md={6}>
+                <StatBattingPercentage
+                  stats={[teamHomeStats]}
+                  columns={[`${teamHome.name} stats`]}
+                />
+              </Grid>
+            </Grid>
+                
+            {homeRows.length > 0 && (
+              <CustomDataGrid
+                pageSize={10}
+                rows={homeRows}
+                columns={playerExtendedStatsColumns}
+                initialState={defaultStateStatsColumns}
+                getRowId={(row:any) => row.id + "-home-" + match.id}
+              />
+            )}
+          </Stack>
+        </Paper>
       )}
 
       { isLoaded && (
-        <Box p={3}>
-          <Card>
-            <CardContent>
-              <Grid container>
-                <Grid item xs={12}>
-                  <Typography component="h3" variant="h5" align="center">
-                    {teamAway.name} Stats
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <StatBatResults
-                    single={teamAwayStats.single}
-                    double={teamAwayStats.double}
-                    triple={teamAwayStats.triple}
-                    homerun={teamAwayStats.homerun}
-                    out={teamAwayStats.out}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <StatBattingPercentage
-                    stats={[teamAwayStats]}
-                    columns={[`${teamAway.name} stats`]}
-                  />
-                </Grid>
-                {awayRows.length > 0 && (
-                  <Grid item xs={12}>
-                    <DataGrid
-                      {...defaultDataGridProps}
-                      rows={awayRows}
-                      columns={playerExtendedStatsColumns}
-                      getRowId={(row) => row.id + "-away-" + match.id}
-                      initialState={defaultStateStatsColumns}
-                      components={{
-                        Toolbar: GridToolbar
-                      }}
-                    />
-                  </Grid>
-                )}
+        <Paper component={Box} p={3} m={3}>
+          <Stack spacing={3} alignItems="center" >
+            <Typography variant="h5" align="center">
+              {teamAway.name} Stats
+            </Typography>
+            <Grid container>
+              <Grid item xs={12} md={6}>
+                <StatBatResults
+                  single={teamAwayStats.single}
+                  double={teamAwayStats.double}
+                  triple={teamAwayStats.triple}
+                  homerun={teamAwayStats.homerun}
+                  out={teamAwayStats.out}
+                />
               </Grid>
-            </CardContent>
-          </Card>
-        </Box>
+              <Grid item xs={12} sm={6}>
+                <StatBattingPercentage
+                  stats={[teamAwayStats]}
+                  columns={[`${teamAway.name} stats`]}
+                />
+              </Grid>
+            </Grid>
+            {awayRows.length > 0 && (
+              <CustomDataGrid
+                pageSize={10}
+                rows={awayRows}
+                columns={playerExtendedStatsColumns}
+                initialState={defaultStateStatsColumns}
+                getRowId={(row:any) => row.id + "-away-" + match.id}
+              />
+            )}
+          </Stack>
+        </Paper>
       )}
     
     </>

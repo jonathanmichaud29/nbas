@@ -10,10 +10,13 @@ exports.getMatches = async (req, res, next) => {
   if (!req.body) {
     return next(new AppError("No parameters received to fetch a match", 404));
   }
+  const selectedLeagueId = castNumber(req.headers.idleague);
   let values = [];
   let wheres = [];
   let orderBy = [];
   
+  wheres.push('`idLeague`=?');
+  values.push(selectedLeagueId)
   if (req.body.matchIds ){
     wheres.push('`id` IN ?')
     values.push([req.body.matchIds]);

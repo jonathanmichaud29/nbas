@@ -26,7 +26,7 @@ export const playerExtendedStatsColumns: GridColDef[] = [
     headerName: 'AB',
     type: 'number',
     width: columnWidth.xs,
-    description: "At Bats = Trips to the plate that do no result in a walk, hit by pitch, sacrifice or reach on interference"
+    description: "At Bats = Trips to the plate that do no result in a walk, hit by pitch, sacrifice or reach on interference",
   },
   {
     field: 'out',
@@ -123,6 +123,7 @@ export const defaultStateStatsColumns = {
       id: false,
       atBats: false,
       out: false,
+      onBasePercentage:false,
     },
   },
 }
