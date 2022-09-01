@@ -13,22 +13,25 @@ exports.getPlayers = async (req, res, next) => {
 
   let query = '';
   let values = [];
-  if( req.body.playerIds !== undefined ){
-    query = "SELECT p.* FROM players as p INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?) WHERE p.id IN ?";
-    const listPlayerIds = req.body.playerIds.length > 0 ? req.body.playerIds : [0];
-    values = [selectedLeagueId, [listPlayerIds]];
-    const resultMainQuery = await mysqlQuery(query, values);
-    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-  }
-  else if(req.body.allPlayers !== undefined && req.body.allPlayers ) {
-    query = "SELECT p.* FROM players as p INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?) ";
-    values = [selectedLeagueId]
-    const resultMainQuery = await mysqlQuery(query, values);
-    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-  }
-  else {
+  let wheres = [];
+  let joinPlayerLeague = '';
+  if( req.body.allPlayers === undefined && req.body.playerIds === undefined ){
     return appResponse(res, next, true, {}, {});
   }
+  if( req.body.allLeagues === undefined ){
+    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?)';
+    values.push(selectedLeagueId);
+  }
+  if( req.body.playerIds !== undefined ){
+    wheres.push('p.id IN ?')
+    const listPlayerIds = req.body.playerIds.length > 0 ? req.body.playerIds : [0];
+    values.push([listPlayerIds])
+  }
+  query = `SELECT p.* FROM players as p 
+    ${joinPlayerLeague}
+    ${wheres.length>0 ? `WHERE ${wheres.join(' AND ')}` : ``}`;
+  const resultMainQuery = await mysqlQuery(query, values);
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   
 };
 

@@ -26,6 +26,7 @@ export const fetchMatches = async (bodyParams: IApiFetchMatchesParams) => {
 export interface IApiFetchHistoryMatchesParams {
   teamId?: number;
   playerId?: number;
+  leagueId?: number;
 }
 export const fetchHistoryMatches = async (bodyParams: IApiFetchHistoryMatchesParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/history-matches/`, bodyParams)

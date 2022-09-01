@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 
-import { Box, Grid, Typography } from "@mui/material";
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { Grid, Stack, Typography } from "@mui/material";
 
 import { IBattingStatsExtended, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
+import CustomDataGrid from '../Generic/CustomDataGrid';
 
 import { getPlayerName } from '../utils/dataAssociation';
-import { playerExtendedStatsColumns, defaultStateStatsColumns, defaultDataGridProps } from '../utils/dataGridColumns'
+import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
 import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation'
 
 function YearStats(props: IYearStatsProps) {
@@ -47,10 +47,44 @@ function YearStats(props: IYearStatsProps) {
     }
   }) ) || [];
 
+  if( ! isLoaded) return (<></>);
   return (
+    <Stack alignItems="center" width="100%" spacing={3}>
+      <Typography variant="h3">{title}</Typography>
+      <Grid container>
+        <Grid item xs={12} sm={6}>
+          <StatBatResults
+            single={allStats.single}
+            double={allStats.double}
+            triple={allStats.triple}
+            homerun={allStats.homerun}
+            out={allStats.out}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <StatBattingPercentage
+            stats={[allStats]}
+            columns={["Season Statistics"]}
+          />
+        </Grid>
+      </Grid>
+          
+      { rows.length > 0 && (
+        <CustomDataGrid
+          pageSize={20}
+          rows={rows}
+          columns={playerExtendedStatsColumns}
+          getRowId={(row:any) => row.playerName}
+          initialState={defaultStateStatsColumns}
+          hideFooter={rows.length <= 20}
+        />
+      )}
+    </Stack>
+  )
+
+  /* return (
     <>
       { isLoaded && (
-        <Box>
           <Grid container spacing={2} style={{ margin:"20px 0px", width:"100%"}}>
             <Grid item xs={12}>
               <Typography component="h2" variant="h6" align='center'>{title}</Typography>
@@ -86,10 +120,9 @@ function YearStats(props: IYearStatsProps) {
               </Grid>
             )}
           </Grid>
-        </Box>
       )}
     </>
-  )
+  ) */
 }
 
 export default YearStats;

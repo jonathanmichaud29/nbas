@@ -3,6 +3,7 @@ import {IPlayer} from './player'
 
 export interface IMatch{
   id: number;
+  idLeague: number;
   idTeamHome: number;
   idTeamAway: number;
   date: Date;
@@ -45,6 +46,7 @@ export interface IMatchLineup {
   idMatch: number;
   idTeam: number;
   idPlayer: number;
+  idLeague: number;
   atBats: number;
   single: number;
   double: number;

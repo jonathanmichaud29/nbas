@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 
-import { Alert, Box, CircularProgress} from "@mui/material";
-
 import { IPlayer } from "../Interfaces/player";
+import { ILeaguePlayer } from '../Interfaces/league';
 
 import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
+import { fetchPlayersLeagues, IApiFetchPlayersLeaguesParams } from '../ApiCall/leagues';
 
 import ViewPlayerProfile from '../Players/ViewPlayerProfile';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 import { setMetas } from '../utils/metaTags';
 
@@ -16,9 +17,10 @@ function PublicPlayer() {
   const idPlayer = id ? parseInt(id, 10) : null;
 
   const [player, setPlayer] = useState<IPlayer | null>(null);
+  const [playersLeagues, setPlayersLeagues] = useState<ILeaguePlayer[] | null>(null);
   const [apiError, changeApiError] = useState("");
 
-  const isLoaded = player !== null;
+  const isLoaded = player !== null && playersLeagues !== null;
 
   if( isLoaded ){
     setMetas({
@@ -28,12 +30,13 @@ function PublicPlayer() {
   }
   
   /**
-   * Fetch Match details
+   * Fetch Player details
    */
   useEffect( () => {
     if ( idPlayer === null ) return;
     const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: [idPlayer]
+      playerIds: [idPlayer],
+      allLeagues: true
     }
     fetchPlayers(paramsFetchPlayers)
       .then(response => {
@@ -47,16 +50,37 @@ function PublicPlayer() {
       });
   }, [idPlayer]);
 
+  useEffect(() => {
+    if ( idPlayer === null ) return;
+    const paramsFetchPlayersLeagues: IApiFetchPlayersLeaguesParams = {
+      playerIds:[idPlayer]
+    }
+    fetchPlayersLeagues(paramsFetchPlayersLeagues)
+      .then(response => {
+        setPlayersLeagues(response.data);
+      })
+      .catch(error => {
+        /* changeApiError(error); */
+      })
+      .finally(() => {
+        /* setIsLeaguePlayersLoaded(true); */
+      });
+  }, [idPlayer])
+
   return (
-    <Box p={3}>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      { player && (
+    <>
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+        hasWrapper={true}
+      />
+      { player && playersLeagues && (
         <ViewPlayerProfile 
           player={player}
+          playersLeagues={playersLeagues}
         />
       ) }
-    </Box>
+    </>
   )
 }
 export default PublicPlayer;

@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 export const defaultTheme = createTheme({
@@ -16,6 +16,7 @@ export const defaultTheme = createTheme({
     primary: {
       main: '#751e1e',
       light: '#ffffff',
+      dark: '#5c2828',
     },
     secondary: {
       main: '#d41717',

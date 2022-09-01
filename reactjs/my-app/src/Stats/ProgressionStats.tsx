@@ -8,12 +8,13 @@ import { createShortDateReadable } from '../utils/dateFormatter';
 import { getCombinedPlayersStats } from '../utils/statsAggregation'
 
 import { chartColors } from '../utils/colorCodes'
+import { Box } from '@mui/material';
 
 ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend );
 
 function ProgressionStats(props: IProgressionStatsProps){
 
-  const { matches, matchLineups } = props;
+  const { matches, matchLineups, teams } = props;
 
   const options = {
     responsive: true,
@@ -36,26 +37,20 @@ function ProgressionStats(props: IProgressionStatsProps){
     }
   };
 
-  let labels = [] as Array<string>;
+  let labels = [] as Array<Array<string>>;
   let stats = [] as IBattingPercentageStats[];
 
   matches.forEach((match) => {
     const matchLineup = matchLineups.find((tmpLineup) => tmpLineup.idMatch === match.id);
-    if( matchLineup !== undefined) {
+    const teamHome = teams.find((team) => team.id === match.idTeamHome);
+    const teamAway = teams.find((team) => team.id === match.idTeamAway);
+    if( matchLineup !== undefined && teamHome !== undefined && teamAway !== undefined) {
+      
       // TODO: Should be "July 7 against X Team"
-      labels.push(createShortDateReadable(match.date));
+      labels.push([createShortDateReadable(match.date), teamHome.name, ' vs ', teamAway.name]);
 
       stats.push(getCombinedPlayersStats([matchLineup])[0])
 
-      /* const nbHits = getStatHits(matchLineup.single, matchLineup.double, matchLineup.triple, matchLineup.homerun);
-      const sluggingTotal = getStatSlugging(matchLineup.single, matchLineup.double, matchLineup.triple, matchLineup.homerun);
-
-      stats.push({
-        battingAverage: nbHits / matchLineup.atBats,
-        sluggingPercentage: sluggingTotal / matchLineup.atBats,
-        onBasePercentage: 0.300,
-        onBaseSluggingPercentage: 1.700,
-      }); */
     }
   })
   const data = {
@@ -89,9 +84,9 @@ function ProgressionStats(props: IProgressionStatsProps){
   };
 
   return (
-    <div style={{position:'relative', height:'300px'}}>
+    <Box sx={{position:'relative', height:'300px', width:'100%'}}>
       <Line options={options} data={data} />
-    </div>
+    </Box>
   )
 }
 

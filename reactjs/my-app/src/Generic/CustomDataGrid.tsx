@@ -1,6 +1,5 @@
-
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useState } from 'react';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 interface ICustomDataGrid {
   pageSize:     number;
@@ -8,6 +7,7 @@ interface ICustomDataGrid {
   columns:      any;
   initialState: any;
   getRowId:     any;
+  hideFooter?:  boolean;
 }
 
 const defaultDataGridProps = {
@@ -20,6 +20,10 @@ function CustomDataGrid(props: ICustomDataGrid) {
 
   const [pageSize, setPageSize] = useState<number>(props.pageSize)
 
+  let initialState = props.initialState;
+  if (props.rows.length < 2){
+    initialState.columns.columnVisibilityModel.playerName = false;
+  }
   return (
     <DataGrid
       {...defaultDataGridProps}
@@ -28,7 +32,8 @@ function CustomDataGrid(props: ICustomDataGrid) {
       rows={props.rows}
       columns={props.columns}
       getRowId={props.getRowId}
-      initialState={props.initialState}
+      initialState={initialState}
+      hideFooter={props.hideFooter || false}
       components={{
         Toolbar: GridToolbar
       }}

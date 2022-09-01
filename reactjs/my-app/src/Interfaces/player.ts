@@ -1,3 +1,4 @@
+import { ILeaguePlayer } from './league';
 import { IMatch, IMatchLineup } from './match'
 import { ITeam } from './team';
 
@@ -12,9 +13,11 @@ export interface IPlayerProps{
 
 export interface IPlayerProfileProps{
   player: IPlayer;
+  playersLeagues: ILeaguePlayer[];
 }
 
 export interface IPlayerMatchResumeProps {
+  player:       IPlayer;
   playerLineup: IMatchLineup;
   match:        IMatch;
   teamHome:     ITeam;

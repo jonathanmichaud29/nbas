@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import teamReducer from './teamSlice'
 import playerReducer from './playerSlice'
+import leagueReducer from './leagueSlice'
 import matchPlayerReducer from './matchPlayerSlice'
 import matchReducer from './matchSlice'
 import leaguePlayerReducer from './leaguePlayerSlice'
@@ -11,6 +12,7 @@ export const store = configureStore({
     teams: teamReducer,
     leagueTeams: leagueTeamReducer,
     players: playerReducer,
+    leagues: leagueReducer,
     leaguePlayers: leaguePlayerReducer,
     matches: matchReducer,
     matchPlayers: matchPlayerReducer,

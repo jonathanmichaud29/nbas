@@ -92,3 +92,9 @@ ALTER TABLE `nbas`.`matches`
   ADD CONSTRAINT `fk_ml_league_1`
     FOREIGN KEY (`idLeague`)
     REFERENCES `nbas`.`leagues` (`id`);
+
+ALTER TABLE `nbas`.`match_lineup` 
+ADD COLUMN `idLeague` INT NOT NULL AFTER `idPlayer`;
+
+UPDATE `nbas`.`match_lineup` SET `idLeague`=1 WHERE `id`>0;
+

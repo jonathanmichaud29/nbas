@@ -24,6 +24,7 @@ const matchSlice = createSlice({
       prepare: (newMatch: IMatch) => ({
         payload: {
           id: newMatch.id,
+          idLeague: newMatch.idLeague,
           idTeamHome: newMatch.idTeamHome,
           idTeamAway: newMatch.idTeamAway,
           date: newMatch.date,

@@ -38,7 +38,7 @@ const monthOfYearLabel = (argDate: Date): string => {
 
 export const createHumanDate = (argDate: Date): string => {
   const dateObject = new Date(argDate);
-  const dayLabel = dayOfWeekLabel(dateObject);
+  /* const dayLabel = dayOfWeekLabel(dateObject); */
   const monthLabel = monthOfYearLabel(dateObject);
 
   const dateReturn = dateObject.getFullYear() + ", " + monthLabel + " " + dateObject.getDate() + " @ " + 

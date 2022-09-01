@@ -7,6 +7,8 @@ const { validateUserLeague } = require("../utils/validation")
 const teamControllers = require("../controllers/team");
 const teamLeagueControllers = require("../controllers/teamLeague");
 
+const leagueControllers = require("../controllers/league");
+
 const playerControllers = require("../controllers/player");
 const playerLeagueControllers = require("../controllers/playerLeague");
 
@@ -16,6 +18,13 @@ const matchControllers = require("../controllers/match");
 const matchLineupControllers = require("../controllers/matchLineup");
 
 const userControllers = require("../controllers/user");
+
+/**
+ * League routes
+ */
+router
+  .route("/r/league/")
+  .post(/* firebaseAuthMiddleware.decodeToken,  */leagueControllers.getLeagues);
 
 /**
  * User routes
@@ -35,6 +44,10 @@ router
 router
   .route("/r/player-league/")
   .post(playerLeagueControllers.getLeaguePlayers);
+
+router
+  .route("/r/players-leagues/")
+  .post(playerLeagueControllers.getPlayersLeagues);
 
 router
   .route("/m/player-league/:idPlayer")

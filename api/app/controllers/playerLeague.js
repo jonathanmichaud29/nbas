@@ -34,4 +34,27 @@ exports.deleteLeaguePlayer = async (req, res, next) => {
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
 };
 
+exports.getPlayersLeagues = async (req, res, next) => {
+  if (!req.body ) return next(new AppError("No form data found", 404));
+  /* const selectedLeagueId = castNumber(req.headers.idleague); */
 
+  let query='SELECT pl.* FROM player_league as pl';
+  let values = [];
+  if( req.body.playerIds !== undefined ){
+    query = "SELECT pl.* FROM player_league as pl WHERE pl.idPlayer IN ?";
+    const listIds = req.body.playerIds.length > 0 ? req.body.playerIds : [0];
+    values.push([listIds]);
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  }
+  if( req.body.leagueIds !== undefined ){
+    query = "SELECT pl.* FROM player_league as pl WHERE pl.idLeague IN ?";
+    const listIds = req.body.leagueIds.length > 0 ? req.body.leagueIds : [0];
+    values.push([listIds]);
+    const resultMainQuery = await mysqlQuery(query, values);
+    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  }
+  
+  const resultMainQuery = await mysqlQuery(query, values);
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+};

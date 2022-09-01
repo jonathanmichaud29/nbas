@@ -1,7 +1,7 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { fetchHistoryMatches, IApiFetchHistoryMatchesParams } from '../ApiCall/matches';
 
@@ -12,22 +12,25 @@ import { ITeam } from '../Interfaces/team'
 import PlayerMatchResume from './PlayerMatchResume'
 import YearStats from '../Stats/YearStats';
 import ProgressionStats from '../Stats/ProgressionStats';
+import ChangePublicLeague from '../League/ChangePublicLeague';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
-  const { player } = props;
+  const { player, playersLeagues } = props;
 
   const [apiError, changeApiError] = useState("");
   const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
   const [listMatches, setListMatches] = useState<IMatch[] | null>(null);
   const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[] | null>(null);
+  const [selectedLeague, setSelectedLeague] = useState<number>(0);
 
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null;
 
   useEffect(() => {
     const paramsHistoryMatches: IApiFetchHistoryMatchesParams = {
-      playerId: player.id
+      playerId: player.id,
     }
     fetchHistoryMatches(paramsHistoryMatches)
       .then((response) => {
@@ -45,77 +48,70 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
       })
   }, [player.id])
 
+  const changeSelectedLeague = (idLeague:number) => {
+    setSelectedLeague(idLeague);
+  }
+
   return (
     <>
-      <Card>
-        <CardContent>
-          { ! isLoaded && <Box><CircularProgress /></Box>}
-          { apiError && <Alert severity="error">{apiError}</Alert> }
-          <Grid container alignItems="center" justifyContent="center" flexDirection="column">
-            <Grid item xs={12} style={{width:"100%"}}>
-              <Typography variant="h3" component="h1" align='center'>
-                {player.name} Profile
-              </Typography>
-            </Grid>
+      { playersLeagues && (
+        <ChangePublicLeague
+          playersLeagues={playersLeagues}
+          onLeagueChange={changeSelectedLeague}
+        />
+      )}
+      <Paper component={Box} p={1} m={3}>
+        <Stack spacing={3} alignItems="center" pb={3} width="100%">
+          <LoaderInfo
+            isLoading={isLoaded}
+            msgError={apiError}
+          />
+          <Typography variant="h1">
+            {player.name} Profile
+          </Typography>
         
-            { isLoaded && (
-              <>
-                <Grid item xs={12} style={{width:"100%"}} >
-                  <YearStats
-                    key={`player-year-stat-${player.id}`}
-                    matchLineups={listMatchLineups}
-                    players={[player]}
-                    title={`${player.name} season batting stats`}
-                  /> 
-                </Grid>
-                <Grid item xs={12} style={{width:"100%"}} >
-                  <ProgressionStats
-                    key={`progression-player-stat-${player.id}`}
-                    matches={listMatches}
-                    matchLineups={listMatchLineups}
-                  />
-                </Grid>
-                <Divider />
-              </>
-            )}
-          </Grid>
-        </CardContent>
-      </Card>
+          { isLoaded && (
+            <YearStats
+              key={`player-year-stat-${player.id}`}
+              matchLineups={selectedLeague === 0 ? listMatchLineups : listMatchLineups.filter((matchLineup) => matchLineup.idLeague === selectedLeague)}
+              players={[player]}
+              title={`League batting stats`}
+            /> 
+          )}
+          { isLoaded && (
+            <ProgressionStats
+              key={`progression-player-stat-${player.id}`}
+              matches={selectedLeague === 0 ? listMatches : listMatches.filter((match) => match.idLeague === selectedLeague)}
+              matchLineups={selectedLeague === 0 ? listMatchLineups : listMatchLineups.filter((matchLineup) => matchLineup.idLeague === selectedLeague)}
+              teams={listTeams}
+            />
+          )}
+        </Stack>
+      </Paper>
+      
       
       { isLoaded && listMatches && listMatches.length > 0 && (
-        <Box pt={3}>
-          <Card>
-            <CardContent>
-              <Typography component="h3" variant="h5" align="center">
-                Player match history
-              </Typography>
-            </CardContent>
-            <CardContent>
-              <Grid container>
-                <Grid item style={{width:'100%'}}>
-                  { listMatches.map((match: IMatch) => {
-                    const teamHome = listTeams.find((team) => team.id === match.idTeamHome)
-                    const teamAway = listTeams.find((team) => team.id === match.idTeamAway)
-                    const playerLineup = listMatchLineups.find((lineup) => lineup.idMatch === match.id)
-                    if( teamHome === undefined || teamAway === undefined || playerLineup === undefined ) return '';
-                    return (
-                      <React.Fragment key={`player-match-resume-${match.id}`}>
-                        <Divider />
-                        <PlayerMatchResume
-                          
-                          playerLineup={playerLineup}
-                          match={match}
-                          teamHome={teamHome}
-                          teamAway={teamAway}
-                        />  
-                      </React.Fragment>
-                    )
-                  })}
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Box>
+        <Paper component={Box} p={3} m={3}>
+          <Stack spacing={3} alignItems="center" pb={3} width="100%">
+            <Typography variant="h2">Player match history</Typography>
+            { listMatches.filter((match) => selectedLeague === 0 || match.idLeague === selectedLeague).map((match: IMatch) => {
+              const teamHome = listTeams.find((team) => team.id === match.idTeamHome)
+              const teamAway = listTeams.find((team) => team.id === match.idTeamAway)
+              const playerLineup = listMatchLineups.find((lineup) => lineup.idMatch === match.id)
+              if( teamHome === undefined || teamAway === undefined || playerLineup === undefined ) return '';
+              return (
+                <PlayerMatchResume
+                  key={`player-match-resume-${match.id}`}
+                  playerLineup={playerLineup}
+                  match={match}
+                  player={player}
+                  teamHome={teamHome}
+                  teamAway={teamAway}
+                />  
+              )
+            })}
+          </Stack>
+        </Paper>
       )}
     </>
   )

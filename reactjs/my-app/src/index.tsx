@@ -8,7 +8,9 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store'
 
 import { defaultTheme } from './utils/theme'
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles'
+import { StyledEngineProvider } from "@mui/material/styles";
 
 
 const root = ReactDOM.createRoot(
@@ -17,10 +19,12 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={defaultTheme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={defaultTheme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </StyledEngineProvider>
     </Provider>
   </React.StrictMode>
 );

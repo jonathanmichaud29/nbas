@@ -1,5 +1,6 @@
 import { IMatch, IMatchLineup } from './match'
 import { IPlayer } from './player'
+import { ITeam } from './team';
 
 export interface IYearStatsProps {
   matchLineups:   IMatchLineup[];
@@ -118,4 +119,5 @@ export interface IStatBattingPercentageProps {
 export interface IProgressionStatsProps {
   matches: IMatch[];
   matchLineups: IMatchLineup[];
+  teams: ITeam[];
 }

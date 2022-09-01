@@ -45,6 +45,7 @@ function PublicMatch() {
       <LoaderInfo
         isLoading={isLoaded}
         msgError={apiError}
+        hasWrapper={true}
       />
       { isLoaded && (
         <ViewMatchDetails 
