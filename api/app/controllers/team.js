@@ -8,19 +8,19 @@ const { getLeagueTeamByName } = require('../utils/simpleQueries');
 exports.getTeams = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   const selectedLeagueId = castNumber(req.headers.idleague);
-
+  const listLeagueIds = req.body.leagueIds !== undefined ? req.body.leagueIds : [selectedLeagueId]
   let query = '';
   let values = [];
   if( req.body.teamIds !== undefined ){
-    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague=?) WHERE t.id IN ?";
+    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague IN ?) WHERE t.id IN ?";
     const listPlayerIds = req.body.teamIds.length > 0 ? req.body.teamIds : [0];
-    values = [selectedLeagueId, [listPlayerIds]];
+    values = [[listLeagueIds], [listPlayerIds]];
     const resultMainQuery = await mysqlQuery(query, values);
     return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
-  else if(req.body.allPlayers !== undefined && req.body.allPlayers ) {
-    query = "SELECT t.* FROM teams as t INNER JOIN team_league as pl ON (t.id=tl.idTeam AND tl.idLeague=?) ";
-    values = [selectedLeagueId]
+  else if(req.body.allTeams !== undefined && req.body.allTeams ) {
+    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague IN ?) ";
+    values = [[listLeagueIds]]
     const resultMainQuery = await mysqlQuery(query, values);
     return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
   }
@@ -116,19 +116,19 @@ exports.getStandingTeams = async (req, res, next) => {
   let query = '';
   let values = [];
   if( req.body.teamIds !== undefined && req.body.teamIds.length > 0 ){
-    query = "SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls "+
-      "FROM nbas.teams as t "+
-      "INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) "+
-      "WHERE m.isCompleted=1 AND t.id IN ? "+
-      "GROUP BY t.id";
+    query = `SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
+      FROM teams as t 
+      INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway)
+      WHERE m.isCompleted=1 AND t.id IN ? 
+      GROUP BY t.id`;
     values = [[req.body.teamIds]];
   }
   else if(req.body.allTeams !== undefined && req.body.allTeams ) {
-    query = "SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls "+
-      "FROM nbas.teams as t "+
-      "INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) "+
-      "WHERE m.isCompleted=1 "+
-      "GROUP BY t.id";
+    query = `SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
+      FROM nbas.teams as t 
+      INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) 
+      WHERE m.isCompleted=1 
+      GROUP BY t.id`;
   }
   else {
     return appResponse(res, next, true, {}, {});

@@ -56,13 +56,13 @@ export interface IStandingTeam {
 
 
 export interface IAllTeamsStandingProps {
-  standingTeams: IStandingTeam[];
+  /* standingTeams: IStandingTeam[]; */
   teams: ITeam[];
 }
 
 export interface IAllTeamsStatsProps {
   teams: ITeam[];
-  matchesLineups: IMatchLineup[];
+  matchesLineups?: IMatchLineup[]; // TODO DEPRECATED
 }
 
 export interface ITeamMatchResumeProps {

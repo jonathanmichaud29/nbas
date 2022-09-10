@@ -3,6 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
 import { IStatBatResultsProps } from '../Interfaces/stats'
+import { sxGroupStyles } from '../utils/theme';
 
 ChartJS.register(ArcElement, Tooltip, Legend); // Doughnut
 
@@ -47,7 +48,7 @@ function StatBatResults(props: IStatBatResultsProps) {
   };
 
   return (
-    <Box style={{position:'relative', height:'300px'}}>
+    <Box sx={sxGroupStyles.boxWrapperChart}>
       <Doughnut options={chartOptions} data={dataChartAtBats} />
     </Box>
   )

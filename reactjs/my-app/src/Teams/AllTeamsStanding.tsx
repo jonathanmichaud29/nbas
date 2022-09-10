@@ -1,68 +1,88 @@
-import { Box, Card, CardContent, Grid, Link, Paper, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+
+import { Box, Link, Paper, Stack, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
-import { IAllTeamsStandingProps }  from '../Interfaces/team'
+import { IAllTeamsStandingProps, IStandingTeam }  from '../Interfaces/team'
+
+import { IApiFetchStandingTeamsParams, fetchStandingTeams } from "../ApiCall/teams";
+
+import LoaderInfo from "../Generic/LoaderInfo";
 
 import { getTeamName } from '../utils/dataAssociation'
+import { sxGroupStyles } from '../utils/theme';
 
 function AllTeamsStanding(props: IAllTeamsStandingProps){
   
-  const {teams, standingTeams} = props;
+  const {teams} = props;
+
+  const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
+  const [apiError, changeApiError] = useState("");
+
+  const isLoaded = standingTeams !== null;
+
+  useEffect(() => {
+    const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
+      teamIds: teams.map((team) => team.id) || [0]
+    }
+    fetchStandingTeams(paramsFetchStandingTeams)
+      .then(response => {
+        const newStandingTeams: IStandingTeam[] = response.data;
+        newStandingTeams.sort((a,b) => b.nbWins - a.nbWins || a.nbGamePlayed - b.nbGamePlayed );
+        setStandingTeams(newStandingTeams);
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+  },[teams])
 
   return (
-    <Box p={3}>
-      <Card>
-        <CardContent>
-          <Grid container>
-            <Grid item xs={12} style={{width:'100%'}}>
-              <Typography component="h1" variant="h3" align="center">
-                League Teams Standing
-              </Typography>
-            </Grid>
-            <Grid item  xs={12} style={{width:'100%'}}>
-              <Grid
-                container
-                spacing={0}
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                style={{margin:"40px 0px"}}
-              >
-                <Grid item xs={4}>
-                  <TableContainer component={Paper}>
-                    <Table sx={{ maxWidth: 450 }} aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Team</TableCell>
-                          <TableCell>GP</TableCell>
-                          <TableCell>W</TableCell>
-                          <TableCell>L</TableCell>
-                          <TableCell>N</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {standingTeams.map((standingTeam) => {
-                          const teamName = getTeamName(standingTeam.id, teams);
-                          return (
-                            <TableRow key={`team-standing-${standingTeam.id}`}>
-                              <TableCell><Link href={`/team/${standingTeam.id}`}>{teamName}</Link></TableCell>
-                              <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
-                              <TableCell align="center">{standingTeam.nbWins}</TableCell>
-                              <TableCell align="center">{standingTeam.nbLosts}</TableCell>
-                              <TableCell align="center">{standingTeam.nbNulls}</TableCell>
-                            </TableRow>
-                          )
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-    </Box>
+    <>
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+        hasWrapper={true}
+      />
+      {isLoaded && (
+        <Paper component={Box} m={3} p={1}>
+          <Stack spacing={3} alignItems="center" pb={3} >
+            <Typography variant="h1" align="center">
+              Teams Standing
+            </Typography>
+            <TableContainer component={Paper} sx={sxGroupStyles.tableContainerSmallest}>
+              <Table size="small" aria-label="League team standing">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Team</TableCell>
+                    <TableCell align="center">GP</TableCell>
+                    <TableCell align="center">W</TableCell>
+                    <TableCell align="center">L</TableCell>
+                    <TableCell align="center">N</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {standingTeams.map((standingTeam) => {
+                    const teamName = getTeamName(standingTeam.id, teams);
+                    return (
+                      <TableRow key={`team-standing-${standingTeam.id}`}>
+                        <TableCell><Link href={`/team/${standingTeam.id}`}>{teamName}</Link></TableCell>
+                        <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
+                        <TableCell align="center">{standingTeam.nbWins}</TableCell>
+                        <TableCell align="center">{standingTeam.nbLosts}</TableCell>
+                        <TableCell align="center">{standingTeam.nbNulls}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        </Paper>
+      )}
+    </>
   )
 }
 

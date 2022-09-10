@@ -6,7 +6,7 @@ import { ITeam, IStandingTeam } from '../Interfaces/team';
 import { IMatch } from '../Interfaces/match';
 
 import { createHumanDate } from '../utils/dateFormatter'
-
+import { sxGroupStyles } from '../utils/theme';
 
 interface IScoreboardProps {
   teamHome:       ITeam;
@@ -29,14 +29,15 @@ function Scoreboard(props: IScoreboardProps) {
   const isTeamStandings = standingTeams && teamHomeStanding && teamAwayStanding;
 
   return (
-    <Stack alignItems="center">
+    
+    <Stack alignItems="center" spacing={1} sx={{width:'100%'}}>
       <Typography variant={titleLevel || 'h6'}>
         {hasLinkMatchDetails ? (
         <Link href={`/match/${match.id}`}>{tableTitle}</Link>
         ) : tableTitle }
       </Typography>
       <Typography variant="subtitle1">{dateReadable}</Typography>
-      <TableContainer component={Paper} sx={{width:'auto'}}>
+      <TableContainer component={Paper} sx={sxGroupStyles.tableContainerSmallest}>
         <Table size="small" aria-label={tableTitle}>
           <TableHead>
             <TableRow>

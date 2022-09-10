@@ -7,6 +7,7 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
 export interface IApiFetchTeamsParams {
   teamIds?: Array<number>;
   allTeams?: boolean;
+  leagueIds?: Array<number>;
 }
 export const fetchTeams = async (bodyParams: IApiFetchTeamsParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/team/`,bodyParams)
@@ -33,9 +34,9 @@ export const fetchStandingTeams = async (bodyParams: IApiFetchStandingTeamsParam
 }
 
 export interface IApiFetchLeagueTeamsParams {
-  
+  leagueIds?:Array<number>;
 }
-export const fetchLeagueTeams = async (bodyParams: IApiFetchTeamsParams) => {
+export const fetchLeagueTeams = async (bodyParams: IApiFetchLeagueTeamsParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/team-league/`,bodyParams)
     .then(response => {
       return Promise.resolve(response.data);

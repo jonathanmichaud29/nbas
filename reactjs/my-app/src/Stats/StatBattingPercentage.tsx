@@ -6,6 +6,7 @@ import { Bar } from 'react-chartjs-2';
 import { IStatBattingPercentageProps } from '../Interfaces/stats';
 
 import { chartColors } from '../utils/colorCodes'
+import { sxGroupStyles } from '../utils/theme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend); // Vertical Bar
 
@@ -62,7 +63,7 @@ function StatBattingPercentage(props: IStatBattingPercentageProps) {
   };
 
   return (
-    <Box style={{position:'relative', height:'300px'}}>
+    <Box sx={sxGroupStyles.boxWrapperChart}>
       <Bar options={chartOptionsPercentage} data={dataChartBattingPercentage} />
     </Box>
   )

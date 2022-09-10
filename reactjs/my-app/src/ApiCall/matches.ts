@@ -43,6 +43,7 @@ export interface IApiFetchMatchLineups {
   allLineups?: boolean;
   matchId?: number;
   teamId?: number;
+  teamIds?: Array<number>;
   playerIds?: Array<number>;
 }
 export const fetchMatchLineups = async(bodyParams: IApiFetchMatchLineups) => {

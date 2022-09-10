@@ -111,3 +111,21 @@ export const defaultTheme = createTheme({
     },
   },
 });
+
+export const sxGroupStyles = {
+  tableContainerSmallest:{
+    width:{
+      xs:'100%', 
+      sm:'auto'
+    }
+  },
+  boxWrapperChart:{
+    width:'100%', 
+    position:'relative', 
+    height:'300px'
+  },
+  tabSwitchLeague:{
+    fontSize:{xs:'0.8em', sm:'0.875em'},
+    padding:{xs:'8px 12px', sm:'12px 16px'}
+  }
+}

@@ -1,18 +1,26 @@
-import { Tabs, Tab, Paper, AppBar } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { ILeaguePlayer } from "../Interfaces/league";
+
 import { RootState } from "../redux/store";
+
+import { Tabs, Tab, Paper, AppBar } from "@mui/material";
+
+import { ILeague, ILeaguePlayer } from "../Interfaces/league";
+
 import { getLeagueName } from "../utils/dataAssociation";
+import { sxGroupStyles } from "../utils/theme";
 
 interface IChangePublicLeague {
-  playersLeagues:ILeaguePlayer[];
+  leagues?:ILeague[];
+  defaultLeagueId?:number;
+  hideAllLeagueOption?:boolean;
+  playersLeagues?:ILeaguePlayer[];
   onLeagueChange?(idLeague: number): void;
 }
 function ChangePublicLeague(props:IChangePublicLeague) {
-  const { playersLeagues, onLeagueChange } = props;
+  const { leagues, defaultLeagueId, hideAllLeagueOption, playersLeagues, onLeagueChange } = props;
 
-  const [selectedLeague, setSelectedLeague] = useState<number>(0);
+  const [selectedLeague, setSelectedLeague] = useState<number>(defaultLeagueId || 0);
 
   const listLeagues = useSelector((state: RootState) => state.leagues )
 
@@ -21,10 +29,6 @@ function ChangePublicLeague(props:IChangePublicLeague) {
     onLeagueChange && onLeagueChange(newValue);
   }
 
-  const tabSX = {
-    fontSize:{xs:'0.8em', sm:'0.875em'},
-    padding:{xs:'8px 12px', sm:'12px 16px'}
-  }
   return (
     <AppBar position="sticky" color="transparent">
       <Paper color="primary">
@@ -36,9 +40,22 @@ function ChangePublicLeague(props:IChangePublicLeague) {
           allowScrollButtonsMobile={true}
           orientation='horizontal'
         >
-          <Tab key={`tab-league-0`} label="All" sx={tabSX}/>
-          {playersLeagues.map((playerLeague:ILeaguePlayer) => (
-            <Tab key={`tab-league-${playerLeague.idLeague}`} label={getLeagueName(playerLeague.idLeague, listLeagues)} sx={tabSX}/>
+          {!hideAllLeagueOption && <Tab key={`tab-league-0`} label="All" value={0} sx={sxGroupStyles.tabSwitchLeague}/>}
+          {playersLeagues && playersLeagues.map((playerLeague:ILeaguePlayer) => (
+            <Tab 
+              key={`tab-league-${playerLeague.idLeague}`} 
+              label={getLeagueName(playerLeague.idLeague, listLeagues)} 
+              value={playerLeague.idLeague} 
+              sx={sxGroupStyles.tabSwitchLeague}
+            />
+          ))}
+          {leagues && leagues.map((league:ILeague) => (
+            <Tab 
+              key={`tab-league-${league.id}`} 
+              label={league.name} 
+              value={league.id} 
+              sx={sxGroupStyles.tabSwitchLeague}
+            />
           ))}
         </Tabs>
       </Paper>
