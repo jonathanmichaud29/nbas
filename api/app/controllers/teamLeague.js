@@ -13,6 +13,10 @@ exports.getLeagueTeams = async (req, res, next) => {
     query = "SELECT * FROM team_league WHERE idLeague IN ?";
     values.push([req.body.leagueIds]);
   }
+  else if( req.body.teamIds !== undefined ){
+    query = "SELECT * FROM team_league WHERE idTeam IN ?";
+    values.push([req.body.teamIds]);
+  }
   else {
     query = "SELECT * FROM team_league WHERE idLeague=?";
     values.push(selectedLeagueId);

@@ -1,5 +1,6 @@
 import { IPlayer } from './player';
 import { IMatch, IMatchLineup } from './match';
+import { ILeague } from './league';
 
 export interface ITeam{
   id: number;
@@ -23,6 +24,7 @@ export interface ITeamPlayers{
 
 export interface ITeamProfileProps{
   team: ITeam;
+  league: ILeague;
 }
 
 export interface ITeamPlayersProps {

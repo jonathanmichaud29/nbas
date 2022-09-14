@@ -1,4 +1,4 @@
-import { Paper, Link, Typography, Stack } from "@mui/material";
+import { Paper, Link, Typography, Stack, Alert } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 import { Variant } from "@mui/material/styles/createTypography";
 
@@ -37,51 +37,56 @@ function Scoreboard(props: IScoreboardProps) {
         ) : tableTitle }
       </Typography>
       <Typography variant="subtitle1">{dateReadable}</Typography>
-      <TableContainer component={Paper} sx={sxGroupStyles.tableContainerSmallest}>
-        <Table size="small" aria-label={tableTitle}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Team</TableCell>
-              { match.isCompleted === 1 && <TableCell align="center">Points</TableCell> }
-              { isTeamStandings && (
-                <>
-                  <TableCell align="center">W</TableCell> 
-                  <TableCell align="center">L</TableCell>
-                  <TableCell align="center">N</TableCell>
-                </>
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell><Link href={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
-              { match.isCompleted === 1 && (
-                <TableCell align="center">{match.teamHomePoints}</TableCell> 
-              )}
-              { isTeamStandings && (
-                <>
-                  <TableCell align="center">{teamHomeStanding.nbWins}</TableCell>
-                  <TableCell align="center">{teamHomeStanding.nbLosts}</TableCell>
-                  <TableCell align="center">{teamHomeStanding.nbNulls}</TableCell>
-                </>
-              )}
-            </TableRow>
-            <TableRow>
-            <TableCell><Link href={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
-              { match.isCompleted === 1 && (
-                <TableCell align="center">{match.teamAwayPoints}</TableCell> 
-              )}
-              { isTeamStandings && (
-                <>
-                  <TableCell align="center">{teamAwayStanding.nbWins}</TableCell>
-                  <TableCell align="center">{teamAwayStanding.nbLosts}</TableCell>
-                  <TableCell align="center">{teamAwayStanding.nbNulls}</TableCell>
-                </>
-              )}
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      { match.isCompleted !== 1 ? (
+        <Alert severity="info">Match is incompleted</Alert>
+      ) : (
+        <TableContainer component={Paper} sx={sxGroupStyles.tableContainerSmallest}>
+          <Table size="small" aria-label={tableTitle}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Team</TableCell>
+                { match.isCompleted === 1 && <TableCell align="center">Points</TableCell> }
+                { isTeamStandings && (
+                  <>
+                    <TableCell align="center">W</TableCell> 
+                    <TableCell align="center">L</TableCell>
+                    <TableCell align="center">N</TableCell>
+                  </>
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell><Link href={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
+                { match.isCompleted === 1 && (
+                  <TableCell align="center">{match.teamHomePoints}</TableCell> 
+                )}
+                { isTeamStandings && (
+                  <>
+                    <TableCell align="center">{teamHomeStanding.nbWins}</TableCell>
+                    <TableCell align="center">{teamHomeStanding.nbLosts}</TableCell>
+                    <TableCell align="center">{teamHomeStanding.nbNulls}</TableCell>
+                  </>
+                )}
+              </TableRow>
+              <TableRow>
+              <TableCell><Link href={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
+                { match.isCompleted === 1 && (
+                  <TableCell align="center">{match.teamAwayPoints}</TableCell> 
+                )}
+                { isTeamStandings && (
+                  <>
+                    <TableCell align="center">{teamAwayStanding.nbWins}</TableCell>
+                    <TableCell align="center">{teamAwayStanding.nbLosts}</TableCell>
+                    <TableCell align="center">{teamAwayStanding.nbNulls}</TableCell>
+                  </>
+                )}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      
     </Stack>
   )
 }

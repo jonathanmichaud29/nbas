@@ -22,7 +22,7 @@ function CustomDataGrid(props: ICustomDataGrid) {
 
   let initialState = props.initialState;
   if (props.rows.length < 2){
-    initialState.columns.columnVisibilityModel.playerName = false;
+    /* initialState.columns.columnVisibilityModel.playerName = false; */
   }
   return (
     <DataGrid

@@ -1,28 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 
-import { Alert, Box, CircularProgress  } from "@mui/material";
-
 import { ITeam } from "../Interfaces/team";
 
-import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
+import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import ViewTeamProfile from '../Teams/ViewTeamProfile';
+import LoaderInfo from '../Generic/LoaderInfo';
+
 import { setMetas } from '../utils/metaTags';
+import { ILeague } from '../Interfaces/league';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
+import { filterLeague } from '../utils/dataFilter';
 
 function PublicTeam() {
   let { id } = useParams();
   const idTeam = id ? parseInt(id, 10) : null;
 
   const [team, setTeam] = useState<ITeam | null>(null);
+  const [league, setLeague] = useState<ILeague | null>(null);
   const [apiError, changeApiError] = useState("");
 
-  const isLoaded = team !== null;
+  const listLeagues = useSelector((state: RootState) => state.leagues )
 
+  const isLoaded = team !== null && league !== null;
+  
   if( isLoaded ){
     setMetas({
-      title:`${team.name} Team profile`,
-      description:`NBAS ${team.name} team profile that included its standing, batting stats and each match summary played this season`
+      title:`${team.name} Team profile - ${league.name}`,
+      description:`${league.name} ${team.name} team profile that included its standing, batting stats and each match summary played the current season`
     });
   }
   
@@ -47,16 +54,37 @@ function PublicTeam() {
       });
   }, [idTeam]);
 
+  useEffect(() => {
+    if( team === null) return;
+    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
+      teamIds: [team.id]
+    }
+    fetchLeagueTeams(paramsFetchLeagueTeams)
+      .then(response => {
+        setLeague(filterLeague(response.data[0].idLeague, listLeagues))
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+  }, [listLeagues, team])
+
   return (
-    <Box p={3}>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      { team && (
+    <>
+      <LoaderInfo
+        isLoading={isLoaded}
+        msgError={apiError}
+        hasWrapper={true}
+      />
+      { isLoaded && (
         <ViewTeamProfile 
           team={team}
+          league={league}
         />
       ) }
-    </Box>
+    </>
   )
 }
 export default PublicTeam;
