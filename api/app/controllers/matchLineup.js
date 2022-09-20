@@ -29,13 +29,13 @@ exports.getMatchLineups = async (req, res, next) => {
     }
     if (req.body.playerIds !== undefined) {
       wheres.push('`idPlayer` IN ?')
-      values.push([req.body.playerIds]);
+      values.push([req.body.playerIds.length>0 ? req.body.playerIds : [0] ]);
     }
   }
 
   const query = "SELECT * FROM match_lineup " +
     ( wheres.length > 0 ? "WHERE "+wheres.join(" AND ") + " " : '' );
-
+  
   const resultMainQuery = await mysqlQuery(query, values);
   let customMessage = '';
   if( resultMainQuery.status ){

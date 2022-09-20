@@ -10,7 +10,7 @@ const { getSystemPlayersByName } = require("../utils/simpleQueries");
 exports.getPlayers = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   const selectedLeagueId = castNumber(req.headers.idleague);
-
+  const listLeagueIds = req.body.leagueIds !== undefined ? req.body.leagueIds : [selectedLeagueId]
   let query = '';
   let values = [];
   let wheres = [];
@@ -20,7 +20,7 @@ exports.getPlayers = async (req, res, next) => {
   }
   if( req.body.allLeagues === undefined ){
     joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?)';
-    values.push(selectedLeagueId);
+    values.push(listLeagueIds);
   }
   if( req.body.playerIds !== undefined ){
     wheres.push('p.id IN ?')

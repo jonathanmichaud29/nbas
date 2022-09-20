@@ -1,87 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
-import { Alert, Box, CircularProgress, Grid } from "@mui/material";
+import { RootState } from "../redux/store";
 
-import { IMatch } from "../Interfaces/match";
+import { ILeague } from "../Interfaces/league";
 
-import { fetchMatches, IApiFetchMatchesParams } from "../ApiCall/matches";
+import ChangePublicLeague from "../League/ChangePublicLeague";
+import ClosestMatches from "../Matchs/ClosestMatches";
 
-import MatchResume from "../Matchs/MatchResume";
+import { getStoragePublicLeagueId, setStoragePublicLeagueId } from "../utils/localStorage";
 
 function HomePage() {
-
-  const [apiError, changeApiError] = useState("");
-  const [matchPast, setMatchPast] = useState<IMatch | null>(null);
-  const [matchUpcoming, setMatchUpcoming] = useState<IMatch | null>(null);
-
-  const isLoaded = matchPast !== null && matchUpcoming !== null;
+  const publicLeagueId = getStoragePublicLeagueId();
+  const listLeagues = useSelector((state: RootState) => state.leagues )
   
-  useEffect(() => {
-    if( matchPast !== null) return;
-
-    const queryParams: IApiFetchMatchesParams = {
-      isPast: true,
-      valueCompleted: 1,
-      quantity: 1,
-    }
-    
-    fetchMatches(queryParams)
-      .then(response => {
-        setMatchPast(response.data[0])
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  },[matchPast]);
-
-  useEffect(() => {
-    if( matchPast !== null) return;
-
-    const queryParams: IApiFetchMatchesParams = {
-      isUpcoming: true,
-      valueCompleted: 0,
-      quantity: 1,
-    }
-    
-    fetchMatches(queryParams)
-      .then(response => {
-        setMatchUpcoming(response.data[0]);
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  },[matchPast]);
+  const [selectedLeague, setSelectedLeague] = useState<ILeague | null>(listLeagues.find((league) => league.id === publicLeagueId) || null);
+  const changeSelectedLeague = (idLeague:number) => {
+    setStoragePublicLeagueId(idLeague);
+    const activeLeague = listLeagues.find((league) => league.id === idLeague) || null
+    setSelectedLeague(activeLeague);
+  }
 
   return (
-    <Box p={3}>
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      <Grid container spacing={4} justifyContent="space-around">
-        { matchPast && (
-          <Grid item sm={12} md={6}  width="100%">
-            <MatchResume 
-              title="Latest match"
-              match={matchPast}
-            />
-          </Grid>
-        )}
-        { matchUpcoming && (
-          <Grid item sm={12} md={6}  width="100%">
-            <MatchResume 
-              title="Upcoming match"
-              match={matchUpcoming}
-            />
-          </Grid>
-        )}
-      </Grid>
-    </Box>
-    
+    <>
+      <ChangePublicLeague
+        hideAllLeagueOption={true}
+        leagues={listLeagues}
+        defaultLeagueId={selectedLeague?.id || publicLeagueId}
+        onLeagueChange={changeSelectedLeague}
+      />
+      { selectedLeague !== null && (
+        <ClosestMatches
+          league={selectedLeague}
+        />
+      )}
+    </>
   )
 }
 export default HomePage;

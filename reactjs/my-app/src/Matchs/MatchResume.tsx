@@ -1,34 +1,32 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { Alert, Box, Card, CardContent, CircularProgress, Divider, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Divider, Grid, Stack, Typography } from "@mui/material";
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
-
-import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
 
 import { IMatchResumeProps } from '../Interfaces/match'
 import { ITeam, IStandingTeam } from "../Interfaces/team";
 
+import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
+
 import Scoreboard from './Scoreboard';
 import BestStatPlayers from '../Players/BestStatPlayers'
+import LoaderInfo from "../Generic/LoaderInfo";
 
 function MatchResume(props: IMatchResumeProps) {
   
   const { title, match } = props;
 
   const [apiError, changeApiError] = useState("");
-  // const [match, setMatch] = useState<IMatch | null>(null);
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
 
   const isLoaded = teamHome !== null && teamAway !== null && standingTeams !== null;
 
-  
-
-  useEffect(() => {
-    if( match === null || teamHome !== null || teamAway !== null) return;
+  useMemo(() => {
     const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway]
+      teamIds: [match.idTeamHome, match.idTeamAway],
+      leagueIds: [match.idLeague]
     }
     fetchTeams(paramsFetchTeams)
       .then(response => {
@@ -47,10 +45,9 @@ function MatchResume(props: IMatchResumeProps) {
       .finally(() => {
         
       });
-  }, [match, teamAway, teamHome])
+  }, [match])
 
-  useEffect(() => {
-    if( standingTeams !== null || match === null) return;
+  useMemo(() => {
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
       teamIds: [match.idTeamHome, match.idTeamAway]
     }
@@ -64,7 +61,8 @@ function MatchResume(props: IMatchResumeProps) {
       .finally(() => {
         
       });
-  }, [match, standingTeams])
+  }, [match])
+
 
   return (
     <Card>
@@ -72,42 +70,45 @@ function MatchResume(props: IMatchResumeProps) {
         <Grid container spacing={1} alignItems="baseline" justifyContent="center">
           <Grid item><SportsBaseballIcon color="primary"/></Grid>
           <Grid item>
-            <Typography variant="h4" component="h2" color="textPrimary">
+            <Typography variant="h2" color="textPrimary" textAlign="center">
               {title}
             </Typography>
           </Grid>
         </Grid>
       </CardContent>
-
+      
       <Divider />
 
-      { ! isLoaded && <Box><CircularProgress /></Box>}
-      { apiError && <Alert severity="error">{apiError}</Alert> }
-      
-      { isLoaded && (
-        <CardContent>
-          <Scoreboard 
-            teamHome={teamHome}
-            teamAway={teamAway}
-            match={match}
-            standingTeams={standingTeams}
-          /> 
-        </CardContent>
-      )}
-        
-      { isLoaded &&
-        <BestStatPlayers 
-          match={match}
-          team={teamHome}
-        />
-      }
-      { isLoaded &&
-        <BestStatPlayers 
-          match={match}
-          team={teamAway}
-        />
-      }
-
+      <CardContent>
+        <Stack spacing={3}>
+          <LoaderInfo
+            isLoading={isLoaded}
+            msgError={apiError}
+          />
+          { isLoaded && (
+            <Scoreboard
+              teamHome={teamHome}
+              teamAway={teamAway}
+              match={match}
+              standingTeams={standingTeams}
+              hasLinkMatchDetails={true}
+            /> 
+          )}
+          <Typography variant="h3" textAlign="center">Best players this {match.isCompleted === 0 ? 'season' : 'game'}</Typography>
+          { isLoaded && (
+            <BestStatPlayers 
+              match={match}
+              team={teamHome}
+            />
+          )}
+          { isLoaded && (
+            <BestStatPlayers 
+              match={match}
+              team={teamAway}
+            />
+          )}
+        </Stack>
+      </CardContent>
     </Card>
   )
 }

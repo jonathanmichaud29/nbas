@@ -7,11 +7,12 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
  */
 
 export interface IApiFetchMatchesParams {
-  matchIds?: Array<number>;
-  quantity?: number;
-  isPast?: boolean;
-  isUpcoming?: boolean;
-  valueCompleted?: number;
+  matchIds?       : Array<number>;
+  quantity?       : number;
+  isPast?         : boolean;
+  isUpcoming?     : boolean;
+  valueCompleted? : number;
+  leagueIds?      :Array<number>;
 }
 export const fetchMatches = async (bodyParams: IApiFetchMatchesParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/match/`, bodyParams)

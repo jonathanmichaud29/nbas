@@ -1,5 +1,6 @@
 import { ITeam } from './team'
 import {IPlayer} from './player'
+import { ILeague } from './league';
 
 export interface IMatch{
   id: number;
@@ -24,6 +25,9 @@ export interface IMatchResumeProps {
   match: IMatch;
 }
 
+export interface IClosestMatchesProps {
+  league: ILeague;
+}
 
 export interface IMatchDetailsProps {
   match: IMatch;

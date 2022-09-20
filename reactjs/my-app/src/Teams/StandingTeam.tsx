@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Box, Grid, Paper } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
 import { IStandingTeamProps }  from '../Interfaces/team'
