@@ -31,6 +31,7 @@ function HomePage() {
       />
       { selectedLeague !== null && (
         <ClosestMatches
+          key={`cm-${selectedLeague.id}`}
           league={selectedLeague}
         />
       )}

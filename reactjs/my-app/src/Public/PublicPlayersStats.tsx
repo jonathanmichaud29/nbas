@@ -1,94 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { Alert, Box, Card, CardContent, CircularProgress, Grid, Typography  } from "@mui/material";
+import { RootState } from '../redux/store';
 
-import { IPlayer } from "../Interfaces/player";
-import { IMatchLineup } from '../Interfaces/match';
+import { ILeague } from '../Interfaces/league';
 
-import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
+import ChangePublicLeague from '../League/ChangePublicLeague';
+import PlayersBattingStats from '../Players/PlayersBattingStats';
 
-import { setMetas } from '../utils/metaTags';
-
-import YearStats from '../Stats/YearStats';
+import { getStoragePublicLeagueId, setStoragePublicLeagueId } from '../utils/localStorage';
 
 function PublicPlayersStats() {
-
-  const [listPlayers, setListPlayers] = useState<IPlayer[] | null>(null);
-  const [listMatchesLineups, setListMatchesLineups] = useState<IMatchLineup[] | null>(null);
-  const [apiError, changeApiError] = useState("");
-
-  const isLoaded = listPlayers !== null && listMatchesLineups !== null;
-
-  setMetas({
-    title:`Players batting statistics`,
-    description:`League players batting statistics this season`
-  });
+  const publicLeagueId = getStoragePublicLeagueId();
+  const listLeagues = useSelector((state: RootState) => state.leagues )
   
-  /**
-   * Fetch Players
-   */
-  useEffect( () => {
-    if ( listPlayers !== null ) return;
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      allPlayers: true
-    }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        setListPlayers(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [listPlayers]);
-
-  /**
-   * Fetch Matches Lineups
-   */
-   useEffect( () => {
-    if ( listMatchesLineups !== null ) return;
-    const paramsMatchLineups: IApiFetchMatchLineups = {
-      allLineups: true,
-    }
-    fetchMatchLineups(paramsMatchLineups)
-      .then(response => {
-        setListMatchesLineups(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [listMatchesLineups]);
+  const [selectedLeague, setSelectedLeague] = useState<ILeague | null>(listLeagues.find((league) => league.id === publicLeagueId) || null);
+  const changeSelectedLeague = (idLeague:number) => {
+    setStoragePublicLeagueId(idLeague);
+    const activeLeague = listLeagues.find((league) => league.id === idLeague) || null
+    setSelectedLeague(activeLeague);
+  }
 
   return (
-    <Box p={3}>
-      <Card>
-        <CardContent>
-          <Grid container alignItems="center" justifyContent="center" flexDirection="column">
-            <Grid item xs={12} style={{width:"100%"}}>
-              <Typography variant="h2" component="h1" align='center'>League Players Standing</Typography>
-            </Grid>
-            { ! isLoaded && <Box><CircularProgress /></Box>}
-            { apiError && <Alert severity="error">{apiError}</Alert> }
-            { isLoaded && (
-              <Grid item xs={12} style={{width:"100%"}} >
-                <YearStats
-                  key={`year-players-stat`}
-                  matchLineups={listMatchesLineups}
-                  players={listPlayers}
-                  title={`League batting stats`}
-                /> 
-              </Grid>
-            )}
-          </Grid>
-        </CardContent>
-      </Card>
-    </Box>
+    <>
+      <ChangePublicLeague
+        hideAllLeagueOption={true}
+        leagues={listLeagues}
+        defaultLeagueId={selectedLeague?.id || publicLeagueId}
+        onLeagueChange={changeSelectedLeague}
+      />
+      { selectedLeague !== null && (
+        <PlayersBattingStats
+          key={`pbs-${selectedLeague.id}`}
+          league={selectedLeague}
+        />
+      )}
+    </>
   )
 }
 export default PublicPlayersStats;

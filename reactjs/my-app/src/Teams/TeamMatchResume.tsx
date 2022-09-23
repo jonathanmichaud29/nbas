@@ -25,7 +25,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   useEffect(() => {
     // Add all stats from match lineups
-    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     setAllStats(teamStats);
 
     // Reorder lineups by hit Order

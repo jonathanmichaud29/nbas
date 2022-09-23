@@ -46,6 +46,7 @@ export interface IApiFetchMatchLineups {
   teamId?: number;
   teamIds?: Array<number>;
   playerIds?: Array<number>;
+  leagueIds?: Array<number>;
 }
 export const fetchMatchLineups = async(bodyParams: IApiFetchMatchLineups) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/match-lineup/`, bodyParams)

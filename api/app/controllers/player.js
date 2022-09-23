@@ -18,8 +18,12 @@ exports.getPlayers = async (req, res, next) => {
   if( req.body.allPlayers === undefined && req.body.playerIds === undefined ){
     return appResponse(res, next, true, {}, {});
   }
-  if( req.body.allLeagues === undefined ){
-    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague=?)';
+  if( req.body.leagueIds !== undefined ) {
+    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
+    values.push( listLeagueIds.length > 0 ? [listLeagueIds] : [0] );
+  }
+  else if( req.body.allLeagues === undefined ){
+    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
     values.push(listLeagueIds);
   }
   if( req.body.playerIds !== undefined ){

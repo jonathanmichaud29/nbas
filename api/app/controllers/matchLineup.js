@@ -32,6 +32,10 @@ exports.getMatchLineups = async (req, res, next) => {
       values.push([req.body.playerIds.length>0 ? req.body.playerIds : [0] ]);
     }
   }
+  if (req.body.leagueIds !== undefined) {
+    wheres.push('`idLeague` IN ?')
+    values.push([req.body.leagueIds.length>0 ? req.body.leagueIds : [0] ]);
+  }
 
   const query = "SELECT * FROM match_lineup " +
     ( wheres.length > 0 ? "WHERE "+wheres.join(" AND ") + " " : '' );

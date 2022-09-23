@@ -1,5 +1,5 @@
 import { EBatResult, IMatchLineup, IPlayerBatResult } from '../Interfaces/match';
-import { defaultPlayerLineupStats, IBattingStatsExtended, IPlayerLineupStats } from '../Interfaces/stats'
+import { defaultBattingStatsExtended, defaultPlayerLineupStats, IBattingStatsExtended, IPlayerLineupStats } from '../Interfaces/stats'
 
 export const getStatHits = (single: number, double: number, triple: number, homerun: number) => {
   return single + double + triple + homerun;
@@ -106,6 +106,28 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
   setExtendedStats(teamsStats);
 
   return teamsStats;
+}
+
+export const getCombinedStats = (matchLineups: IMatchLineup[]) => {
+  let stats: IBattingStatsExtended = Object.assign({}, defaultBattingStatsExtended);
+  
+  matchLineups.forEach((matchLineup) => {
+    stats.atBats += matchLineup.atBats;
+    stats.single += matchLineup.single;
+    stats.double += matchLineup.double;
+    stats.triple += matchLineup.triple;
+    stats.homerun += matchLineup.homerun;
+    stats.out += matchLineup.out;
+    stats.walk += matchLineup.walk;
+    stats.hitByPitch += matchLineup.hitByPitch;
+    stats.sacrificeFly += matchLineup.sacrificeFly;
+    stats.runsBattedIn += matchLineup.runsBattedIn;
+  });
+
+
+  setExtendedStats([stats]);
+
+  return stats;
 }
 
 export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {

@@ -142,10 +142,10 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     const teamAwayLineups = filterTeamLineups(matchLineups, teamAway.id);
     teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
 
-    const homeStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    const homeStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     setTeamHomeStats(homeStats);
 
-    const awayStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
+    const awayStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     setTeamAwayStats(awayStats);
 
     // Reorder lineups by hit Order

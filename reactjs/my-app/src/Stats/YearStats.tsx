@@ -10,7 +10,7 @@ import CustomDataGrid from '../Generic/CustomDataGrid';
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
-import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation'
+import { getCombinedPlayersStats, getCombinedStats, getCombinedTeamsStats } from '../utils/statsAggregation'
 
 function YearStats(props: IYearStatsProps) {
 
@@ -24,9 +24,12 @@ function YearStats(props: IYearStatsProps) {
   useEffect(() => {
     const playersStats: IBattingStatsExtended[] = getCombinedPlayersStats(matchLineups);
     setAllPlayerStats(playersStats);
-
-    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || defaultBattingStatsExtended;
-    setAllStats(teamStats);
+/* 
+    const teamStats: IBattingStatsExtended = getCombinedTeamsStats(matchLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
+    console.info(teamStats);
+ */
+    const mergeStats = getCombinedStats(matchLineups);
+    setAllStats(mergeStats);
   }, [matchLineups]);
 
   const rows = ( allPlayerStats && allPlayerStats.map((playerStats) => {
