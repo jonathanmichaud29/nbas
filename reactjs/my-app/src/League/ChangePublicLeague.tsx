@@ -40,7 +40,8 @@ function ChangePublicLeague(props:IChangePublicLeague) {
           allowScrollButtonsMobile={true}
           orientation='horizontal'
         >
-          {!hideAllLeagueOption && <Tab key={`tab-league-0`} label="All" value={0} sx={sxGroupStyles.tabSwitchLeague}/>}
+          {/* {!hideAllLeagueOption && <Tab key={`tab-league-0`} label="All" value={0} sx={sxGroupStyles.tabSwitchLeague}/>} */}
+          <Tab key={`tab-league-0`} label="All" value={0} disabled={hideAllLeagueOption} sx={sxGroupStyles.tabSwitchLeague}/>
           {playersLeagues && playersLeagues.map((playerLeague:ILeaguePlayer) => (
             <Tab 
               key={`tab-league-${playerLeague.idLeague}`} 

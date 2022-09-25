@@ -14,17 +14,18 @@ import YearStats from '../Stats/YearStats';
 import ProgressionStats from '../Stats/ProgressionStats';
 import ChangePublicLeague from '../League/ChangePublicLeague';
 import LoaderInfo from '../Generic/LoaderInfo';
+import { filterMatchesByLeague, filterMatchesLineupsByLeague } from '../utils/dataFilter';
 
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
-  const { player, playersLeagues } = props;
+  const { player, playersLeagues, league } = props;
 
   const [apiError, changeApiError] = useState("");
   const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
-  const [listMatches, setListMatches] = useState<IMatch[] | null>(null);
-  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[] | null>(null);
-  const [selectedLeague, setSelectedLeague] = useState<number>(0);
+  const [listMatches, setListMatches] = useState<IMatch[]>([]);
+  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[]>([]);
+  /* const [selectedLeague, setSelectedLeague] = useState<number>(0); */
 
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null;
 
@@ -48,19 +49,13 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
       })
   }, [player.id])
 
-  const changeSelectedLeague = (idLeague:number) => {
-    setSelectedLeague(idLeague);
-  }
+
+  const filteredMatches = league !== null ? filterMatchesByLeague(listMatches, league.id) : listMatches;
+  const filteredMatchesLineups = league !== null ? filterMatchesLineupsByLeague(listMatchLineups, league.id) : listMatchLineups;
 
   return (
     <>
-      { playersLeagues && (
-        <ChangePublicLeague
-          playersLeagues={playersLeagues}
-          onLeagueChange={changeSelectedLeague}
-        />
-      )}
-      <Paper component={Box} p={1} m={3}>
+      <Paper component={Box} p={3} m={3}>
         <Stack spacing={3} alignItems="center" pb={3} width="100%">
           <LoaderInfo
             isLoading={isLoaded}
@@ -73,7 +68,7 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
           { isLoaded && (
             <YearStats
               key={`player-year-stat-${player.id}`}
-              matchLineups={selectedLeague === 0 ? listMatchLineups : listMatchLineups.filter((matchLineup) => matchLineup.idLeague === selectedLeague)}
+              matchLineups={filteredMatchesLineups}
               players={[player]}
               title={`League batting stats`}
             /> 
@@ -81,8 +76,8 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
           { isLoaded && (
             <ProgressionStats
               key={`progression-player-stat-${player.id}`}
-              matches={selectedLeague === 0 ? listMatches : listMatches.filter((match) => match.idLeague === selectedLeague)}
-              matchLineups={selectedLeague === 0 ? listMatchLineups : listMatchLineups.filter((matchLineup) => matchLineup.idLeague === selectedLeague)}
+              matches={filteredMatches}
+              matchLineups={filteredMatchesLineups}
               teams={listTeams}
             />
           )}
@@ -94,7 +89,7 @@ function ViewPlayerProfile(props: IPlayerProfileProps) {
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" pb={3} width="100%">
             <Typography variant="h2">Player match history</Typography>
-            { listMatches.filter((match) => selectedLeague === 0 || match.idLeague === selectedLeague).map((match: IMatch) => {
+            { filteredMatches.map((match: IMatch) => {
               const teamHome = listTeams.find((team) => team.id === match.idTeamHome)
               const teamAway = listTeams.find((team) => team.id === match.idTeamAway)
               const playerLineup = listMatchLineups.find((lineup) => lineup.idMatch === match.id)

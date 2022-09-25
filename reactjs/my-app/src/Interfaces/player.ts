@@ -14,6 +14,7 @@ export interface IPlayerProps{
 export interface IPlayerProfileProps{
   player: IPlayer;
   playersLeagues: ILeaguePlayer[];
+  league: ILeague | null;
 }
 
 export interface IPlayerMatchResumeProps {
