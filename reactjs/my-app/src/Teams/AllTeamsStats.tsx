@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Box, Grid, Paper, Stack, Typography } from '@mui/material'
 
 import { IAllTeamsStatsProps } from '../Interfaces/team'
 import { IBattingStatsExtended } from '../Interfaces/stats';
-import { IMatchLineup } from '../Interfaces/match';
 
 import { IApiFetchMatchLineups, fetchMatchLineups } from '../ApiCall/matches';
 
@@ -19,7 +18,6 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
 
   const {teams} = props;
 
-  const [matchesLineups, setMatchesLineups] = useState<IMatchLineup[] | null>(null);
   const [allTeamsStats, setAllTeamsStats] = useState<IBattingStatsExtended[] | null>(null);
   const [apiError, changeApiError] = useState("");
 
@@ -28,14 +26,15 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
   /**
    * Fetch Matches Lineups
    */
-  useEffect( () => {
+  useMemo( () => {
     
     const paramsMatchLineups: IApiFetchMatchLineups = {
       teamIds: teams.map((team) => team.id),
     }
     fetchMatchLineups(paramsMatchLineups)
       .then(response => {
-        setMatchesLineups(response.data)
+        const teamsStats = getCombinedTeamsStats(response.data);
+        setAllTeamsStats(teamsStats);
       })
       .catch(error => {
         changeApiError(error);
@@ -44,14 +43,6 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
         
       });
   }, [teams]);
-
-  useEffect(() => {
-    if(  matchesLineups === null ) return;
-
-    const teamsStats = getCombinedTeamsStats(matchesLineups);
-    setAllTeamsStats(teamsStats);
-
-  }, [matchesLineups, teams]);
 
   return (
     <>
@@ -82,7 +73,6 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
                     xs={12} sm={6} md={3}
                     justifyContent="center"
                     alignItems="center"
-                    spacing={3}
                   >
                     <Stack spacing={3} alignItems="center" sx={{width:'100%'}}>
                       <Typography variant="h6" component="h3">

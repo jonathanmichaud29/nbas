@@ -25,7 +25,7 @@ exports.getMatchLineups = async (req, res, next) => {
     }
     if (req.body.teamIds !== undefined) {
       wheres.push('`idTeam` IN ?')
-      values.push([req.body.teamIds]);
+      values.push([req.body.teamIds.length > 0 ? req.body.teamIds : [0] ]);
     }
     if (req.body.playerIds !== undefined) {
       wheres.push('`idPlayer` IN ?')

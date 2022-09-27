@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+
+import { RootState } from '../redux/store';
 
 import { ITeam } from '../Interfaces/team';
 import { ILeague, ILeagueTeam } from '../Interfaces/league';
 
-import { fetchLeagues, IApiFetchLeaguesParams } from '../ApiCall/leagues';
 import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import LoaderInfo from '../Generic/LoaderInfo';
@@ -13,48 +15,27 @@ import AllTeamsStats from '../Teams/AllTeamsStats';
 
 import { setMetas } from '../utils/metaTags';
 import { getStoragePublicLeagueId, setStoragePublicLeagueId } from '../utils/localStorage';
-import { getLeagueName } from '../utils/dataAssociation';
 
 function PublicTeamsStats() {
   const publicLeagueId = getStoragePublicLeagueId();
-  const [listLeagues, setListLeagues] = useState<ILeague[] | null>(null);
-  const [selectedLeagueId, setSelectedLeagueId] = useState<number | null>(publicLeagueId !== 0 ? publicLeagueId : null);
+  const listLeagues = useSelector((state: RootState) => state.leagues )
+  const [selectedLeague, setSelectedLeague] = useState<ILeague | null>(listLeagues.find((league) => league.id === publicLeagueId) || null);
+
+  const changeSelectedLeague = (idLeague:number) => {
+    setStoragePublicLeagueId(idLeague);
+    const activeLeague = listLeagues.find((league) => league.id === idLeague) || null
+    setSelectedLeague(activeLeague);
+  }
 
   const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
   const [listLeaguesTeams, setListLeaguesTeams] = useState<ILeagueTeam[] | null>(null);
   const [apiError, changeApiError] = useState("");
 
-  const isLoaded = listLeagues !== null && selectedLeagueId !== null && listTeams !== null && listLeaguesTeams !== null;
 
-  const changeSelectedLeague = (idLeague:number) => {
-    setStoragePublicLeagueId(idLeague);
-    setSelectedLeagueId(idLeague);
-  }
-
-  /**
-   * Fetch Leagues
-   */
-  if( listLeagues === null){
-    const paramsFetchLeagues: IApiFetchLeaguesParams = {
-      allLeagues:true
-    }
-    fetchLeagues(paramsFetchLeagues)
-      .then(response => {
-        setListLeagues(response.data);
-        if( selectedLeagueId === null && response.data[0]){
-          setSelectedLeagueId(response.data[0].id)
-          setStoragePublicLeagueId(response.data[0].id);
-        }
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }
-  useEffect(()=>{
-    if( listLeagues === null) return;
+  useMemo(()=>{
+    /**
+     * Fetch all team-league association
+     */
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       leagueIds: listLeagues.map((league) => league.id)
     }
@@ -68,22 +49,10 @@ function PublicTeamsStats() {
       .finally(() => {
         
       });
-  },[listLeagues])
-
-  useEffect(() =>{
-    if( selectedLeagueId === null || listLeagues === null) return;
-    const leagueName = getLeagueName(selectedLeagueId, listLeagues);
-    setMetas({
-      title:`${leagueName} Teams standing`,
-      description:`${leagueName} teams standing this season with team batting statistics`
-    });
-  },[listLeagues, selectedLeagueId])
-
-  /**
-   * Fetch Teams
-   */
-  useEffect( () => {
-    if ( listTeams !== null || listLeagues === null ) return;
+    
+    /**
+     * Fetch all teams details
+     */
     const paramsFetchTeams: IApiFetchTeamsParams = {
       allTeams: true,
       leagueIds: listLeagues.map((league) => league.id)
@@ -98,13 +67,20 @@ function PublicTeamsStats() {
       .finally(() => {
         
       });
-  }, [listLeagues, listTeams]);
+  },[listLeagues])
+
+  useMemo(() =>{
+    setMetas({
+      title:`${selectedLeague?.name} Teams standing`,
+      description:`${selectedLeague?.name} teams standing this season with team batting statistics`
+    });
+  },[selectedLeague])
+
   
-  const getTeamsInLeague = useCallback((): ITeam[] => {
-    const leagueTeams = listLeaguesTeams?.filter((leagueTeam) => leagueTeam.idLeague === selectedLeagueId);
-    const teamsId = leagueTeams?.map((leagueTeam) => leagueTeam.idTeam)
-    return (listTeams ? listTeams.filter((team) => teamsId?.includes(team.id) ) : [])
-  }, [listLeaguesTeams, listTeams, selectedLeagueId]);
+  const leagueTeamsIds = listLeaguesTeams?.filter((leagueTeam) => leagueTeam.idLeague === selectedLeague?.id).map((leagueTeam) => leagueTeam.idTeam);
+  const listLeagueTeams = (listTeams ? listTeams.filter((team) => leagueTeamsIds?.includes(team.id) ) : []);
+
+  const isLoaded = listLeagueTeams !== null && listTeams !== null;
 
   return (
     <>
@@ -113,22 +89,24 @@ function PublicTeamsStats() {
         msgError={apiError}
         hasWrapper={true}
       />
-      { isLoaded && (
-        <ChangePublicLeague
-          leagues={listLeagues}
-          hideAllLeagueOption={true}
-          defaultLeagueId={selectedLeagueId}
-          onLeagueChange={changeSelectedLeague}
-        />
-      )}
-      { isLoaded && (
+      
+      <ChangePublicLeague
+        leagues={listLeagues}
+        hideAllLeagueOption={true}
+        defaultLeagueId={selectedLeague?.id || publicLeagueId}
+        onLeagueChange={changeSelectedLeague}
+      />
+      
+      { listLeagueTeams.length > 0 && (
         <AllTeamsStanding 
-          teams={getTeamsInLeague()}
+          key={`teams-standing-${selectedLeague?.id}`}
+          teams={listLeagueTeams}
         />
       ) }
-      { isLoaded && (
+      { listLeagueTeams.length > 0 && (
         <AllTeamsStats 
-          teams={getTeamsInLeague()}
+          key={`teams-stats-${selectedLeague?.id}`}
+          teams={listLeagueTeams}
         />
       ) }
     </>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Box, Link, Paper, Stack, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
@@ -21,7 +21,7 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
 
   const isLoaded = standingTeams !== null;
 
-  useEffect(() => {
+  useMemo(() => {
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
       teamIds: teams.map((team) => team.id) || [0]
     }
