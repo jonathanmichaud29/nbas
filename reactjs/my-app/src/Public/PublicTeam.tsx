@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux';
+
+import { RootState } from '../redux/store';
 
 import { ITeam } from "../Interfaces/team";
+import { ILeague } from '../Interfaces/league';
 
 import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
@@ -9,14 +13,12 @@ import ViewTeamProfile from '../Teams/ViewTeamProfile';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { setMetas } from '../utils/metaTags';
-import { ILeague } from '../Interfaces/league';
-import { RootState } from '../redux/store';
-import { useSelector } from 'react-redux';
 import { filterLeague } from '../utils/dataFilter';
+import { castNumber } from '../utils/castValues';
 
 function PublicTeam() {
-  let { id } = useParams();
-  const idTeam = id ? parseInt(id, 10) : null;
+  const { id } = useParams();
+  const idTeam = castNumber(id);
 
   const [team, setTeam] = useState<ITeam | null>(null);
   const [league, setLeague] = useState<ILeague | null>(null);
@@ -34,30 +36,12 @@ function PublicTeam() {
   }
   
   /**
-   * Fetch Match details
+   * Fetch Team League
    */
-  useEffect( () => {
-    if ( idTeam === null ) return;
 
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [idTeam]
-    }
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        setTeam(response.data[0])
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [idTeam]);
-
-  useEffect(() => {
-    if( team === null) return;
+   useMemo(() => {
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
-      teamIds: [team.id]
+      teamIds: [idTeam]
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
@@ -69,7 +53,30 @@ function PublicTeam() {
       .finally(() => {
         
       });
-  }, [listLeagues, team])
+  }, [idTeam, listLeagues])
+
+  /**
+   * Fetch Team
+   */  
+  useMemo(() => {
+    if( league === null) return;
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      teamIds: [idTeam],
+      leagueIds: [league.id]
+    }
+    fetchTeams(paramsFetchTeams)
+      .then(response => {
+        setTeam(response.data[0])
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+  },[idTeam, league])
+
+  
 
   return (
     <>

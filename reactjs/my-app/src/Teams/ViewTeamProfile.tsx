@@ -1,7 +1,6 @@
+import { useMemo, useState } from 'react';
 
-import { useEffect, useState } from 'react';
-
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Box, Divider, Paper, Stack, Typography } from "@mui/material";
 
 import { ITeamProfileProps, ITeam } from '../Interfaces/team'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
@@ -27,7 +26,7 @@ function ViewTeamProfile(props: ITeamProfileProps) {
 
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null && listPlayers !== null;
 
-  useEffect(() => {
+  useMemo(() => {
     const paramsHistoryMatches: IApiFetchHistoryMatchesParams = {
       teamId: team.id
     }
@@ -44,67 +43,57 @@ function ViewTeamProfile(props: ITeamProfileProps) {
       .finally(() => {
 
       })
-  }, [team.id])
+  }, [team])
+
+  const listCompletedMatches = listMatches?.filter((match) => match.isCompleted === 1) || []
 
   return (
-    <>
-      <Paper component={Box} m={3}>
-        <Stack spacing={3} p={3} alignItems="center">
-          <Typography variant="h1">
-            {team.name} Profile
-          </Typography>
-          <Typography variant="h2">
-            {league.name} League
-          </Typography>
-          <LoaderInfo
-            isLoading={isLoaded}
-            msgError={apiError}
+    <Paper component={Box} m={3} p={3}>
+      <Stack spacing={3} alignItems="center">
+        <Typography variant="h1">{team.name} - {league.name}</Typography>
+        <LoaderInfo
+          isLoading={isLoaded}
+          msgError={apiError}
+        />
+        { isLoaded && (
+          <StandingTeam
+            key={`team-standing-${team.id}`}
+            team={team}
+            matches={listMatches}
           />
-          { isLoaded && (
-            <StandingTeam
-              key={`team-standing-${team.id}`}
-              team={team}
-              matches={listMatches}
+        )}
+        {isLoaded && (
+          <YearStats
+            key={`team-year-stat-${team.id}`}
+            matchLineups={listMatchLineups}
+            players={listPlayers}
+            title={`Season batting stats`}
+          /> 
+        )}
+
+        <Divider />
+        <Typography variant="h3">Matches history</Typography>
+        
+        { listCompletedMatches.length > 0 ? listCompletedMatches.map((match) => {
+          const teamHome = listTeams?.find((team) => team.id === match.idTeamHome)
+          const teamAway = listTeams?.find((team) => team.id === match.idTeamAway)
+          const matchLineups = listMatchLineups?.filter((lineup) => lineup.idMatch === match.id)
+          if( teamHome === undefined || teamAway === undefined || matchLineups === undefined ) return '';
+          return (
+            <TeamMatchResume
+              key={`team-match-resume-${match.id}`}
+              matchLineups={matchLineups}
+              match={match}
+              players={listPlayers || []}
+              teamHome={teamHome}
+              teamAway={teamAway}
             />
-          )}
-          {isLoaded && (
-            <YearStats
-              key={`team-year-stat-${team.id}`}
-              matchLineups={listMatchLineups}
-              players={listPlayers}
-              title={`Season batting stats`}
-            /> 
-          )}
-        </Stack>
-      </Paper>
-      
-      { isLoaded && listMatches.length > 0 && (
-        <Paper component={Box} m={3}>
-          <Stack spacing={3} p={3} alignItems="center">
-            <Typography variant="h3">
-              Matches history
-            </Typography>
-            
-            { listMatches.filter((match) => match.isCompleted === 1).map((match: IMatch) => {
-              const teamHome = listTeams.find((team) => team.id === match.idTeamHome)
-              const teamAway = listTeams.find((team) => team.id === match.idTeamAway)
-              const matchLineups = listMatchLineups.filter((lineup) => lineup.idMatch === match.id)
-              if( teamHome === undefined || teamAway === undefined || matchLineups === undefined ) return '';
-              return (
-                <TeamMatchResume
-                  key={`team-match-resume-${match.id}`}
-                  matchLineups={matchLineups}
-                  match={match}
-                  players={listPlayers}
-                  teamHome={teamHome}
-                  teamAway={teamAway}
-                />
-              )
-            })}
-          </Stack>
-        </Paper>
-      )}
-    </>
+          )
+        }) : (
+          <Alert severity='info'>No Match found</Alert>
+        )}
+      </Stack>
+    </Paper>
   )
 }
 
