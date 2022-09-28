@@ -72,7 +72,7 @@ function ViewTeamProfile(props: ITeamProfileProps) {
         )}
 
         <Divider />
-        <Typography variant="h3">Matches history</Typography>
+        <Typography variant="h2">Matches history</Typography>
         
         { listCompletedMatches.length > 0 ? listCompletedMatches.map((match) => {
           const teamHome = listTeams?.find((team) => team.id === match.idTeamHome)

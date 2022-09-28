@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { RootState } from "../redux/store";
 
-import { Tabs, Tab, Paper, AppBar } from "@mui/material";
+import { Tabs, Tab, Paper, AppBar, Alert } from "@mui/material";
 
 import { ILeague, ILeaguePlayer } from "../Interfaces/league";
 
@@ -40,7 +40,6 @@ function ChangePublicLeague(props:IChangePublicLeague) {
           allowScrollButtonsMobile={true}
           orientation='horizontal'
         >
-          {/* {!hideAllLeagueOption && <Tab key={`tab-league-0`} label="All" value={0} sx={sxGroupStyles.tabSwitchLeague}/>} */}
           <Tab key={`tab-league-0`} label="All" value={0} disabled={hideAllLeagueOption} sx={sxGroupStyles.tabSwitchLeague}/>
           {playersLeagues && playersLeagues.map((playerLeague:ILeaguePlayer) => (
             <Tab 
@@ -59,6 +58,9 @@ function ChangePublicLeague(props:IChangePublicLeague) {
             />
           ))}
         </Tabs>
+        { hideAllLeagueOption && defaultLeagueId === 0 && (
+          <Alert severity="info">A league is required to display information</Alert>
+        )}
       </Paper>
     </AppBar>
     

@@ -34,6 +34,7 @@ export interface IMatchDetailsProps {
 }
 
 export interface IListMatchProps{
+  league?: ILeague;
   isAdmin?: boolean;
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
 import { Alert, Box, Grid, IconButton, Paper, Stack, Tooltip, Typography  } from "@mui/material";
@@ -6,23 +6,22 @@ import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
 
-import { IMatch, IListMatchProps } from '../Interfaces/match';
-import { ITeam } from '../Interfaces/team';
-
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatches, removeMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
 import { addLeagueTeams } from '../redux/leagueTeamSlice';
 
+import { IMatch, IListMatchProps } from '../Interfaces/match';
+import { ITeam } from '../Interfaces/team';
+
 import { deleteMatch, fetchMatches, IApiDeleteMatchParams, IApiFetchMatchesParams } from '../ApiCall/matches'
 import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams'
-
-import { createHumanDate } from '../utils/dateFormatter';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import LoaderInfo from '../Generic/LoaderInfo';
 import InfoDialog from '../Generic/InfoDialog';
 
+import { createHumanDate } from '../utils/dateFormatter';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,17 +29,13 @@ function ListMatches(props: IListMatchProps) {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLeagueTeamsLoaded, setIsLeagueTeamsLoaded] = useState(false);
-  const [isTeamsLoaded, setIsTeamsLoaded] = useState(false);
 
-  const { isAdmin } = props;
+  const { league, isAdmin } = props;
 
   const listMatches = useSelector((state: RootState) => state.matches )
   const listTeams = useSelector((state: RootState) => state.teams )
   const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
 
-  const orderedMatches = [...listMatches];
-  orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -71,9 +66,15 @@ function ListMatches(props: IListMatchProps) {
       });
   }
   
-  useEffect(() => {
-    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
+  /**
+   * Fetch League Teams
+   */
+  useMemo(() => {
+    let paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       
+    }
+    if( league !== undefined ){
+      paramsFetchLeagueTeams.leagueIds = [league.id]
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
@@ -83,16 +84,20 @@ function ListMatches(props: IListMatchProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLeagueTeamsLoaded(true);
+        
       });
-  }, [dispatch]);
+  }, [dispatch, league]);
 
-  useEffect(() => {
-    if( ! isLeagueTeamsLoaded || isTeamsLoaded ) return;
-
+  /**
+   * Fetch Teams Details
+   */
+  useMemo(() => {
     const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
-    const paramsFetchTeams: IApiFetchTeamsParams = {
+    let paramsFetchTeams: IApiFetchTeamsParams = {
       teamIds: teamIds
+    }
+    if( league !== undefined ){
+      paramsFetchTeams.leagueIds = [league.id]
     }
 
     fetchTeams(paramsFetchTeams)
@@ -103,13 +108,18 @@ function ListMatches(props: IListMatchProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsTeamsLoaded(true)
+        
       });
-  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
+  }, [dispatch, league, listLeagueTeams])
 
-  useEffect(() => {
-    if( ! isLeagueTeamsLoaded || ! isTeamsLoaded ) return;
-    const paramsFetchMatches: IApiFetchMatchesParams = {}
+  /**
+   * Fetch League Matches
+   */
+  useMemo(() => {
+    let paramsFetchMatches: IApiFetchMatchesParams = {}
+    if( league !== undefined ){
+      paramsFetchMatches.leagueIds = [league.id]
+    }
     fetchMatches(paramsFetchMatches)
       .then(response => {
         dispatch(addMatches(response.data));
@@ -120,7 +130,7 @@ function ListMatches(props: IListMatchProps) {
       .finally(() => {
         setIsLoaded(true)
       });
-  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded])
+  }, [dispatch, league])
 
   /**
    * Handle multiples modals
@@ -154,7 +164,10 @@ function ListMatches(props: IListMatchProps) {
     }
     setOpenConfirmDelete(false);
   }
-
+  
+  const orderedMatches = league !== undefined ? listMatches.filter((match) => match.idLeague === league.id) : [...listMatches];
+  orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
   const htmlMatches = ( orderedMatches.length > 0 ? orderedMatches.map((match: IMatch) => {
       let listActions = [];
       
@@ -224,7 +237,7 @@ function ListMatches(props: IListMatchProps) {
   
   return (
     <Paper component={Box} p={3} m={3}>
-      <Stack spacing={3} alignItems="center" pb={3}>
+      <Stack spacing={3} alignItems="center">
         <Typography variant="h2">Season Matches</Typography>
         <LoaderInfo
           isLoading={isLoaded}
