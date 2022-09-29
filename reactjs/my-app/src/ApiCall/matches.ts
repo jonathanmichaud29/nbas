@@ -12,7 +12,8 @@ export interface IApiFetchMatchesParams {
   isPast?         : boolean;
   isUpcoming?     : boolean;
   valueCompleted? : number;
-  leagueIds?      :Array<number>;
+  leagueIds?      : Array<number>;
+  isIgnoringLeague?: boolean;
 }
 export const fetchMatches = async (bodyParams: IApiFetchMatchesParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/match/`, bodyParams)

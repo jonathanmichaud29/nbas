@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
@@ -51,17 +51,14 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
                     players !== null && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
                     matchRows !== null && homeRows !== null && awayRows !== null;
 
-  if( teamHome !== null && teamAway !== null ){
-    setMetas({
-      title:`Match summary - ${teamHome.name} vs ${teamAway.name}`,
-      description:`NBAS match summary ${teamHome.name} vs ${teamAway.name} on date ${createDateReadable(match.date)}`
-    });
-  }
 
-  useEffect(() => {
-    if( matchLineups !== null && teamHome !== null && teamAway !== null ) return;
+  useMemo(() => {
+    /**
+     * Fetch Match Lineups
+     */
     const paramsMatchLineups: IApiFetchMatchLineups = {
-      matchId: match.id
+      matchId: match.id,
+      leagueIds: [match.idLeague]
     }
     fetchMatchLineups(paramsMatchLineups)
       .then((response) => {
@@ -74,8 +71,12 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
 
       })
     
+    /**
+     * Fetch Match Teams
+     */
     const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway]
+      teamIds: [match.idTeamHome, match.idTeamAway],
+      leagueIds: [match.idLeague]
     }
     fetchTeams(paramsFetchTeams)
       .then(response => {
@@ -94,28 +95,10 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [matchLineups, match, teamAway, teamHome])
 
-  useEffect(() => {
-    if( matchLineups === null || players !== null) return;
-
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: matchLineups.map((matchLineup) => matchLineup.idPlayer)
-    }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        setPlayers(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [matchLineups, players])
-
-  useEffect(() => {
-    if( standingTeams !== null || match === null) return;
+    /**
+     * Fetch Teams Standing
+     */
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
       teamIds: [match.idTeamHome, match.idTeamAway]
     }
@@ -129,41 +112,51 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [match, standingTeams])
+  }, [match])
+
+  /**
+   * Set Meta Tags values
+   */
+  useMemo(() => {
+    if( teamHome === null || teamAway === null) return;
+    setMetas({
+      title:`Match summary - ${teamHome.name} vs ${teamAway.name}`,
+      description:`NBAS match summary ${teamHome.name} vs ${teamAway.name} on date ${createDateReadable(match.date)}`
+    });
+  }, [match, teamHome, teamAway])
+
+  /**
+   * Fetch Players in Match Lineups
+   */
+  useMemo(() => {
+    if( matchLineups === null ) return;
+
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      playerIds: matchLineups.map((matchLineup) => matchLineup.idPlayer),
+      leagueIds: [match.idLeague]
+    }
+    fetchPlayers(paramsFetchPlayers)
+      .then(response => {
+        setPlayers(response.data)
+      })
+      .catch(error => {
+        changeApiError(error);
+      })
+      .finally(() => {
+        
+      });
+  }, [match, matchLineups])
 
 
-  useEffect(() => {
-    if( teamHome === null || teamAway === null || matchLineups === null || teamHomeStats !== null || teamAwayStats !== null) return;
-
-    // Add all stats from match lineups
-    const teamHomeLineups = filterTeamLineups(matchLineups, teamHome.id);
-    teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
-
-    const teamAwayLineups = filterTeamLineups(matchLineups, teamAway.id);
-    teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
-
-    const homeStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
-    setTeamHomeStats(homeStats);
-
-    const awayStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
-    setTeamAwayStats(awayStats);
-
-    // Reorder lineups by hit Order
-    
-  }, [matchLineups, teamAway, teamAwayStats, teamHome, teamHomeStats])
-
-
-  useEffect(() => {
+  
+  /**
+   * Aggregate data for DataGrid and Charts
+   */
+  useMemo(() => {
     if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
-
-    const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchLineups);
     
-    const homeLineups = filterTeamLineups(matchLineups, teamHome.id)
-    const awayLineups = filterTeamLineups(matchLineups, teamAway.id)
-
-    const homeStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(homeLineups);
-    const awayStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(awayLineups);
-
+    // Aggregate Match Data
+    const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchLineups);
     const matchRows = ( allStats.map((playerStats) => {
       return {
         id: playerStats.id,
@@ -183,7 +176,15 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     }) );
     setMatchRows(matchRows);
 
-    const homeRows = ( homeStats.map((playerStats) => {
+    // Aggregate Home Team data
+    const teamHomeLineups = filterTeamLineups(matchLineups, teamHome.id);
+    teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
+    const homeTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
+    const homePlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamHomeLineups);
+    setTeamHomeStats(homeTeamStats);
+
+
+    const homeRows = ( homePlayerStats.map((playerStats) => {
       return {
         id: playerStats.id,
         playerName: getPlayerName(playerStats.id, players),
@@ -201,8 +202,15 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       }
     }) );
     setHomeRows(homeRows);
-
-    const awayRows = ( awayStats.map((playerStats) => {
+    
+    // Aggregate Away Team data
+    const teamAwayLineups = filterTeamLineups(matchLineups, teamAway.id);
+    teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
+    const awayTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
+    const awayPlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamAwayLineups);
+    setTeamAwayStats(awayTeamStats);
+    
+    const awayRows = ( awayPlayerStats.map((playerStats) => {
       return {
         id: playerStats.id,
         playerName: getPlayerName(playerStats.id, players),
@@ -221,7 +229,8 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     }) );
     setAwayRows(awayRows);
 
-  },[matchLineups, players, teamAway, teamHome])
+  }, [matchLineups, teamAway, teamHome, players])
+
 
 
   return (
@@ -251,7 +260,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
             )}
             { matchRows.length > 0 && (
               <CustomDataGrid
-                pageSize={5}
+                pageSize={10}
                 rows={matchRows}
                 columns={playerExtendedStatsColumns}
                 initialState={defaultStateStatsColumns}
@@ -265,11 +274,11 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       { isLoaded && (
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" >
-            <Typography variant="h5" align="center">
+            <Typography variant="h2" align="center">
               {teamHome.name} Stats
             </Typography>
             <Grid container>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <StatBatResults
                   single={teamHomeStats.single}
                   double={teamHomeStats.double}
@@ -278,7 +287,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
                   out={teamHomeStats.out}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <StatBattingPercentage
                   stats={[teamHomeStats]}
                   columns={[`${teamHome.name} stats`]}
@@ -302,11 +311,11 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       { isLoaded && (
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" >
-            <Typography variant="h5" align="center">
+            <Typography variant="h2" align="center">
               {teamAway.name} Stats
             </Typography>
             <Grid container>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <StatBatResults
                   single={teamAwayStats.single}
                   double={teamAwayStats.double}
