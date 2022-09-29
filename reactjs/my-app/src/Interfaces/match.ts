@@ -1,6 +1,7 @@
 import { ITeam } from './team'
-import {IPlayer} from './player'
+import { IPlayer } from './player'
 import { ILeague } from './league';
+import { IBattingStatsExtended } from './stats';
 
 export interface IMatch{
   id: number;
@@ -78,6 +79,13 @@ export interface IMatchPlayers {
 export interface IMatchPlayer {
   match: IMatch;
   lineupPlayer: IMatchLineup
+}
+
+export interface IMatchTeamStatsProps{
+  match: IMatch;
+  team: ITeam;
+  teamStats: IBattingStatsExtended;
+  dataGridRows: any;
 }
 
 export interface ITeamMatchLineupProps {

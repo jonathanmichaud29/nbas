@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { Grid, Stack, Typography } from "@mui/material";
 
-import { IBattingStatsExtended, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
+import { IBattingStatsExtended, IYearStatsProps } from '../Interfaces/stats';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
@@ -10,7 +10,7 @@ import CustomDataGrid from '../Generic/CustomDataGrid';
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
-import { getCombinedPlayersStats, getCombinedStats, getCombinedTeamsStats } from '../utils/statsAggregation'
+import { getCombinedPlayersStats, getCombinedStats } from '../utils/statsAggregation'
 
 function YearStats(props: IYearStatsProps) {
 
