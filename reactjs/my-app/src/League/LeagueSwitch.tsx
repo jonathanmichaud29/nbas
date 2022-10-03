@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { Alert, Button, Box, Card, CardHeader, Container, Grid } from "@mui/material";
+import { Button, Box, Paper, Typography, Stack } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { resetPlayers } from '../redux/playerSlice';
@@ -11,20 +11,20 @@ import { resetTeams } from "../redux/teamSlice";
 
 import { ILeague } from "../Interfaces/league";
 
-import { fetchUserLeagues } from "../ApiCall/users";
+import { fetchUserLeagues, IApiFetchUserLeaguesParams } from "../ApiCall/users";
+
+import LoaderInfo from "../Generic/LoaderInfo";
 
 import { updateAxiosBearer } from "../utils/axios";
 import { getStorageLeagueId } from "../utils/localStorage";
 
-
 function LeagueSwitch() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [messageError, setMessageError] = useState('');
+  const [apiError, changeApiError] = useState('');
   const [selectedLeague, setCurrentLeague] = useState<ILeague | null>(null);
-  const [leagues, setLeagues] = useState<ILeague[] | null>(null);
-
-  const isLoaded = leagues !== null;
+  const [leagues, setLeagues] = useState<ILeague[]>([]);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const selectNewLeague = (league: ILeague) => {
     setCurrentLeague(league);
@@ -37,56 +37,55 @@ function LeagueSwitch() {
     dispatch(resetLeagueTeams());
   }
 
-  useEffect(() => {
-    if( leagues !== null ) return;
-
-    fetchUserLeagues({})
+  if( ! isLoaded ) {
+    const paramsUserLeagues: IApiFetchUserLeaguesParams = {}
+    fetchUserLeagues(paramsUserLeagues)
       .then(response => {
+        
+        if ( response.data.length === 0) {
+          changeApiError("There is no league assigned to your profile. Please advised the admin");
+          return;
+        }
+
         setLeagues(response.data);
         const currentLeagueId = getStorageLeagueId();
-        if ( response.data.length === 0) {
-          setMessageError("There is no league assigned to your profile. Please advised the admin");
-        }
-        else {
-          response.data.every((league: ILeague) => {
-            if( currentLeagueId === 0  || currentLeagueId === league.id ){
-              selectNewLeague(league);
-              return false;
-            }
-            return true;
-          })
-        }
+        response.data.every((league: ILeague) => {
+          if( currentLeagueId === 0  || currentLeagueId === league.id ){
+            selectNewLeague(league);
+            return false;
+          }
+          return true;
+        })
       })
-  })
-
-  
+      .catch((error) => {
+        changeApiError(error);
+      })
+      .finally(() =>{
+        setIsLoaded(true)
+      })
+  }
   
   return (
-    <Box p={3}>
-      <Container maxWidth="sm">
-        <Card>
-          <Grid container direction="column" justifyContent="center" alignItems="center">
-            <Grid item>
-              <CardHeader title="Switch league management" component="h1" />
-            </Grid>
-            { messageError && (
-              <Grid item pb={3}>
-                <Alert severity="error">{messageError}</Alert>
-              </Grid>
-            )}
-            {isLoaded && leagues.map((league) => (
-              <Grid item pb={3} key={`select-league-${league.id}`}>
-                <Button
-                  variant={selectedLeague === league ? 'outlined' : 'contained'}
-                  onClick={() => selectNewLeague(league)}
-                  disabled={selectedLeague === league}
-                >{league.name}</Button>
-              </Grid>
-            ))}
-          </Grid>
-        </Card>
-      </Container>
-    </Box>
+    <Paper component={Box} p={3} m={3}>
+      <Stack spacing={3} alignItems="center">
+        <Typography variant="h2">Change league management</Typography>
+        <LoaderInfo
+          isLoading={isLoaded}
+          msgError={apiError}
+        />
+        { selectedLeague !== null && (
+          <Typography variant="h6" component="h3">Current league: {selectedLeague.name}</Typography>
+        )}
+        {leagues.length && leagues.filter((league) => league !== selectedLeague).map((league) => (
+          <Button
+            key={`league-switch-${league.id}`}
+            variant={selectedLeague === league ? 'text' : 'contained'}
+            onClick={() => selectNewLeague(league)}
+            disabled={selectedLeague === league}
+          >{league.name}</Button>
+        ))}
+      </Stack>
+    </Paper>
   )
 }
 export default LeagueSwitch;

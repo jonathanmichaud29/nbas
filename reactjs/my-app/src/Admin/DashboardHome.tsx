@@ -1,4 +1,5 @@
-import { Box, Button, Card, CardContent, CardHeader, Container, Grid } from "@mui/material";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { logout } from "../Firebase/firebase";
 import LeagueSwitch from "../League/LeagueSwitch";
@@ -7,25 +8,16 @@ function DashboardHome() {
   
   return (
     <>
-      <Box p={3}>
-        <Container maxWidth="sm">
-          <Card>
-            <CardContent>
-              <Grid container alignItems="center" justifyContent="center">
-                <Grid item>
-                  <CardHeader title="Hello admin!" component="h1" sx={{textAlign:"center"}} />
-                </Grid>
-                <Grid item>
-                  <Button
-                    onClick={logout}
-                    variant="contained"
-                  >Logout</Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
+      <Paper component={Box} p={3} m={3}>
+        <Stack spacing={3} alignItems="center">
+          <Typography variant="h1">Hello admin!</Typography>
+          <Button
+            startIcon={<LogoutIcon />}
+            onClick={logout}
+            variant="contained"
+          >Logout</Button>
+        </Stack>
+      </Paper>
       <LeagueSwitch />
     </>
   );
