@@ -3,6 +3,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 import { logout } from "../Firebase/firebase";
 import LeagueSwitch from "../League/LeagueSwitch";
+import CreateLeague from "../League/CreateLeague";
 
 function DashboardHome() {
   
@@ -18,6 +19,8 @@ function DashboardHome() {
           >Logout</Button>
         </Stack>
       </Paper>
+      <CreateLeague
+      />
       <LeagueSwitch />
     </>
   );

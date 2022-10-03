@@ -24,7 +24,11 @@ const userControllers = require("../controllers/user");
  */
 router
   .route("/r/league/")
-  .post(/* firebaseAuthMiddleware.decodeToken,  */leagueControllers.getLeagues);
+  .post(leagueControllers.getLeagues);
+
+router
+  .route("/m/league/")
+  .post(firebaseAuthMiddleware.decodeToken, leagueControllers.createLeague);
 
 /**
  * User routes

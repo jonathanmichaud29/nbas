@@ -98,3 +98,4 @@ ADD COLUMN `idLeague` INT NOT NULL AFTER `idPlayer`;
 
 UPDATE `nbas`.`match_lineup` SET `idLeague`=1 WHERE `id`>0;
 
+ALTER TABLE `nbas`.`leagues` ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;

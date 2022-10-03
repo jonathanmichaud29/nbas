@@ -2,7 +2,7 @@ const { json } = require("express");
 const AppError = require("../utils/appError");
 const transformMysqlErrorCode = require("../utils/dbErrorTranslator");
 
-const appResponse = (response, next, status, data, error, customMessage) => {
+const appResponse = (response, next, status, data, error, customMessage, context="team") => {
   if( status ) {
     let jsonData = {
       status: "success",
@@ -15,7 +15,7 @@ const appResponse = (response, next, status, data, error, customMessage) => {
     response.status(200).json(jsonData)
   }
   else {
-    const err_message = (typeof(error) === 'string' ? error : transformMysqlErrorCode(error, "team"));
+    const err_message = (typeof(error) === 'string' ? error : transformMysqlErrorCode(error, context));
     if( process.env.LOGS_ERROR == 1){
       console.error("appResponse Error", error)
     }

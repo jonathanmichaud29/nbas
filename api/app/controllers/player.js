@@ -24,7 +24,7 @@ exports.getPlayers = async (req, res, next) => {
   }
   else if( req.body.allLeagues === undefined ){
     joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
-    values.push(listLeagueIds);
+    values.push([listLeagueIds]);
   }
   if( req.body.playerIds !== undefined ){
     wheres.push('p.id IN ?')
