@@ -7,9 +7,9 @@ const { is_missing_keys, castNumber } = require("../utils/validation")
 exports.getLeaguePlayers = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   const selectedLeagueId = castNumber(req.headers.idleague);
-
-  let query = "SELECT * FROM player_league WHERE idLeague=?";
-  let values = [selectedLeagueId]
+  const paramLeagueIds = req.body.leagueIds !== undefined ? (req.body.leagueIds.length > 0 ? [req.body.leagueIds] : [0] ) : [selectedLeagueId];
+  let query = "SELECT * FROM player_league WHERE idLeague IN ?";
+  let values = [[paramLeagueIds]]
   
   const resultMainQuery = await mysqlQuery(query, values);
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);

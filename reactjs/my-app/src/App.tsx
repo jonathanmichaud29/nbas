@@ -10,6 +10,7 @@ import {
 import PublicApp from './Public/PublicApp';
 import HomePage from './Public/HomePage'
 import PublicCalendar from "./Public/PublicCalendar";
+import PublicCompare from './Public/PublicCompare'
 import PublicMatch from './Public/PublicMatch'
 import PublicPlayer from './Public/PublicPlayer'
 import PublicPlayersStats from './Public/PublicPlayersStats'
@@ -46,6 +47,7 @@ function App() {
             <Route path="match/:id" element={<PublicMatch />} />
             <Route path="stats/players" element={<PublicPlayersStats />} />
             <Route path="stats/teams" element={<PublicTeamsStats />} />
+            <Route path="stats/compare" element={<PublicCompare />} />
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>

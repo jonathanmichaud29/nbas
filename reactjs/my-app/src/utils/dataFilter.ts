@@ -1,5 +1,7 @@
-import { ILeague } from "../Interfaces/league";
+import { ILeague, ILeaguePlayer, ILeagueTeam } from "../Interfaces/league";
 import { IMatch, IMatchLineup } from "../Interfaces/match";
+import { IPlayer } from "../Interfaces/player";
+import { ITeam } from "../Interfaces/team";
 
 export const filterTeamLineups = (matchLineups: IMatchLineup[], idTeam: number) => {
   return matchLineups.filter((matchLineup) => matchLineup.idTeam === idTeam);
@@ -22,4 +24,14 @@ export const filterMatchesLineupsByLeague = (listMatchLineups: IMatchLineup[], i
   if(listMatchLineups === null ) return [];
   if(idLeague === 0) return listMatchLineups; 
   return listMatchLineups?.filter((matchLineup) => matchLineup.idLeague === idLeague) || []
+}
+
+export const filterPlayersByLeague = (players: IPlayer[], leaguesPlayers: ILeaguePlayer[], league: ILeague) => {
+  const leaguePlayerIds = leaguesPlayers.filter((leaguePlayer) => leaguePlayer.idLeague === league.id).map((leaguePlayer) => leaguePlayer.idPlayer)
+  return players.filter((player) => leaguePlayerIds.includes(player.id) )
+}
+
+export const filterTeamsByLeague = (teams: ITeam[], leaguesTeams: ILeagueTeam[], league: ILeague) => {
+  const leagueTeamIds = leaguesTeams.filter((leagueTeam) => leagueTeam.idLeague === league.id).map((leagueTeam) => leagueTeam.idTeam)
+  return teams.filter((team) => leagueTeamIds.includes(team.id) )
 }

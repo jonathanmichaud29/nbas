@@ -1,3 +1,4 @@
+import { ILeague } from './league';
 import { IMatch, IMatchLineup } from './match'
 import { IPlayer } from './player'
 import { ITeam } from './team';
@@ -120,4 +121,18 @@ export interface IProgressionStatsProps {
   matches: IMatch[];
   matchLineups: IMatchLineup[];
   teams: ITeam[];
+}
+
+export interface ICompareBattingStatsProps {
+  battingStats: IBattingStatsExtended[];
+  players?:IPlayer[];
+  teams?:ITeam[];
+}
+
+export interface IToolComparePlayersProps{
+  league: ILeague;
+}
+
+export interface IToolCompareTeamsProps{
+  league: ILeague;
 }

@@ -21,7 +21,7 @@ export const fetchPlayers = async (bodyParams: IApiFetchPlayersParams) => {
 }
 
 export interface IApiFetchLeaguePlayersParams {
-  
+  leagueIds?:Array<number>;
 }
 export const fetchLeaguePlayers = async (bodyParams: IApiFetchPlayersParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/player-league/`,bodyParams)

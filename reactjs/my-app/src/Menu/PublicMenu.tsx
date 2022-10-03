@@ -29,6 +29,10 @@ function PublicMenu() {
       {
         label:"Calendar",
         url: "/calendar",
+      },
+      {
+        label:"Compare",
+        url: "/stats/compare",
       }
     ];
 
