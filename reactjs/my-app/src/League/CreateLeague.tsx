@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 
 import { Paper, Box, Stack, Typography, Button, CircularProgress } from "@mui/material";
+
+import { AppDispatch } from "../redux/store";
+import { addLeague } from "../redux/leagueSlice";
 
 import { createLeague, IApiCreateLeagueParams } from "../ApiCall/leagues";
 
@@ -13,6 +17,7 @@ interface IFormInput {
 }
 
 export default function CreateLeague(){
+  const dispatch = useDispatch<AppDispatch>();
 
   const [apiInfo, changeApiInfo] = useState<string>("");
   const [apiError, changeApiError] = useState<string>("");
@@ -45,6 +50,7 @@ export default function CreateLeague(){
     createLeague(paramsCreateLeague)
       .then((response) =>{
         reset()
+        dispatch(addLeague(response.data))
         changeApiSuccess(response.message);
 
       })

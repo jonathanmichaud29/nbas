@@ -7,6 +7,7 @@ import matchPlayerReducer from './matchPlayerSlice'
 import matchReducer from './matchSlice'
 import leaguePlayerReducer from './leaguePlayerSlice'
 import leagueTeamReducer from './leagueTeamSlice'
+
 export const store = configureStore({
   reducer: {
     teams: teamReducer,

@@ -13,8 +13,6 @@ import { fetchLeagues, IApiFetchLeaguesParams } from "../ApiCall/leagues";
 
 import PublicMenu from "../Menu/PublicMenu";
 
-import { updateAxiosBearer } from "../utils/axios";
-
 type TAdminData = {
   isAdmin:boolean
 }
@@ -35,19 +33,14 @@ function PublicApp() {
     if (user) {
       user.getIdToken().then(token=>{
         window.localStorage.setItem('userToken', token);
-        updateAxiosBearer()
         
         const paramsSetUserFirebaseToken: IApiSetUserFirebaseTokenParams = {
           email: user.email || '',
           token: token,
         }
         setUserFirebaseToken(paramsSetUserFirebaseToken)
-          /* .then(response => {
-            
-          }) */
           .catch(error => {
             window.localStorage.clear();
-            updateAxiosBearer()
           })
           .finally(() => {
             setAdminData(true)
@@ -57,7 +50,6 @@ function PublicApp() {
     }
     else {
       window.localStorage.clear();
-      updateAxiosBearer();
       setAdminValidate(true);
     }
   }, [user, loading]);
@@ -71,10 +63,10 @@ function PublicApp() {
         dispatch(addLeagues(response.data));
       })
       .catch(error => {
-        /* changeApiError(error); */
+        
       })
       .finally(() => {
-        /* setIsLeaguePlayersLoaded(true); */
+        
       });
   }, [dispatch]);
 

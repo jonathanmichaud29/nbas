@@ -9,7 +9,6 @@ import PublicMenu from "../Menu/PublicMenu";
 import { setDefaultAdminMetas } from '../utils/metaTags';
 
 import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
-import { updateAxiosBearer } from "../utils/axios";
 
 function AdminApp() {
   const navigate = useNavigate();
@@ -21,7 +20,6 @@ function AdminApp() {
     if (user) {
       user.getIdToken().then(token=>{
         window.localStorage.setItem('userToken', token);
-        updateAxiosBearer()
 
         const paramsSetUserFirebaseToken: IApiSetUserFirebaseTokenParams = {
           email: user.email || '',
@@ -35,13 +33,11 @@ function AdminApp() {
           })
           .catch(error => {
             window.localStorage.clear();
-            updateAxiosBearer()
           })
       })
     }
     else {
       window.localStorage.clear();
-      updateAxiosBearer();
       navigate("/admin/login");
     }
   }, [user, loading, navigate, location]);

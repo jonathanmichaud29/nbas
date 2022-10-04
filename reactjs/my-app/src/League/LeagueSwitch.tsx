@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Box, Paper, Typography, Stack } from "@mui/material";
 
-import { AppDispatch } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { resetPlayers } from '../redux/playerSlice';
 import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
 import { resetLeagueTeams } from "../redux/leagueTeamSlice";
 import { resetTeams } from "../redux/teamSlice";
+import { addLeagues } from "../redux/leagueSlice";
 
 import { ILeague } from "../Interfaces/league";
 
@@ -15,42 +16,44 @@ import { fetchUserLeagues, IApiFetchUserLeaguesParams } from "../ApiCall/users";
 
 import LoaderInfo from "../Generic/LoaderInfo";
 
-import { updateAxiosBearer } from "../utils/axios";
 import { getStorageLeagueId } from "../utils/localStorage";
 
 function LeagueSwitch() {
   const dispatch = useDispatch<AppDispatch>();
 
+  const currentLeagueId = getStorageLeagueId();
+
   const [apiError, changeApiError] = useState('');
   const [selectedLeague, setCurrentLeague] = useState<ILeague | null>(null);
-  const [leagues, setLeagues] = useState<ILeague[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  const listLeagues = useSelector((state: RootState) => state.leagues )
 
   const selectNewLeague = (league: ILeague) => {
     setCurrentLeague(league);
     window.localStorage.setItem("currentLeagueId", league.id.toString());
     window.localStorage.setItem("currentLeagueName", league.name);
-    updateAxiosBearer();
     dispatch(resetPlayers());
     dispatch(resetLeaguePlayers());
     dispatch(resetTeams());
     dispatch(resetLeagueTeams());
+
   }
 
-  if( ! isLoaded ) {
+  if( ! isLoaded ){
     const paramsUserLeagues: IApiFetchUserLeaguesParams = {}
     fetchUserLeagues(paramsUserLeagues)
       .then(response => {
-        
+        setIsLoaded(true)
         if ( response.data.length === 0) {
           changeApiError("There is no league assigned to your profile. Please advised the admin");
           return;
         }
 
-        setLeagues(response.data);
-        const currentLeagueId = getStorageLeagueId();
+        dispatch(addLeagues(response.data));
         response.data.every((league: ILeague) => {
           if( currentLeagueId === 0  || currentLeagueId === league.id ){
+            console.log("new league found and set");
             selectNewLeague(league);
             return false;
           }
@@ -61,7 +64,7 @@ function LeagueSwitch() {
         changeApiError(error);
       })
       .finally(() =>{
-        setIsLoaded(true)
+        
       })
   }
   
@@ -76,7 +79,7 @@ function LeagueSwitch() {
         { selectedLeague !== null && (
           <Typography variant="h6" component="h3">Current league: {selectedLeague.name}</Typography>
         )}
-        {leagues.length && leagues.filter((league) => league !== selectedLeague).map((league) => (
+        {listLeagues.length > 0 && listLeagues.filter((league) => league.id !== selectedLeague?.id).map((league) => (
           <Button
             key={`league-switch-${league.id}`}
             variant={selectedLeague === league ? 'text' : 'contained'}

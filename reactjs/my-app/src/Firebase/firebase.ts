@@ -9,7 +9,6 @@ import {
 import {
   getFirestore,
 } from "firebase/firestore";
-import { updateAxiosBearer } from "../utils/axios";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
@@ -62,7 +61,6 @@ const sendPasswordReset = async (email: string) => {
 
 const logout = () => {
   window.localStorage.clear();
-  updateAxiosBearer();
   signOut(auth);
   
 };
