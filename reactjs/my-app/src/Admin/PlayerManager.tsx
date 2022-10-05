@@ -7,6 +7,7 @@ function PlayerManager() {
       <CreatePlayer />
       <ListPlayers 
         isAdmin={true}
+        hasFilter={true}
       />
     </>
   )

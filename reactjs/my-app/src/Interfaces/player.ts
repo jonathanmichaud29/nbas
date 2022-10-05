@@ -9,6 +9,7 @@ export interface IPlayer{
 
 export interface IPlayerProps{
   isAdmin?: boolean;
+  hasFilter?: boolean;
 }
 
 export interface IPlayerProfileProps{

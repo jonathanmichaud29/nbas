@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
-import { Alert, Box, Grid, IconButton, Paper, Stack, Tooltip, Typography  } from "@mui/material";
+import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Tooltip, Typography  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
@@ -21,27 +21,30 @@ import ConfirmDelete from "../Modals/ConfirmDelete";
 
 import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
+import SearchPlayer from './SearchPlayer';
 
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [apiError, changeApiError] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
-  const [isLeaguePlayersLoaded, setIsLeaguePlayersLoaded] = useState(false);
-  const [isPlayersLoaded, setIsPlayersLoaded] = useState(false);
+  const { isAdmin, hasFilter } = props;
 
-  const { isAdmin } = props;
+  const [apiError, changeApiError] = useState<string>("");
+  const [apiSuccess, changeApiSuccess] = useState<string>("");
+  const [filterTerm, setFilterTerm] = useState<string>("");
 
   const listPlayers = useSelector((state: RootState) => state.players )
   const listLeaguePlayers = useSelector((state: RootState) => state.leaguePlayers )
 
-  const isLoaded = isLeaguePlayersLoaded && isPlayersLoaded;
+  const orderedPlayers = [...listPlayers]
+  orderedPlayers.sort((a:IPlayer, b:IPlayer) => a.name.localeCompare(b.name));
+  const filteredPlayers = filterTerm === '' ? orderedPlayers : orderedPlayers.filter((player:IPlayer) => player.name.toLowerCase().includes(filterTerm.toLowerCase()) )
+
+  const changeFilterTerm = (term: string) => {
+    setFilterTerm(term);
+  }
 
   const reinitializeApiMessages = () => {
     changeApiError('');
-    changeApiSuccess('');
-  }
-  const clearMsgSuccess = () => {
     changeApiSuccess('');
   }
 
@@ -60,7 +63,6 @@ function ListPlayers(props: IPlayerProps) {
         }
         dispatch(removeLeaguePlayer(leaguePlayerToRemove));
         changeApiSuccess(response.message)
-        setTimeout(clearMsgSuccess, 1500);
       })
       .catch(error => {
         changeApiError(error);
@@ -70,7 +72,7 @@ function ListPlayers(props: IPlayerProps) {
       });
   }
   
-  useEffect(() => {
+  useMemo(() => {
     const paramsFetchLeaguePlayers: IApiFetchLeaguePlayersParams = {
       
     }
@@ -82,13 +84,13 @@ function ListPlayers(props: IPlayerProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLeaguePlayersLoaded(true);
+        
       });
   }, [dispatch]);
 
-  useEffect(() => {
-    if( ! isLeaguePlayersLoaded || isPlayersLoaded ) return;
-    
+  useMemo(() => {
+    if( listLeaguePlayers === null || listLeaguePlayers.length === 0 ) return;
+
     const playerIds = listLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
     const paramsFetchPlayers: IApiFetchPlayersParams = {
       playerIds: playerIds
@@ -101,9 +103,9 @@ function ListPlayers(props: IPlayerProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setIsPlayersLoaded(true);
+        
       });
-  }, [dispatch, isLeaguePlayersLoaded, isPlayersLoaded, listLeaguePlayers])
+  }, [dispatch, listLeaguePlayers])
 
   /**
    * Handle multiples modals
@@ -127,61 +129,93 @@ function ListPlayers(props: IPlayerProps) {
     setOpenConfirmDelete(false);
   }
 
-  const htmlPlayers = ( listPlayers && listPlayers.length > 0 ? listPlayers.map((player: IPlayer) => {
-      let listActions = [];
-      let actionLabel=`${player.name} Profile`;
-      listActions.push(
-        <Tooltip title={actionLabel} key={`action-view-leaguePlayer-${player.id}`}>
-          <IconButton color="primary"
-            aria-label={actionLabel}
-            href={`/player/${player.id}`}
+  
+  const htmlPlayers = ( filteredPlayers && filteredPlayers.length > 0 ? (
+    <Box p={3} width="100%">
+      <Grid container spacing={3} flexWrap="wrap"
+        sx={{
+          flexDirection:{xs:"column", sm:"row"}
+        }}
+      >
+        { filteredPlayers.map((player: IPlayer) => {
+          let listActions = [];
+          let actionLabel=`${player.name} Profile`;
+          listActions.push(
+            <Tooltip title={actionLabel} key={`action-view-leaguePlayer-${player.id}`}>
+              <IconButton color="primary"
+                aria-label={actionLabel}
+                href={`/player/${player.id}`}
+                >
+                <AccountBoxIcon />
+              </IconButton>
+            </Tooltip>
+          )
+          if( isAdmin ) {
+            actionLabel=`Delete Player ${player.name}`
+            listActions.push(
+              <Tooltip title={actionLabel} key={`action-delete-player-${player.id}`}>
+                <IconButton color="primary"
+                  key={`action-delete-player-${player.id}`}
+                  aria-label={actionLabel}
+                  onClick={ () => handleOpenConfirmDelete(player) }
+                  >
+                  <Delete />
+                </IconButton>
+              </Tooltip>
+              
+            )
+          }
+          return (
+            <Grid item 
+              key={`player-row-${player.id}`} 
+              xs={12} sm={6} md={4} lg={3}
             >
-            <AccountBoxIcon />
-          </IconButton>
-        </Tooltip>
-      )
-      if( isAdmin ) {
-        actionLabel=`Delete Player ${player.name}`
-        listActions.push(
-          <Tooltip title={actionLabel} key={`action-delete-player-${player.id}`}>
-            <IconButton color="primary"
-              key={`action-delete-player-${player.id}`}
-              aria-label={actionLabel}
-              onClick={ () => handleOpenConfirmDelete(player) }
+              <Card raised={true}
+                sx={{
+                  '&:hover' : {
+                    backgroundColor:"#efefef"
+                  }
+                }}
               >
-              <Delete />
-            </IconButton>
-          </Tooltip>
-          
-        )
-      }
-      return (
-        <Grid key={`match-row-${player.id}`} container columnSpacing={1} pt={1} pb={1} alignItems="center" flexWrap="nowrap" justifyContent="space-between"
-          sx={{
-            flexDirection:{xs:"column", sm:"row"},
-            '&:hover':{
-              backgroundColor:'#f1f1f1'
-            }
-        }}>
-          <Grid item>{player.name}</Grid>
-          <Grid item >{ listActions.map((action) => action )}</Grid>
-        </Grid>
-      )
-  }) : (
-    <Alert severity='info'>No player found this season</Alert>
+                <CardHeader 
+                  title={player.name}
+                  titleTypographyProps={{variant:'h6'}}
+                />
+                <CardActions 
+                  sx={{
+                    justifyContent:'center'
+                  }}
+                >
+                  {listActions}
+                </CardActions>
+              </Card>
+            </Grid>
+          )
+        })}
+      </Grid>
+    </Box>
+  ) : (
+    <Alert severity='info'>{ filterTerm ? 'No player matching your search' : 'No player found this season'}</Alert>
   ));
   
   return (
     <Paper component={Box} p={3} m={3}>
-      <Stack spacing={3} alignItems="center" pb={3}>
+      <Stack spacing={3} alignItems="center">
         <Typography variant="h2">Player list</Typography>
+        { hasFilter && (
+          <SearchPlayer 
+            onChangeName={changeFilterTerm}
+          />
+        )}
         <LoaderInfo
-          isLoading={isLoaded}
           msgError={apiError}
         />
-        <InfoDialog
-          msgSuccess={apiSuccess}
-        />
+        { apiSuccess && (
+          <InfoDialog
+            msgSuccess={apiSuccess}
+          />
+        )}
+        
         { htmlPlayers }
         { currentPlayerView && isAdmin && (
           <ConfirmDelete

@@ -8,20 +8,17 @@ import { AppDispatch } from "../redux/store";
 import { addPlayer } from '../redux/playerSlice';
 import { addLeaguePlayer } from "../redux/leaguePlayerSlice";
 
-import { createPlayer, IApiCreatePlayerParams } from '../ApiCall/players';
-
 import { ILeaguePlayer, ILeaguePlayerDetails } from '../Interfaces/league';
 import { IPlayer } from '../Interfaces/player';
 import { IFieldPlayerExistsActions } from '../Interfaces/forms';
 
-import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
+import { createPlayer, IApiCreatePlayerParams } from '../ApiCall/players';
 
 import FormTextInput from '../Forms/FormTextInput';
 import FormRadioButtons from '../Forms/FormRadioButtons';
 import LoaderInfo from '../Generic/LoaderInfo';
 
-
-
+import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
 
 interface IFormInput {
   name: string;
@@ -30,22 +27,21 @@ interface IFormInput {
 
 function CreatePlayer() {
   const dispatch = useDispatch<AppDispatch>();
+
+  const currentLeagueId = getStorageLeagueId();
   const currentLeagueName = getStorageLeagueName();
   
-  const [apiInfo, changeApiInfo] = useState("");
-  const [apiError, changeApiError] = useState("");
-  const [apiWarning, changeApiWarning] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
-  const [requestStatus, setRequestStatus] = useState(false);
+  const [apiInfo, changeApiInfo] = useState<string>("");
+  const [apiError, changeApiError] = useState<string>("");
+  const [apiWarning, changeApiWarning] = useState<string>("");
+  const [apiSuccess, changeApiSuccess] = useState<string>("");
+  const [requestStatus, setRequestStatus] = useState<boolean>(false);
   const [playerExistsActions, setPlayerExistsActions] = useState<IFieldPlayerExistsActions[]>([]);
 
   const defaultValues = {
     name: "",
     existingPlayer:0
   }
-
-  const currentLeagueId = getStorageLeagueId();
-  
 
   const reinitializeApiMessages = () => {
     changeApiInfo('');
@@ -134,8 +130,8 @@ function CreatePlayer() {
 
   return (
     <Paper component={Box} p={3} m={3}>
-      <Stack spacing={1} alignItems="center" pb={3}>
-        <Typography variant="h1">{`${currentLeagueName}`}</Typography>
+      <Stack spacing={1} alignItems="center">
+        <Typography variant="h1">{`${currentLeagueName}`} Players</Typography>
         <Typography variant="subtitle1">Add new player to league</Typography>
         <LoaderInfo
           msgError={apiError}
@@ -143,36 +139,35 @@ function CreatePlayer() {
           msgInfo={apiInfo}
           msgSuccess={apiSuccess}
         />
-      </Stack>
-
-      <FormProvider {...methods}>
-        <Stack spacing={2} alignItems="center">
-          <FormTextInput
-            label={`New player name`}
-            controllerName={`name`}
-            type="text"
-            isRequired={true}
-          />
-
-          { playerExistsActions && playerExistsActions.length > 0 && (
-            <FormRadioButtons
-              listValues={playerExistsActions}
-              controllerName={`existingPlayer`}
+        <FormProvider {...methods}>
+          <Stack spacing={2} alignItems="center">
+            <FormTextInput
+              label={`New player name`}
+              controllerName={`name`}
+              type="text"
               isRequired={true}
             />
-          )}
 
-          <Button 
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            disabled={requestStatus}
-            startIcon={requestStatus && (
-              <CircularProgress size={14}/>
+            { playerExistsActions && playerExistsActions.length > 0 && (
+              <FormRadioButtons
+                listValues={playerExistsActions}
+                controllerName={`existingPlayer`}
+                isRequired={true}
+              />
             )}
-          >{requestStatus ? 'Request Sent' : 'Add Player'}</Button>
 
-        </Stack>
-      </FormProvider>
+            <Button 
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              disabled={requestStatus}
+              startIcon={requestStatus && (
+                <CircularProgress size={14}/>
+              )}
+            >{requestStatus ? 'Request Sent' : 'Add Player'}</Button>
+
+          </Stack>
+        </FormProvider>
+      </Stack>
     </Paper>
   );
 }
