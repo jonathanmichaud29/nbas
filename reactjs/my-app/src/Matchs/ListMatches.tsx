@@ -244,9 +244,11 @@ function ListMatches(props: IListMatchProps) {
           /* msgSuccess={apiSuccess} */
           msgError={apiError}
         />
-        <InfoDialog
-          msgSuccess={apiSuccess}
-        />
+        { apiSuccess && (
+          <InfoDialog
+            msgSuccess={apiSuccess}
+          />
+        )}
         {htmlMatches}
       </Stack>
 

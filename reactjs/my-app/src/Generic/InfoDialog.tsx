@@ -1,4 +1,6 @@
-import { Box, CircularProgress, Alert, Dialog } from "@mui/material";
+import { useState } from "react";
+
+import { Box, CircularProgress, Alert, Snackbar } from "@mui/material";
 
 interface IInfoDialog {
   isLoading?:   boolean;
@@ -11,6 +13,12 @@ interface IInfoDialog {
 function InfoDialog(props: IInfoDialog) {
 
   const { isLoading, msgInfo, msgSuccess, msgWarning, msgError } = props;
+  
+  const [openSuccess, setOpenSuccess] = useState<boolean>(!!msgSuccess);
+
+  const handleCloseSuccess = () => {
+    setOpenSuccess(false);
+  }
 
   return (
     <>
@@ -21,9 +29,9 @@ function InfoDialog(props: IInfoDialog) {
         <Alert severity="info">{msgInfo}</Alert>
       )}
       { !!msgSuccess && (
-        <Dialog open={true}>
-          <Alert severity="success">{msgSuccess}</Alert>
-        </Dialog>
+        <Snackbar anchorOrigin={{ horizontal:'center', vertical:'top' }} open={openSuccess} autoHideDuration={6000} onClose={handleCloseSuccess} >
+          <Alert onClose={handleCloseSuccess} severity="success">{msgSuccess}</Alert>
+        </Snackbar>
       )}
       { !!msgWarning && (
         <Alert severity="warning">{msgWarning}</Alert>

@@ -231,9 +231,11 @@ function ListTeams(props: ITeamProps) {
           isLoading={isLoaded}
           msgError={apiError}
         />
-        <InfoDialog
-          msgSuccess={apiSuccess}
-        />
+        { apiSuccess && (
+          <InfoDialog
+            msgSuccess={apiSuccess}
+          />
+        )}
         { htmlTeams }
       </Stack>
 
