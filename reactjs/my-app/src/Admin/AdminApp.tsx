@@ -9,11 +9,18 @@ import PublicMenu from "../Menu/PublicMenu";
 import { setDefaultAdminMetas } from '../utils/metaTags';
 
 import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
+import { getStorageLeagueId } from "../utils/localStorage";
 
 function AdminApp() {
   const navigate = useNavigate();
-  const [user, loading] = useAuthState(auth);
   const location = useLocation().pathname;
+  const [user, loading] = useAuthState(auth);
+  
+  useEffect(() => {
+    if( getStorageLeagueId() === 0 && location !== '/admin/dashboard'){
+      navigate('/admin/dashboard');
+    }
+  },[location, navigate])
   
   useEffect(() => {
     if (loading) return;
