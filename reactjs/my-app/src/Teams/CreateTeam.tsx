@@ -25,6 +25,7 @@ interface IFormInput {
 
 function CreateTeam() {
   const dispatch = useDispatch<AppDispatch>();
+  
   const currentLeagueName = getStorageLeagueName();
 
   const [apiError, changeApiError] = useState("");
@@ -80,35 +81,34 @@ function CreateTeam() {
   return (
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={1} alignItems="center" pb={3}>
-        <Typography variant="h1">{currentLeagueName}</Typography>
-        <Typography variant="subtitle1">Add new team to league</Typography>
+        <Typography variant="h1">{currentLeagueName} Teams</Typography>
+        <Typography variant="subtitle1">Add new team into league</Typography>
         <LoaderInfo
           msgError={apiError}
         />
+        <FormProvider {...methods}>
+          <Stack spacing={2} alignItems="center">
+            <FormTextInput
+              label={`New team name`}
+              controllerName={`name`}
+              type="text"
+              isRequired={true}
+            />
+            <Button 
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              disabled={requestStatus}
+              startIcon={requestStatus && (
+                <CircularProgress size={14}/>
+              )}
+            >{requestStatus ? 'Request Sent' : 'Add new team'}</Button>
+
+            <LoaderInfo
+              msgSuccess={apiSuccess}
+            />
+          </Stack>
+        </FormProvider>
       </Stack>
-
-      <FormProvider {...methods}>
-        <Stack spacing={2} alignItems="center">
-          <FormTextInput
-            label={`New team name`}
-            controllerName={`name`}
-            type="text"
-            isRequired={true}
-          />
-          <Button 
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            disabled={requestStatus}
-            startIcon={requestStatus && (
-              <CircularProgress size={14}/>
-            )}
-          >{requestStatus ? 'Request Sent' : 'Add new team'}</Button>
-
-          <LoaderInfo
-            msgSuccess={apiSuccess}
-          />
-        </Stack>
-      </FormProvider>
     </Paper>
   );
 }

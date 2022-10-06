@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { Alert, Paper, Button, Box, Modal, Typography, Autocomplete, TextField } from "@mui/material";
+import { Button, Autocomplete, TextField, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from "@mui/material";
 
 import { ITeamPlayersProps } from "../Interfaces/team";
 import { IPlayer } from "../Interfaces/player";
 
 import { fetchUnassignedPlayers, addTeamPlayer, IApiAddTeamPlayerParams } from '../ApiCall/teamsPlayers'
 
-import styleModal from './styleModal'
+import LoaderInfo from "../Generic/LoaderInfo";
 
 const defaultValues = {
   player: {},
@@ -25,7 +25,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
   /**
    * Set States
    */
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(props.isOpen);
   const [listUnassignedPlayers, setUnassignedPlayers] = useState<IPlayer[]>([]);
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -43,7 +43,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
     reinitializeApiMessages();
   }
 
-  useEffect(() => {
+  useMemo(() => {
     if ( ! isOpen ) return;
 
     fetchUnassignedPlayers()
@@ -91,59 +91,69 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
   }
 
   return (
-    <>
-      <Modal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-      >
-        <Box sx={styleModal}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add player to team <b>{selectedTeam?.name}</b>
-          </Typography>
-          
-          <Paper>
-            <Controller
-              name={"player"}
-              control={control}
-              rules={{ 
-                required: "This is required",
-              }}
-              render={({ field: { onChange, value } }) => (
-                <Autocomplete 
-                  id={"player-autocomplete"}
-                  disablePortal
-                  onChange={(_, data) => {
-                    onChange(data);
-                    return data;
-                  }}
-                  key={`playcer-ac-${incrementAcIndex}`}
-                  options={listUnassignedPlayers}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value.id }
-                  renderInput={(params) => (
-                    <TextField 
-                      {...params} 
-                      label="Available Players" 
-                      error={errors.player ? true : false} 
-                      helperText={errors.player ? (errors.player as any).message : '' }
-                    />
-                  )}
-                />
-              )}
-            />
-            <Button 
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              >Add player to team</Button>
+    <Dialog
+      open={isModalOpen}
+      
+    >
+      <DialogTitle textAlign="center">Add player to <b>{selectedTeam?.name}</b></DialogTitle>
 
-            { apiSuccess && <Alert security="success">{apiSuccess}</Alert> }
-            { apiError && <Alert severity="error">{apiError}</Alert> }
+      <DialogContent>
+        <Stack spacing={3}>
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+            msgError={apiError}
+          />
+      
+          <Controller
+            name={"player"}
+            control={control}
+            rules={{ 
+              required: "This is required",
+            }}
+            render={({ field: { onChange, value } }) => (
+              <Autocomplete 
+                id={"player-autocomplete"}
+                /* disablePortal */
+                onChange={(_, data) => {
+                  onChange(data);
+                  return data;
+                }}
+                key={`playcer-ac-${incrementAcIndex}`}
+                options={listUnassignedPlayers}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id }
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Available Players" 
+                    error={errors.player ? true : false} 
+                    helperText={errors.player ? (errors.player as any).message : '' }
+                  />
+                )}
+              />
+            )}
+          />
+        </Stack>
+      </DialogContent>
 
-          </Paper>
-        </Box>
-      </Modal>
-    </>
+      <DialogActions>
+        <Stack spacing={1} rowGap={1} alignItems="center" justifyContent="center" direction="row" flexWrap="wrap">
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
+            disabled={requestStatus}
+            startIcon={requestStatus && (
+              <CircularProgress size={14}/>
+            )}
+          >{requestStatus ? 'Request Sent' : 'Add player to team'}</Button>
+          <Button
+            onClick={handleModalClose}
+            variant="outlined"
+          >Close</Button>
+        </Stack>
+        
+      </DialogActions>
+    </Dialog>
   )
 }
 export default AddTeamPlayer;

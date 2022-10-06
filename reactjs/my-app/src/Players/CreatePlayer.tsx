@@ -132,7 +132,7 @@ function CreatePlayer() {
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={1} alignItems="center">
         <Typography variant="h1">{`${currentLeagueName}`} Players</Typography>
-        <Typography variant="subtitle1">Add new player to league</Typography>
+        <Typography variant="subtitle1">Add new player into league</Typography>
         <LoaderInfo
           msgError={apiError}
           msgWarning={apiWarning}

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { Alert, Box, Modal, Typography, List, ListItem, IconButton } from "@mui/material";
+
+import { Alert, Box, Modal, Typography, List, ListItem, IconButton, Dialog, DialogContent, DialogTitle, Stack, Button, DialogActions } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 
 import { ITeamPlayers, ITeamPlayersProps } from "../Interfaces/team";
+
 import { fetchTeamsPlayers, deleteTeamPlayer, IApiFetchTeamsPlayersParams, IApiDeleteTeamPlayerParams } from '../ApiCall/teamsPlayers'
 
 import styleModal from './styleModal'
+import LoaderInfo from "../Generic/LoaderInfo";
 
 
 
@@ -15,7 +18,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(props.isOpen);
   const [listTeamPlayers, setListTeamPlayers] = useState<ITeamPlayers[]>([]);
   
   const reinitializeApiMessages = () => {
@@ -51,7 +54,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }
 
   useEffect(() => {
-    if ( ! isOpen || selectedTeam === undefined ) return;
+    if ( ! isOpen || selectedTeam === null ) return;
 
     const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
       teamIds: [selectedTeam.id],
@@ -69,18 +72,15 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }, [selectedTeam, isOpen]);
 
   return (
-    <>
-      <Modal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-      >
-        <Box sx={styleModal}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            <b>{selectedTeam?.name}</b> players
-          </Typography>
+    <Dialog
+      open={isModalOpen}
+    >
+      <DialogTitle textAlign="center"><b>{selectedTeam?.name}</b> players</DialogTitle>
+
+      <DialogContent>
+        <Stack spacing={3}>
           
-          { isOpen && listTeamPlayers ? (
+          { listTeamPlayers ? (
             <List>
               { listTeamPlayers.map((teamPlayer: ITeamPlayers) => {
                 let listActions = [];
@@ -100,6 +100,11 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
                   <ListItem 
                     key={`team-player-${teamPlayer.teamId}-${teamPlayer.playerId}`}
                     secondaryAction={ listActions.map((action) => action) }
+                    sx={{
+                      '&:hover':{
+                        backgroundColor:'#efefef'
+                      }
+                    }}
                     >{teamPlayer.playerName}</ListItem>
                 )
               })}
@@ -108,12 +113,23 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
             <Alert severity="info">There is no rooster for this team</Alert>
           ) }
 
-          { apiError && <Alert severity="error">{apiError}</Alert> }
-          { apiSuccess && <Alert severity="success">{apiSuccess}</Alert> }
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+            msgError={apiError}
+          />
+        </Stack>
+      </DialogContent>
 
-        </Box>
-      </Modal>
-    </>
+      <DialogActions>
+        <Stack spacing={1} rowGap={1} alignItems="center" justifyContent="center" direction="row" flexWrap="wrap">
+          <Button
+            onClick={handleModalClose}
+            variant="outlined"
+          >Close</Button>
+        </Stack>
+      </DialogActions>
+
+    </Dialog>
   )
 }
 export default ViewTeamPlayers;

@@ -29,7 +29,7 @@ export interface ITeamProfileProps{
 
 export interface ITeamPlayersProps {
   isOpen: boolean;
-  selectedTeam?: ITeam;
+  selectedTeam: ITeam | null;
   isAdmin?: boolean;
   callbackCloseModal(): void;
 }

@@ -53,6 +53,7 @@ exports.mysqlQueryPoolInserts = async(query, values) => {
 
   if( success ){
     await promiseConn.commit();
+    promiseConn.release()
     return {
       status: true, 
       data: data, 
@@ -60,6 +61,7 @@ exports.mysqlQueryPoolInserts = async(query, values) => {
     }
   } else {
     await promiseConn.rollback();
+    promiseConn.release()
     return {
       status: false, 
       data: [], 
@@ -96,6 +98,7 @@ exports.mysqlQueryPoolMixUpdates = async(queries) => {
 
   if( success ){
     await promiseConn.commit();
+    promiseConn.release()
     return {
       status: true, 
       data: data, 
@@ -103,6 +106,7 @@ exports.mysqlQueryPoolMixUpdates = async(queries) => {
     }
   } else {
     await promiseConn.rollback();
+    promiseConn.release()
     return {
       status: false, 
       data: [], 
