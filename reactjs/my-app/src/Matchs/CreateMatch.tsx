@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+
+import { Button, Box, CircularProgress, Stack, Typography, Paper } from "@mui/material";
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatch } from "../redux/matchSlice";
 import { addTeams } from "../redux/teamSlice";
 import { addLeagueTeams } from '../redux/leagueTeamSlice';
-
-import { Button, Box, CircularProgress, Stack, Typography, Paper } from "@mui/material";
 
 import { ITeam } from '../Interfaces/team';
 import { ILeagueTeam } from '../Interfaces/league';
@@ -17,9 +17,10 @@ import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeam
 
 import FormSelect from '../Forms/FormSelect';
 import FormDateTimePicker from '../Forms/FormDateTimePicker';
+import LoaderInfo from '../Generic/LoaderInfo';
 
 import { getStorageLeagueName } from '../utils/localStorage';
-import LoaderInfo from '../Generic/LoaderInfo';
+
 
 const dateNow = new Date();
 const defaultValues = {
@@ -44,13 +45,9 @@ function CreateMatch() {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
-  const [isLeagueTeamsLoaded, setIsLeagueTeamsLoaded] = useState(false);
-  const [isTeamsLoaded, setIsTeamsLoaded] = useState(false);
   
   const listTeams = useSelector((state: RootState) => state.teams )
   const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
-
-  const isLoaded = isLeagueTeamsLoaded && isTeamsLoaded;
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -73,7 +70,9 @@ function CreateMatch() {
   }
 
   
-
+  /**
+   * 
+   */
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, reset, watch, setError, clearErrors } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
@@ -102,7 +101,7 @@ function CreateMatch() {
       
   }
 
-  useEffect(() => {
+  useMemo(() => {
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       
     }
@@ -114,12 +113,12 @@ function CreateMatch() {
         changeApiError(error);
       })
       .finally(() => {
-        setIsLeagueTeamsLoaded(true);
+        
       });
   }, [dispatch]);
 
-  useEffect(() => {
-    if( ! isLeagueTeamsLoaded || isTeamsLoaded ) return;
+  useMemo(() => {
+    if( listLeagueTeams.length === 0 ) return;
 
     const teamIds = listLeagueTeams.map((leagueTeam: ILeagueTeam) => leagueTeam.idTeam);
     const paramsFetchTeams: IApiFetchTeamsParams = {
@@ -134,25 +133,23 @@ function CreateMatch() {
         changeApiError(error);
       })
       .finally(() => {
-        setIsTeamsLoaded(true)
+        
       });
-  }, [dispatch, isLeagueTeamsLoaded, isTeamsLoaded, listLeagueTeams])
+  }, [dispatch, listLeagueTeams])
 
   return (
     
     <Paper component={Box} p={3} m={3}>
-      <Stack spacing={1} alignItems="center" pb={3}>
-        <Typography variant="h1">{currentLeagueName}</Typography>
+      <Stack spacing={1} alignItems="center">
+        <Typography variant="h1">{currentLeagueName} Matches</Typography>
         <Typography variant="subtitle1">Add new match to calendar</Typography>
         <LoaderInfo
-          isLoading={isLoaded}
           msgError={apiError}
+          msgSuccess={apiSuccess}
         />
-      </Stack>
 
-      {isLoaded && (
         <FormProvider {...methods}>
-          <Stack spacing={2} alignItems="center">
+          <Stack spacing={3} alignItems="center">
             <FormSelect
               label='Home team'
               controllerName='teamHome'
@@ -213,14 +210,10 @@ function CreateMatch() {
               )}
               >{requestStatus ? 'Request Sent' : 'Create match'}</Button>
 
-            <LoaderInfo
-              msgSuccess={apiSuccess}
-            />
             
           </Stack>
         </FormProvider>
-      )}
-      
+      </Stack>
     </Paper>
   );
 }

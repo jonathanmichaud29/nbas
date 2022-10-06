@@ -47,6 +47,21 @@ export const createHumanDate = (argDate: Date): string => {
   return dateReturn;
 }
 
+export const extractCalendarDay = (argDate: Date): string => {
+  const dateObject = new Date(argDate);
+  const monthLabel = monthOfYearLabel(dateObject);
+
+  const dateReturn = dateObject.getFullYear() + ", " + monthLabel + " " + dateObject.getDate();
+
+  return dateReturn;
+}
+
+export const extractHourFromDate = (argDate: Date): string => {
+  const dateObject = new Date(argDate);
+  const dateReturn = dateObject.getHours().toString().padStart(2, '0') + ":" + dateObject.getMinutes().toString().padStart(2, '0');
+  return dateReturn;
+}
+
 export const createShortDateReadable = (argDate: Date): string => {
   const dateObject = new Date(argDate)
   return dateObject.toLocaleDateString("en-CA",{ 

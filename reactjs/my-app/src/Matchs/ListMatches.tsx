@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
-import { Alert, Box, Grid, IconButton, Paper, Stack, Tooltip, Typography  } from "@mui/material";
+import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Typography  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
@@ -21,7 +21,7 @@ import ConfirmDelete from "../Modals/ConfirmDelete";
 import LoaderInfo from '../Generic/LoaderInfo';
 import InfoDialog from '../Generic/InfoDialog';
 
-import { createHumanDate } from '../utils/dateFormatter';
+import { createHumanDate, extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,13 +36,11 @@ function ListMatches(props: IListMatchProps) {
   const listTeams = useSelector((state: RootState) => state.teams )
   const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
 
+  const orderedMatches = league !== undefined ? listMatches.filter((match) => match.idLeague === league.id) : [...listMatches];
+  orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   const reinitializeApiMessages = () => {
     changeApiError('');
-    changeApiSuccess('');
-  }
-
-  const clearMsgSuccess = () => {
     changeApiSuccess('');
   }
 
@@ -56,7 +54,6 @@ function ListMatches(props: IListMatchProps) {
       .then(response => {
         dispatch(removeMatch(match.id));
         changeApiSuccess(response.message);
-        setTimeout(clearMsgSuccess, 1500);
       })
       .catch(error => {
         changeApiError(error);
@@ -165,74 +162,112 @@ function ListMatches(props: IListMatchProps) {
     setOpenConfirmDelete(false);
   }
   
-  const orderedMatches = league !== undefined ? listMatches.filter((match) => match.idLeague === league.id) : [...listMatches];
-  orderedMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
-  const htmlMatches = ( orderedMatches.length > 0 ? orderedMatches.map((match: IMatch) => {
-      let listActions = [];
-      
-      const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
-      const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
-      const dateReadable = createHumanDate(match.date);
-      if( teamHome === undefined || teamAway === undefined) return "";
+  let lastMatchCalendarDay = '';
+  const htmlMatches = ( orderedMatches.length > 0 ? (
+    <Box p={3} width="100%">
+      <Grid container spacing={3} flexWrap="wrap"
+        sx={{
+          flexDirection:{xs:"column", sm:"row"}
+        }}
+      >
+        { orderedMatches.map((match: IMatch) => {
+          let listActions = [];
+          
+          const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
+          const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
+          const hourDate = extractHourFromDate(match.date);
+          const currentMatchCalendarDay = extractCalendarDay(match.date);
+          const isNewDay = currentMatchCalendarDay !== lastMatchCalendarDay;
+          lastMatchCalendarDay = currentMatchCalendarDay;
+          if( teamHome === undefined || teamAway === undefined) return "";
 
-      let actionLabel;
-      if( match.isCompleted ){
-        actionLabel = `View Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`;
-        listActions.push(
-          <IconButton color="primary"
-            key={`action-view-match-${match.id}`}
-            aria-label={actionLabel}
-            title={actionLabel}
-            href={`/match/${match.id}`}
-            >
-            <InfoIcon />
-          </IconButton>
-        );
-      }
-      if( isAdmin ) {
-        actionLabel=`Edit Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`;
-        listActions.push(
-          <IconButton color="primary"
-            key={`action-edit-match-${match.id}`}
-            aria-label={actionLabel}
-            title={actionLabel}
-            href={`/admin/match/${match.id}`}
-            >
-            <EditIcon />
-          </IconButton>
-        )
-        
-        actionLabel=`Delete Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`
-        listActions.push(
-          <Tooltip title={actionLabel} key={`action-delete-match-${match.id}`}>
-            <IconButton color="primary"
-              aria-label={actionLabel}
-              /* title={actionLabel} */
-              onClick={ () => handleOpenConfirmDelete(match) }
+          let actionLabel;
+          if( match.isCompleted ){
+            actionLabel = `View Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`;
+            listActions.push(
+              <IconButton color="primary"
+                key={`action-view-match-${match.id}`}
+                aria-label={actionLabel}
+                title={actionLabel}
+                href={`/match/${match.id}`}
+                >
+                <InfoIcon />
+              </IconButton>
+            );
+          }
+          if( isAdmin ) {
+            actionLabel=`Edit Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`;
+            listActions.push(
+              <IconButton color="primary"
+                key={`action-edit-match-${match.id}`}
+                aria-label={actionLabel}
+                title={actionLabel}
+                href={`/admin/match/${match.id}`}
+                >
+                <EditIcon />
+              </IconButton>
+            )
+            
+            actionLabel=`Delete Match ${match.id} - ${teamHome.name} VS ${teamAway.name}`
+            listActions.push(
+              <IconButton color="primary"
+                key={`action-delete-match-${match.id}`}
+                aria-label={actionLabel}
+                title={actionLabel}
+                onClick={ () => handleOpenConfirmDelete(match) }
+                >
+                <Delete />
+              </IconButton>
+            )
+            
+          }
+          
+          return (
+            <React.Fragment key={`match-row-${match.id}`}>
+              { isNewDay && (
+                <Grid item xs={12}>
+                  <Typography variant="h4" component="h2">{lastMatchCalendarDay}</Typography>
+                </Grid>
+              )}
+              <Grid item 
+                xs={12} sm={6} md={3}
               >
-              <Delete />
-            </IconButton>
-          </Tooltip>
-        )
-        
-      }
-      
-      return (
-        <Grid key={`match-row-${match.id}`} container columnSpacing={1} pt={1} pb={1} alignItems="center" flexWrap="nowrap" justifyContent="space-between"
-          sx={{
-            flexDirection:{xs:"column", sm:"row"},
-            '&:hover':{
-              backgroundColor:'#f1f1f1'
-            }
-          }}>
-          <Grid item ><Typography variant="body1">{dateReadable}</Typography></Grid>
-          <Grid item ><Typography variant="body1">{teamHome.name} VS {teamAway.name}</Typography></Grid>
-          <Grid item >{ listActions.map((action) => action )}</Grid>
-        </Grid>
-      )
-  }) : (
-    <Alert severity='info'>No match found this season</Alert>
+                <Card raised={true}
+                  sx={{
+                    '&:hover' : {
+                      backgroundColor:"#efefef"
+                    }
+                  }}
+                >
+                  <CardHeader 
+                    title={`${teamHome.name} \nvs\n ${teamAway.name}`}
+                    subheader={hourDate}
+                    titleTypographyProps={{variant:'h6'}}
+                    sx={{
+                      flexDirection:'column-reverse',
+                      textAlign:'center',
+                      whiteSpace:'pre-line'
+                    }}
+                  />
+                  <CardActions 
+                    disableSpacing={true}
+                    sx={{
+                      justifyContent:'center',
+                      flexWrap:'wrap'
+                    }}
+                  >
+                    {listActions}
+                  </CardActions>
+                </Card>
+              </Grid>
+            </React.Fragment>
+          )
+        })}
+      </Grid>
+    </Box>
+  ) : (
+    <Alert severity='info'>No match found in this league</Alert>
   ));
   
   return (
