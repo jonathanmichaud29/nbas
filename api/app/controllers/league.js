@@ -85,6 +85,7 @@ exports.createLeague = async (req, res, next) => {
 
   if( success ){
     await promiseConn.commit();
+    promiseConn.release()
     const customData = {
       id: leagueId,
       name: [req.body.name]
@@ -94,6 +95,7 @@ exports.createLeague = async (req, res, next) => {
   }
   else {
     await promiseConn.rollback();
+    promiseConn.release()
     return appResponse(res, next, success, null, error, null, 'league');
   }
   

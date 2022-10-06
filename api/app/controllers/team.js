@@ -80,6 +80,7 @@ exports.createTeam = async (req, res, next) => {
 
   if( success ){
     await promiseConn.commit();
+    promiseConn.release()
     const customData = {
       teamId: teamId,
       teamName: req.body.name,
@@ -91,6 +92,7 @@ exports.createTeam = async (req, res, next) => {
   }
   else {
     await promiseConn.rollback();
+    promiseConn.release()
     return appResponse(res, next, success, null, error);
   }
 };

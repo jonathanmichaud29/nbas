@@ -100,6 +100,7 @@ exports.createPlayer = async (req, res, next) => {
 
   if( success ){
     await promiseConn.commit();
+    promiseConn.release()
     const customData = {
       playerId: playerId,
       playerName: req.body.name,
@@ -110,8 +111,8 @@ exports.createPlayer = async (req, res, next) => {
     return appResponse(res, next, success, customData, null, customMessage);
   }
   else {
-    console.log("rollback")
     await promiseConn.rollback();
+    promiseConn.release()
     return appResponse(res, next, success, null, error);
   }
   
