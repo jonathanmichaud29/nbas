@@ -46,12 +46,13 @@ const defaultValues = {
 }
 function CompleteMatch(props: ICompleteMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
+
   const {isOpen, match, teamHome, teamAway, callbackCloseModal, allPlayers} = props;
   
   /**
    * Set States
    */
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(isOpen);
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
@@ -84,7 +85,8 @@ function CompleteMatch(props: ICompleteMatchProps) {
   }
 
   useEffect(() => {
-    setModalOpen(true);
+    if( ! isOpen ) return;
+    setModalOpen(isOpen);
   }, [isOpen]);
 
   useEffect( () => {
@@ -608,20 +610,22 @@ function CompleteMatch(props: ICompleteMatchProps) {
           </Stack>
         </FormProvider>
       </DialogContent>
-      <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>
-        <Button 
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          disabled={requestStatus}
-          startIcon={requestStatus && (
-            <CircularProgress size={14}/>
-          )}
-        >{requestStatus ? 'Request Sent' : 'Save Stats'}</Button>
-        <Button
-          onClick={handleModalClose}
-          variant="outlined"
-        >Close</Button>
-        
+      
+      <DialogActions>
+        <Stack spacing={1} rowGap={1} alignItems="center" justifyContent="center" direction="row" flexWrap="wrap">
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
+            disabled={requestStatus}
+            startIcon={requestStatus && (
+              <CircularProgress size={14}/>
+            )}
+          >{requestStatus ? 'Request Sent' : 'Save Stats'}</Button>
+          <Button
+            onClick={handleModalClose}
+            variant="outlined"
+          >Close</Button>
+        </Stack>
       </DialogActions>
     </Dialog>
   )

@@ -98,7 +98,7 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
       <DialogTitle textAlign="center">Add player to <b>{selectedTeam?.name}</b></DialogTitle>
 
       <DialogContent>
-        <Stack spacing={3}>
+        <Stack spacing={3} mt={1}>
           <LoaderInfo
             msgSuccess={apiSuccess}
             msgError={apiError}
@@ -113,7 +113,6 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
             render={({ field: { onChange, value } }) => (
               <Autocomplete 
                 id={"player-autocomplete"}
-                /* disablePortal */
                 onChange={(_, data) => {
                   onChange(data);
                   return data;

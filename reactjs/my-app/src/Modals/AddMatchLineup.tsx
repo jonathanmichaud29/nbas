@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
@@ -25,9 +25,10 @@ interface IFormInput {
   player: IOrderPlayers;
 }
 
-function AddMatchLineup(props: IAddMatchLineupProps) {
+export default function AddMatchLineup(props: IAddMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const {isOpen, match, selectedTeam, callbackCloseModal, allPlayers} = props;
+
+  const {isOpen, match, selectedTeam, callbackCloseModal} = props;
   
   /**
    * Set States
@@ -37,10 +38,10 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
-  const [incrementAcIndex, setIncrementAcIndex] = useState(1);
 
   const [orderPlayersByTeam, setOrderPlayersByTeam] = useState<IOrderPlayers[]>([]);
 
+  const listPlayers = useSelector((state: RootState) => state.players )
   const selectCurrentMatchPlayers = createSelector(
     (state: RootState) => state.matchPlayers,
     (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
@@ -48,19 +49,16 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
   const allMatchPlayers = useSelector(selectCurrentMatchPlayers) || null;
   
 
-  const reinitializeApiMessages = () => {
-    changeApiSuccess("")
-    changeApiError("")
-  }
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-    callbackCloseModal();
-    reinitializeApiMessages();
-  }
-
   useEffect(() => {
-    if ( selectedTeam === null ) return;
+    if( ! isOpen ) return;
+    setModalOpen(true);
+  }, [isOpen])
+
+  /**
+   * Fetch Team Players depending on the selected team
+   */
+  useMemo(() => {
+    if( selectedTeam === null) return;
     const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
       allTeamsPlayers: true,
     }
@@ -72,38 +70,50 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
         changeApiError(error);
       })
       .finally(() => {
-        setModalOpen(true);
+        
       });
   }, [selectedTeam]);
 
-
-  useEffect(() => {
-    if( listTeamsPlayers === null) return;
-
+  
+  /**
+   * Fetch Team Players depending on the selected team
+   */
+  useMemo(() => {
     const listActivePlayerIds = allMatchPlayers?.lineupPlayers.map((lineupPlayer: IMatchLineup) => lineupPlayer.idPlayer) || [];
     
     // Player's Categorisation and add new attributes helping to sort them in the list
-    let listOrderPlayers: IOrderPlayers[] = allPlayers.map((player: IPlayer) => {
+    let listOrderPlayers: IOrderPlayers[] = listPlayers.map((player: IPlayer) => {
       const teamPlayerFound = listTeamsPlayers.find((teamPlayer) => teamPlayer.playerId === player.id) || null;
       return {
-        currentTeamName: ( teamPlayerFound === null ? 'Reservist' : teamPlayerFound.teamName ),
-        priority: ( teamPlayerFound !== null && teamPlayerFound.teamId === selectedTeam.id ? 1 : 0 ),
+        currentTeamName: ( teamPlayerFound !== null ? teamPlayerFound.teamName : 'Reservist' ),
+        priority: ( teamPlayerFound !== null ? 1 : 0 ),
         ...player
       }
     });
     
-    // Remove Player's Categorisation that are actually in this match lineup
+    // Remove Players that are actually in this match lineup
     listOrderPlayers = listOrderPlayers.filter((orderPlayer: IOrderPlayers) => {
       return listActivePlayerIds.find((elem: number) => elem === orderPlayer.id ) === undefined
     })
-    // Order them by priority, then team name and player name
+    // Order them by priority (high to low), then team name (alphabetically) and player name (alphabetically)
     listOrderPlayers.sort((a,b) => b.priority - a.priority || -b.currentTeamName.localeCompare(a.currentTeamName) || -b.name.localeCompare(a.name) )
     setOrderPlayersByTeam(listOrderPlayers);
-  },[allMatchPlayers?.lineupPlayers, allPlayers, listTeamsPlayers, selectedTeam.id])
+  },[allMatchPlayers?.lineupPlayers, listPlayers, listTeamsPlayers])
 
   /**
    * Form behaviors
    */
+  const reinitializeApiMessages = () => {
+    changeApiSuccess("")
+    changeApiError("")
+  }
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    callbackCloseModal();
+    reinitializeApiMessages();
+  }
+
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, reset, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
@@ -119,7 +129,6 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
     addMatchLineups(paramsAddMatchLineup)
       .then((response) =>{
         reset()
-        setIncrementAcIndex(incrementAcIndex+1);
         changeApiSuccess(response.message);
         const responseData = response.data[0];
         setOrderPlayersByTeam(orderPlayersByTeam.filter((player: IOrderPlayers) => player.id !== responseData.idPlayer));
@@ -169,52 +178,51 @@ function AddMatchLineup(props: IAddMatchLineupProps) {
             msgSuccess={apiSuccess}
             msgError={apiError}
           />
-          { orderPlayersByTeam && (
-            <Controller
-              name={"player"}
-              control={control}
-              rules={{ 
-                required: "This is required",
-              }}
-              render={({ field: { onChange, value } }) => (
-                <Autocomplete 
-                  id={"player-autocomplete"}
-                  disablePortal={false}
-                  onChange={(_, data) => {
-                    onChange(data);
-                    return data;
-                  }}
-                  key={`playcer-ac-${incrementAcIndex}`}
-                  options={orderPlayersByTeam}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value.id }
-                  groupBy={(option) => option.currentTeamName }
-                  renderInput={(params) => (
-                    <TextField 
-                      {...params} 
-                      label="Available Players" 
-                      error={errors.player ? true : false} 
-                      helperText={errors.player ? (errors.player as any).message : '' }
-                    />
-                  )}
-                />
-              )}
-            />
-          )}
+
+          <Controller
+            name={"player"}
+            control={control}
+            rules={{ 
+              required: "This is required",
+            }}
+            render={({ field: { onChange, value } }) => (
+              <Autocomplete 
+                id={"player-autocomplete"}
+                disablePortal={false}
+                onChange={(_, data) => {
+                  onChange(data);
+                  return data;
+                }}
+                options={orderPlayersByTeam}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id }
+                groupBy={(option) => option.currentTeamName }
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Available Players" 
+                    error={errors.player ? true : false} 
+                    helperText={errors.player ? (errors.player as any).message : '' }
+                  />
+                )}
+              />
+            )}
+          />
         </Stack>
       </DialogContent>
-      <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>
-        <Button
-          onClick={handleModalClose}
-          variant="outlined"
-        >Close</Button>
-        <Button 
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-        >Add player to team</Button>
+      <DialogActions>
+        <Stack spacing={1} rowGap={1} alignItems="center" justifyContent="center" direction="row" flexWrap="wrap">
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
+          >Add player to team</Button>
+          <Button
+            onClick={handleModalClose}
+            variant="outlined"
+          >Close</Button>
+        </Stack>
       </DialogActions>
     </Dialog>
     
   )
 }
-export default AddMatchLineup;

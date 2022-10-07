@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
@@ -25,8 +25,9 @@ interface IFormInput {
   players: ITeamPlayers[];
 }
 
-function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
+export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
+
   const {isOpen, match, selectedTeam, callbackCloseModal} = props;
   
   /**
@@ -56,7 +57,7 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
     reinitializeApiMessages();
   }
 
-  useEffect(() => {
+  useMemo(() => {
     if ( selectedTeam === null || allMatchPlayers === null ) return;
     const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
       teamIds: [selectedTeam.id],
@@ -66,15 +67,21 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
         const lineupPlayerIds = allMatchPlayers.lineupPlayers.map((lineupPlayer) => lineupPlayer.idPlayer)
         const listTeamPlayers: ITeamPlayers[] = response.data;
         const newListTeamPlayers = listTeamPlayers.filter((player: ITeamPlayers) => lineupPlayerIds.includes(player.playerId) === false);
+        newListTeamPlayers.sort((a, b) => a.playerName.localeCompare(b.playerName))
         setListTeamsPlayers(newListTeamPlayers);
       })
       .catch(error => {
         changeApiError(error);
       })
       .finally(() => {
-        setModalOpen(true);
+        
       });
   }, [allMatchPlayers, selectedTeam]);
+
+  useEffect(() => {
+    if( ! isOpen ) return;
+    setModalOpen(isOpen);
+  },[isOpen])
 
   /**
    * Form behaviors
@@ -190,17 +197,18 @@ function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
           )}
         </Stack>
       </DialogContent>
-      <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>
-        <Button
-          onClick={handleModalClose}
-          variant="outlined"
-        >Close</Button>
-        <Button 
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
+      <DialogActions>
+        <Stack spacing={1} rowGap={1} alignItems="center" justifyContent="center" direction="row" flexWrap="wrap">
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
           >Add players to lineup</Button>
+          <Button
+            onClick={handleModalClose}
+            variant="outlined"
+          >Close</Button>
+        </Stack>
       </DialogActions>
     </Dialog>
   )
 }
-export default AddTeamPlayersLineup;
