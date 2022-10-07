@@ -9,7 +9,7 @@ import { ITeam, IStandingTeam } from "../Interfaces/team";
 import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
 
 import Scoreboard from './Scoreboard';
-import BestStatPlayers from '../Players/BestStatPlayers'
+import BestMatchPlayers from '../Players/BestMatchPlayers'
 import LoaderInfo from "../Generic/LoaderInfo";
 
 function MatchResume(props: IMatchResumeProps) {
@@ -96,13 +96,13 @@ function MatchResume(props: IMatchResumeProps) {
           )}
           <Typography variant="h3" textAlign="center">Best players this {match.isCompleted === 0 ? 'season' : 'game'}</Typography>
           { isLoaded && (
-            <BestStatPlayers 
+            <BestMatchPlayers 
               match={match}
               team={teamHome}
             />
           )}
           { isLoaded && (
-            <BestStatPlayers 
+            <BestMatchPlayers 
               match={match}
               team={teamAway}
             />

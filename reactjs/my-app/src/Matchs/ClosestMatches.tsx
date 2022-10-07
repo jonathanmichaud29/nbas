@@ -69,32 +69,33 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
         msgError={apiError}
         hasWrapper={true}
       />
-      <Paper component={Box} m={3} p={3}>
-        <Stack spacing={3} alignItems="center">
-          <Typography variant="h1">
-            Closest Match for {league.name}
-          </Typography>
-          <Grid container justifyContent="space-around" rowSpacing={3}>
-            { matchPast && (
-              <Grid item sm={12} md={6} sx={{maxWidth:'100%'}}>
-                <MatchResume 
-                  title="Latest match"
-                  match={matchPast}
-                />
-              </Grid>
-            )}
-            { matchUpcoming && (
-              <Grid item sm={12}  md={6} sx={{maxWidth:'100%'}}>
-                <MatchResume 
-                  title="Upcoming match"
-                  match={matchUpcoming}
-                />
-              </Grid>
-            )}
-          </Grid>
-        </Stack>
-      </Paper>
-      
+      { (matchPast || matchUpcoming) && (
+        <Paper component={Box} m={3} p={3}>
+          <Stack spacing={3} alignItems="center">
+            <Typography variant="h1">
+              Closest Match for {league.name}
+            </Typography>
+            <Grid container justifyContent="space-around" rowSpacing={3}>
+              { matchPast && (
+                <Grid item sm={12} md={6} sx={{maxWidth:'100%'}}>
+                  <MatchResume 
+                    title="Latest match"
+                    match={matchPast}
+                  />
+                </Grid>
+              )}
+              { matchUpcoming && (
+                <Grid item sm={12}  md={6} sx={{maxWidth:'100%'}}>
+                  <MatchResume 
+                    title="Upcoming match"
+                    match={matchUpcoming}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </Stack>
+        </Paper>
+      ) }
       
     </>
   )

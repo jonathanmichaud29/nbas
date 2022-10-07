@@ -18,12 +18,12 @@ import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats } from '../utils/statsAggregation';
 
 
-interface IBestStatPlayersProps {
+interface IBestMatchPlayersProps {
   match: IMatch;
   team: ITeam;
 }
 
-function BestStatPlayers(props: IBestStatPlayersProps) {
+export default function BestMatchPlayers(props: IBestMatchPlayersProps) {
   const {match, team} = props;
 
   const [apiError, changeApiError] = useState("");
@@ -154,5 +154,3 @@ function BestStatPlayers(props: IBestStatPlayersProps) {
     </>
   )
 }
-
-export default BestStatPlayers;
