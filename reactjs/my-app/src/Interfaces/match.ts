@@ -21,6 +21,12 @@ export interface IMatchProps{
   isAdmin?: boolean;
 }
 
+export interface IAdminMatchHeaderProps{
+  match: IMatch;
+  teamHome: ITeam;
+  teamAway: ITeam;
+}
+
 export interface IMatchResumeProps {
   title: string;
   match: IMatch;
@@ -44,7 +50,6 @@ export interface IAddMatchLineupProps{
   match: IMatch;
   selectedTeam: ITeam;
   callbackCloseModal(): void;
-  allPlayers: Array<IPlayer>;
 }
 
 export interface IMatchLineup {
@@ -93,7 +98,7 @@ export interface ITeamMatchLineupProps {
   isHomeTeam: boolean;
   match: IMatch;
   team: ITeam;
-  allPlayers: Array<IPlayer>;
+  allPlayers?: Array<IPlayer>;
 }
 
 export interface ICompleteMatchProps{

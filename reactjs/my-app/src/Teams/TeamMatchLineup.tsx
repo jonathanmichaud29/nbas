@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
@@ -13,21 +13,22 @@ import { IMatchLineup, ITeamMatchLineupProps } from '../Interfaces/match';
 
 import { deleteMatchLineup, IApiDeleteMatchLineupParams } from '../ApiCall/matches';
 
-import { getPlayerName } from '../utils/dataAssociation';
-
 import AddMatchLineup from '../Modals/AddMatchLineup';
 import AddTeamPlayersLineup from '../Modals/AddTeamPlayersLineup';
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import LoaderInfo from '../Generic/LoaderInfo';
 
+import { getPlayerName } from '../utils/dataAssociation';
 
 function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAdmin, match, /* isHomeTeam, */ team, allPlayers } = props;
+
+  const { isAdmin, match, team } = props;
 
   const [apiError, changeApiError] = useState("");
-  const [lineupTeam, setLineupTeam] = useState<IMatchLineup[] | null>(null);
+  const [lineupTeam, setLineupTeam] = useState<IMatchLineup[]>([]);
 
+  const listPlayers = useSelector((state: RootState) => state.players )
   const selectCurrentMatchPlayers = createSelector(
     (state: RootState) => state.matchPlayers,
     (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
@@ -61,7 +62,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
 
   const handleDeletePlayerLineup = (lineup: IMatchLineup) => {
     setCurrentLineup(lineup);
-    setCurrentPlayerName(getPlayerName(lineup.idPlayer, allPlayers));
+    setCurrentPlayerName(getPlayerName(lineup.idPlayer, listPlayers));
     setOpenConfirmDeleteLineup(true);
   }
   const cbCloseModalDelete = () => {
@@ -95,9 +96,8 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
 
   
 
-  useEffect( () => {
-    if( allMatchPlayers === null ) return;
-    const teamPlayers = allMatchPlayers.lineupPlayers.filter((lineupPlayer: IMatchLineup) => lineupPlayer.idTeam === team.id )
+  useMemo( () => {
+    const teamPlayers = allMatchPlayers?.lineupPlayers.filter((lineupPlayer: IMatchLineup) => lineupPlayer.idTeam === team.id ) || []
     setLineupTeam(teamPlayers);
   }, [allMatchPlayers, team.id]);
 
@@ -144,7 +144,7 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
                 <ListItem 
                   key={`match-lineup-${lineup.id}`}
                   secondaryAction={ listActions.map((action) => action) }
-                  >{getPlayerName(lineup.idPlayer, allPlayers)}</ListItem>
+                  >{getPlayerName(lineup.idPlayer, listPlayers)}</ListItem>
               )
             })}
           </List>
@@ -156,14 +156,22 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
         />
       </Stack>
       
-      { isAdmin && isModalOpenAddMatchLineup && (
+      { isAdmin && (
         <AddMatchLineup
           key={`match-lineup-${match.id}-${team.id}`}
           isOpen={isModalOpenAddMatchLineup}
           match={match}
           selectedTeam={team}
           callbackCloseModal={cbCloseAddMatchLineup}
-          allPlayers={allPlayers}
+          />
+      )}
+      { isAdmin && (
+        <AddTeamPlayersLineup
+          key={`team-players-lineup-${match.id}-${team.id}`}
+          isOpen={isModalOpenAddTeamPlayersLineup}
+          match={match}
+          selectedTeam={team}
+          callbackCloseModal={cbCloseAddTeamPlayersLineup}
           />
       )}
       { currentPlayerName && isAdmin && (
@@ -176,16 +184,6 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
           description={`Are-you sure you want to remove the player '${currentPlayerName}' from this lineup?`}
           />
       ) }
-      { isAdmin && isModalOpenAddTeamPlayersLineup && (
-        <AddTeamPlayersLineup
-          key={`team-players-lineup-${match.id}-${team.id}`}
-          isOpen={isModalOpenAddTeamPlayersLineup}
-          match={match}
-          selectedTeam={team}
-          callbackCloseModal={cbCloseAddTeamPlayersLineup}
-          allPlayers={allPlayers}
-          />
-      )}
     </>
   )
 }

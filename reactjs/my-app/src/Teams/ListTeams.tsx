@@ -78,8 +78,8 @@ function ListTeams(props: ITeamProps) {
   }
   const handleOpenAddPlayerToTeam = (team: ITeam) => {
     setCurrentTeamView(team);
-    setOpenViewTeamPlayers(false);
     setOpenAddPlayerToTeam(true);
+    setOpenViewTeamPlayers(false);
     setOpenConfirmDeleteTeam(false);
   }
 
@@ -92,19 +92,22 @@ function ListTeams(props: ITeamProps) {
 
   const cbCloseTeamPlayers = () => {
     setOpenViewTeamPlayers(false);
+    setCurrentTeamView(null);
   }
   const cbCloseAddTeamPlayer = () => {
     setOpenAddPlayerToTeam(false);
+    setCurrentTeamView(null);
   }
   const cbCloseModalDelete = () => {
     setOpenConfirmDeleteTeam(false);
+    setCurrentTeamView(null);
   }
   const cbCloseConfirmDelete = () => {
     if( currentTeamView ){
       confirmDeleteTeam(currentTeamView);
-      setCurrentTeamView(null);
     }
     setOpenConfirmDeleteTeam(false);
+    setCurrentTeamView(null);
   }
 
   useMemo(() => {

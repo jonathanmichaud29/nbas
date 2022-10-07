@@ -10,7 +10,7 @@ const { getSystemPlayersByName } = require("../utils/simpleQueries");
 exports.getPlayers = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
   const selectedLeagueId = castNumber(req.headers.idleague);
-  const listLeagueIds = req.body.leagueIds !== undefined ? req.body.leagueIds : [selectedLeagueId]
+  const listLeagueIds = req.body.leagueIds !== undefined ? ( req.body.leagueIds.length > 0 ? req.body.leagueIds : [0]) : [selectedLeagueId]
   let query = '';
   let values = [];
   let wheres = [];
@@ -18,19 +18,16 @@ exports.getPlayers = async (req, res, next) => {
   if( req.body.allPlayers === undefined && req.body.playerIds === undefined ){
     return appResponse(res, next, true, {}, {});
   }
-  if( req.body.leagueIds !== undefined ) {
-    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
-    values.push( listLeagueIds.length > 0 ? [listLeagueIds] : [0] );
-  }
-  /* else if( req.body.allLeagues === undefined ){
-    joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
-    values.push([listLeagueIds]);
-  } */
+  
+  joinPlayerLeague = 'INNER JOIN player_league as pl ON (p.id=pl.idPlayer AND pl.idLeague IN ?)';
+  values.push( [listLeagueIds] );
+
   if( req.body.playerIds !== undefined ){
     wheres.push('p.id IN ?')
     const listPlayerIds = req.body.playerIds.length > 0 ? req.body.playerIds : [0];
     values.push([listPlayerIds])
   }
+  
   query = `SELECT p.* FROM players as p 
     ${joinPlayerLeague}
     ${wheres.length>0 ? `WHERE ${wheres.join(' AND ')}` : ``}`;
