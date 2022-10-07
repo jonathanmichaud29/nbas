@@ -53,6 +53,7 @@ export default function PublicCompare(){
       />
       { selectedLeague !== null && (
         <ToolStats
+          key={`tool-stats-${selectedLeague.id}-${selectedCategory}`}
           league={selectedLeague}
           category={selectedCategory}
         />
