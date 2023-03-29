@@ -26,6 +26,7 @@ import PlayerManager from './Admin/PlayerManager';
 import MatchManager from './Admin/MatchManager';
 import Login from './Firebase/Login';
 import TeamManager from './Admin/TeamManager';
+import SeasonManager from './Admin/SeasonManager';
 import CalendarManager from './Admin/CalendarManager';
 
 import { setDefaultMetas } from './utils/metaTags';
@@ -56,6 +57,7 @@ function App() {
             <Route path="teams" element={<TeamManager />} />
             <Route path="players" element={<PlayerManager />} />
             <Route path="calendar" element={<CalendarManager />} />
+            <Route path="seasons" element={<SeasonManager />} />
             <Route path="match/:id" element={<MatchManager />} />
           </Route>
 

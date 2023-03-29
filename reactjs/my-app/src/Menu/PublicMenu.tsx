@@ -88,6 +88,10 @@ function PublicMenu() {
         url: "/admin/dashboard",
       },
       {
+        label:"Seasons",
+        url: "/admin/seasons",
+      },
+      {
         label:"Players",
         url: "/admin/players",
       },

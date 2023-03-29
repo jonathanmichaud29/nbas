@@ -26,6 +26,13 @@ export interface ILeagueTeam {
   idLeague: number;
 }
 
+export interface ILeagueSeason {
+  id: number;
+  idLeague: number;
+  name: string;
+  year: number;
+}
+
 
 export interface ILeagueTeamDetails {
   teamId: number;

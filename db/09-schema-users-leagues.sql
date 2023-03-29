@@ -31,7 +31,7 @@ CREATE TABLE `nbas`.`user_league` (
 
 ALTER TABLE `nbas`.`user_league` ADD PRIMARY KEY (`idUser`, `idLeague`);
 
-INSERT INTO `nbas`.`user_league` (`idUser`, `idLeague`) VALUES (1, 1)
+INSERT INTO `nbas`.`user_league` (`idUser`, `idLeague`) VALUES (1, 1);
 
 CREATE TABLE `nbas`.`player_league` (
   `idPlayer` INT NOT NULL,

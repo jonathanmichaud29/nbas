@@ -8,6 +8,7 @@ const teamControllers = require("../controllers/team");
 const teamLeagueControllers = require("../controllers/teamLeague");
 
 const leagueControllers = require("../controllers/league");
+const leagueSeasonControllers = require("../controllers/leagueSeason");
 
 const playerControllers = require("../controllers/player");
 const playerLeagueControllers = require("../controllers/playerLeague");
@@ -30,6 +31,21 @@ router
   .route("/m/league/")
   .post(firebaseAuthMiddleware.decodeToken, leagueControllers.createLeague);
 
+
+/**
+ * League Season routes
+ */
+router
+  .route("/r/league-season/")
+  .post(leagueSeasonControllers.getLeagueSeasons);
+
+router
+  .route("/m/league-season/")
+  .post(firebaseAuthMiddleware.decodeToken, leagueSeasonControllers.createLeagueSeason);
+
+router
+  .route("/m/league-season/:idSeason")
+  .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, leagueSeasonControllers.deleteLeagueSeason);
 /**
  * User routes
  */
