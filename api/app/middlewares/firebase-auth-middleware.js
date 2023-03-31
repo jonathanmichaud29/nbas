@@ -5,14 +5,17 @@ class FirebaseAuthMiddleware{
     const authToken = req.headers.authorization;
     try{
       const token = authToken.split(" ")[1];
-      const decodeValue = await admin.auth().verifyIdToken(token);
-      if( decodeValue) {
-        return next();
-      }
-      return res.status(500).json({
-        status: "error",
-        message: "Invalid token",
-      });
+      await admin.auth().verifyIdToken(token)
+        .then(response => {
+          return next();
+        })
+        .catch(error => {
+          return res.status(401).json({
+            status: "error",
+            message: "Invalid token",
+          }); 
+        })
+      
     }
     catch(e) {
       return res.status(500).json({
