@@ -92,10 +92,6 @@ function PublicMenu() {
         url: "/admin/leagues",
       },
       {
-        label:"Seasons",
-        url: "/admin/seasons",
-      },
-      {
         label:"Players",
         url: "/admin/players",
       },
