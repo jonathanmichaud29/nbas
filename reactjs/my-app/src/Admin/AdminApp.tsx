@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -9,12 +9,14 @@ import PublicMenu from "../Menu/PublicMenu";
 import { setDefaultAdminMetas } from '../utils/metaTags';
 
 import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
-import { getStorageLeagueId } from "../utils/localStorage";
+import { getStorageLeagueId, getStorageLeagueSeasonId } from "../utils/localStorage";
+import ChangeAdminLeague from "../League/ChangeAdminLeague";
 
 function AdminApp() {
   const navigate = useNavigate();
   const location = useLocation().pathname;
   const [user, loading] = useAuthState(auth);
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
   
   useEffect(() => {
     if( getStorageLeagueId() === 0 && location !== '/admin/dashboard'){
@@ -41,6 +43,9 @@ function AdminApp() {
           .catch(error => {
             window.localStorage.clear();
           })
+          .then(() => {
+            setDataRetrieved(true);
+          })
       })
     }
     else {
@@ -53,6 +58,9 @@ function AdminApp() {
   return (
     <>
       <PublicMenu />
+      {dataRetrieved && (
+        <ChangeAdminLeague />
+      )}
       <Outlet />
     </>
   )

@@ -11,6 +11,7 @@ import { createLeague, IApiCreateLeagueParams } from "../ApiCall/leagues";
 
 import FormTextInput from "../Forms/FormTextInput";
 import LoaderInfo from "../Generic/LoaderInfo";
+import { addAdminLeagues } from "../redux/adminContextSlice";
 
 interface IFormInput {
   name: string;
@@ -50,7 +51,8 @@ export default function CreateLeague(){
     createLeague(paramsCreateLeague)
       .then((response) =>{
         reset()
-        dispatch(addLeague(response.data))
+        dispatch(addLeague(response.data));
+        dispatch(addAdminLeagues([response.data]));
         changeApiSuccess(response.message);
 
       })

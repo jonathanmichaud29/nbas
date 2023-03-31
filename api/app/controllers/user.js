@@ -1,8 +1,6 @@
 const AppError = require("../utils/appError");
 const appResponse = require("../utils/appResponse");
 const { mysqlQuery } = require("../services/db");
-const { getTeamsData, getMatchesData, getPlayersData } = require("../utils/simpleQueries");
-const { dateFormatShort, dateFormatToDatabase } = require("../utils/dateFormatter")
 const { is_missing_keys } = require("../utils/validation");
 
 exports.userFirebaseToken = async (req, res, next) => {
@@ -35,7 +33,7 @@ exports.fetchUserLeagues = async (req, res, next) => {
   if (!req.body) {
     return next(new AppError("No parameters found", 404));
   }
-  const query = "SELECT l.* " +
+  let query = "SELECT l.* " +
   "FROM users as u " +
   "INNER JOIN user_league AS ul ON (u.id=ul.idUser) " +
   "INNER JOIN leagues as l ON (ul.idLeague=l.id) " +
@@ -43,5 +41,21 @@ exports.fetchUserLeagues = async (req, res, next) => {
   const values = [req.userToken];
   const resultMainQuery = await mysqlQuery(query, values);
 
-  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  let customData = {
+    leagues:[],
+    leagueSeasons: []
+  }
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customData.leagues = resultMainQuery.data;
+
+    const aLeagueIds = customData.leagues.map((league) => league.id);
+    query = "SELECT ls.* FROM league_season as ls WHERE idLeague IN (?)";
+    const resultSeasons = await mysqlQuery(query, [aLeagueIds])
+    if( resultSeasons.status ){
+      customData.leagueSeasons = resultSeasons.data;
+    }
+  }
+
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error);
 }

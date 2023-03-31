@@ -88,7 +88,7 @@ exports.createLeague = async (req, res, next) => {
     promiseConn.release()
     const customData = {
       id: leagueId,
-      name: [req.body.name]
+      name: req.body.name
     }
     const customMessage = `league '${req.body.name}' created!`
     return appResponse(res, next, success, customData, null, customMessage);

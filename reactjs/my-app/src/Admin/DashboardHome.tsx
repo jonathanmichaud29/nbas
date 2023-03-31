@@ -3,8 +3,6 @@ import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import { logout } from "../Firebase/firebase";
-import LeagueSwitch from "../League/LeagueSwitch";
-import CreateLeague from "../League/CreateLeague";
 
 import { AppDispatch } from "../redux/store";
 import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
@@ -39,9 +37,6 @@ function DashboardHome() {
           >Logout</Button>
         </Stack>
       </Paper>
-      <CreateLeague
-      />
-      <LeagueSwitch />
     </>
   );
 }

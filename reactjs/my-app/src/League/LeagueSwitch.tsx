@@ -9,6 +9,7 @@ import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
 import { resetLeagueTeams } from "../redux/leagueTeamSlice";
 import { resetTeams } from "../redux/teamSlice";
 import { addLeagues } from "../redux/leagueSlice";
+import { addAdminLeagues, addAdminLeagueSeasons } from "../redux/adminContextSlice";
 
 import { ILeague } from "../Interfaces/league";
 
@@ -17,6 +18,7 @@ import { fetchUserLeagues, IApiFetchUserLeaguesParams } from "../ApiCall/users";
 import LoaderInfo from "../Generic/LoaderInfo";
 
 import { getStorageLeagueId } from "../utils/localStorage";
+import { resetLeagueSeasons } from "../redux/leagueSeasonSlice";
 
 function LeagueSwitch() {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +39,7 @@ function LeagueSwitch() {
     dispatch(resetLeaguePlayers());
     dispatch(resetTeams());
     dispatch(resetLeagueTeams());
+    dispatch(resetLeagueSeasons());
 
   }
 
@@ -50,8 +53,10 @@ function LeagueSwitch() {
           return;
         }
 
-        dispatch(addLeagues(response.data));
-        response.data.every((league: ILeague) => {
+        dispatch(addLeagues(response.data.leagues));
+        dispatch(addAdminLeagues(response.data.leagues));
+        dispatch(addAdminLeagueSeasons(response.data.leagueSeasons));
+        response.data.leagues.every((league: ILeague) => {
           if( currentLeagueId === 0  || currentLeagueId === league.id ){
             console.log("new league found and set");
             selectNewLeague(league);

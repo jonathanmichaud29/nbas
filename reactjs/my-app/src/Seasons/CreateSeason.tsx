@@ -1,10 +1,10 @@
-import { useState }  from 'react';
+import { useEffect, useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
-import { AppDispatch } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { addLeagueSeason } from '../redux/leagueSeasonSlice';
 
 import { ILeagueSeason } from '../Interfaces/league';
@@ -14,6 +14,7 @@ import LoaderInfo from '../Generic/LoaderInfo';
 
 import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
 import { createLeagueSeason, IApiCreateLeagueSeasonParams } from '../ApiCall/seasons';
+import { addAdminLeagueSeasons } from '../redux/adminContextSlice';
 
 
 interface IFormInput {
@@ -23,8 +24,10 @@ interface IFormInput {
 
 function CreateSeason() {
   const dispatch = useDispatch<AppDispatch>();
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  /* const currentLeagueName = getStorageLeagueName(); */
 
-  const currentLeagueName = getStorageLeagueName();
+  const [leagueName, setLeagueName] = useState<string>(stateAdminContext.currentLeague?.name || '');
   
   const [apiInfo, changeApiInfo] = useState<string>("");
   const [apiError, changeApiError] = useState<string>("");
@@ -69,6 +72,7 @@ function CreateSeason() {
           year: response.data.year,
         }
         dispatch(addLeagueSeason(dataLeagueSeason));
+        dispatch(addAdminLeagueSeasons([dataLeagueSeason]));
       })
       .catch(error => {
         changeApiError(error.message);
@@ -78,10 +82,14 @@ function CreateSeason() {
       })
   }
 
+  useEffect(()=>{
+    setLeagueName(stateAdminContext.currentLeague?.name || '');
+  }, [stateAdminContext.currentLeague]);
+
   return (
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={1} alignItems="center">
-        <Typography variant="h1">{`${currentLeagueName}`} Seasons</Typography>
+        <Typography variant="h1">{`${leagueName}`} Seasons</Typography>
         <Typography variant="subtitle1">Add new season into league</Typography>
         <LoaderInfo
           msgError={apiError}

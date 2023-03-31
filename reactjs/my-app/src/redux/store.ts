@@ -8,6 +8,7 @@ import matchReducer from './matchSlice'
 import leaguePlayerReducer from './leaguePlayerSlice'
 import leagueTeamReducer from './leagueTeamSlice'
 import leagueSeasonReducer from './leagueSeasonSlice'
+import adminContextReducer from './adminContextSlice'
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     leagueSeasons: leagueSeasonReducer,
     matches: matchReducer,
     matchPlayers: matchPlayerReducer,
+    adminContext: adminContextReducer,
   },
 })
 
