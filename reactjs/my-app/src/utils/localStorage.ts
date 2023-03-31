@@ -28,9 +28,11 @@ export const getStorageLeagueSeasonId = () => {
   return castNumber(window.localStorage.getItem("currentLeagueSeasonId"))
 }
 
+// TODO : Remove this call and instead use Redux storage for context (admin or public)
 export const getStorageLeagueName = () => {
   return window.localStorage.getItem("currentLeagueName")
 }
+// TODO : Remove this call and instead use Redux storage for context (admin or public)
 export const getStorageLeagueSeasonName = () => {
   return window.localStorage.getItem("currentLeagueSeasonName")
 }

@@ -57,7 +57,7 @@ export default function CreateLeague(){
 
       })
       .catch(error => {
-        changeApiError(error.message);
+        changeApiError(error);
       })
       .finally(() => {
         setRequestStatus(false);

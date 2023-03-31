@@ -1,18 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Paper, AppBar, Alert, FormControl } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
-/* import { SelectChangeEvent } from "@mui/material/Select" */
-import { ILeague, ILeagueSeason } from "../Interfaces/league";
+import { AppDispatch, RootState } from "../redux/store";
+import { addAdminLeagues, addAdminLeagueSeasons, 
+  setAdminLeague, setAdminLeagueSeason } from "../redux/adminContextSlice";
 
-import { getStorageLeagueId, getStorageLeagueSeasonId } from "../utils/localStorage";
+import { ILeague, ILeagueSeason } from "../Interfaces/league";
 import { IApiFetchUserLeaguesParams, fetchUserLeagues } from "../ApiCall/users";
 
-import { AppDispatch, RootState } from "../redux/store";
-import { addAdminLeagues, addAdminLeagueSeasons, setAdminLeague, setAdminLeagueSeason } from "../redux/adminContextSlice";
+import { getStorageLeagueId, getStorageLeagueSeasonId } from "../utils/localStorage";
+
 import LoaderInfo from "../Generic/LoaderInfo";
 
 interface IChangeAdminLeague {
@@ -28,7 +29,7 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
   const currentLeagueId = getStorageLeagueId();
   const currentLeagueSeasonId = getStorageLeagueSeasonId();
   const stateAdminContext = useSelector((state: RootState) => state.adminContext )
-
+  
   const [apiError, changeApiError] = useState('');
 
   useMemo(()=>{
@@ -44,12 +45,11 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
         dispatch(addAdminLeagueSeasons(response.data.leagueSeasons));
         
         response.data.leagues.every((league: ILeague) => {
-          if( stateAdminContext.currentLeague === null  || stateAdminContext.currentLeague === league ){
+          if( currentLeagueId === null  || currentLeagueId === league.id ){
             let newLeagueSeason = null;
-            const leagueSeasons = response.data.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === league.id);
             if( response.data.leagueSeasons && response.data.leagueSeasons.length ){
               response.data.leagueSeasons.every((leagueSeason: ILeagueSeason) => {
-                if( stateAdminContext.currentLeagueSeason === null  || stateAdminContext.currentLeagueSeason === leagueSeason ){
+                if( currentLeagueSeasonId === null  || currentLeagueSeasonId === leagueSeason.id ){
                   newLeagueSeason = leagueSeason;
                   return false;
                 }
@@ -103,23 +103,8 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
     const newLeagueSeasonId = event.target.value as unknown as number;
     const newLeagueSeason = stateAdminContext.leagueSeasons.find((leagueSeason: ILeagueSeason) => leagueSeason.id === newLeagueSeasonId) || null;
     dispatch(setAdminLeagueSeason(newLeagueSeason));
-    // dispatch(setAdminLeagueSeasonId(newLeagueSeasonId));
     window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeasonId.toString());
-
-    /* let leagueSeasonName = stateAdminContext.leagueSeasons.find((leagueSeason: ILeagueSeason) => leagueSeason.id === newLeagueSeasonId)?.name || '';
-    window.localStorage.setItem("currentLeagueSeasonName", leagueSeasonName); */
   }
-
-  /* useEffect(() => {
-    const leagueName = stateAdminContext.leagues.find((league: ILeague) => league.id === stateAdminContext.currentLeague.id)?.name || '';
-    window.localStorage.setItem("currentLeagueName", leagueName);
-  }, [stateAdminContext.currentLeague]); */
-
-  /* useEffect(() => {
-    let leagueSeasonName = stateAdminContext.leagueSeasons.find((leagueSeason: ILeagueSeason) => leagueSeason.id === stateAdminContext.currentLeagueSeasonId)?.name || '';
-    window.localStorage.setItem("currentLeagueSeasonName", leagueSeasonName);
-  }, [stateAdminContext.currentLeagueSeasonId]); */
-
 
   return (
     <AppBar position="sticky" color="transparent">

@@ -14,7 +14,7 @@ import LoaderInfo from '../Generic/LoaderInfo';
 
 import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
 import { createLeagueSeason, IApiCreateLeagueSeasonParams } from '../ApiCall/seasons';
-import { addAdminLeagueSeasons } from '../redux/adminContextSlice';
+import { addAdminLeagueSeasons, setAdminLeagueSeason } from '../redux/adminContextSlice';
 
 
 interface IFormInput {
@@ -25,10 +25,9 @@ interface IFormInput {
 function CreateSeason() {
   const dispatch = useDispatch<AppDispatch>();
   const stateAdminContext = useSelector((state: RootState) => state.adminContext )
-  /* const currentLeagueName = getStorageLeagueName(); */
 
-  const [leagueName, setLeagueName] = useState<string>(stateAdminContext.currentLeague?.name || '');
-  
+  const leagueName = stateAdminContext.currentLeague?.name || '';
+
   const [apiInfo, changeApiInfo] = useState<string>("");
   const [apiError, changeApiError] = useState<string>("");
   const [apiWarning, changeApiWarning] = useState<string>("");
@@ -67,24 +66,22 @@ function CreateSeason() {
 
         const dataLeagueSeason: ILeagueSeason = {
           id: response.data.id,
-          idLeague: response.data.leagueId,
+          idLeague: response.data.idLeague,
           name: response.data.name,
           year: response.data.year,
         }
         dispatch(addLeagueSeason(dataLeagueSeason));
         dispatch(addAdminLeagueSeasons([dataLeagueSeason]));
+        dispatch(setAdminLeagueSeason(dataLeagueSeason));
+        window.localStorage.setItem("currentLeagueSeasonId", response.data.id);
       })
       .catch(error => {
-        changeApiError(error.message);
+        changeApiError(error);
       })
       .finally(() => {
         setRequestStatus(false);
       })
   }
-
-  useEffect(()=>{
-    setLeagueName(stateAdminContext.currentLeague?.name || '');
-  }, [stateAdminContext.currentLeague]);
 
   return (
     <Paper component={Box} p={3} m={3}>

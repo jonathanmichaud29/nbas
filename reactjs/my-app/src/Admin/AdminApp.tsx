@@ -3,14 +3,13 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import { auth } from "../Firebase/firebase";
-
-import PublicMenu from "../Menu/PublicMenu";
+import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
 
 import { setDefaultAdminMetas } from '../utils/metaTags';
+import { getStorageLeagueId } from "../utils/localStorage";
 
-import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
-import { getStorageLeagueId, getStorageLeagueSeasonId } from "../utils/localStorage";
 import ChangeAdminLeague from "../League/ChangeAdminLeague";
+import PublicMenu from "../Menu/PublicMenu";
 
 function AdminApp() {
   const navigate = useNavigate();

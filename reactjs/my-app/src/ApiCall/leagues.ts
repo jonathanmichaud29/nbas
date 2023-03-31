@@ -47,6 +47,6 @@ export const createLeague = async (bodyParams: IApiCreateLeagueParams) => {
       return Promise.resolve(response.data);
     })
     .catch(error => {
-      return Promise.reject(error.response.data);
+      return Promise.reject(error.response.data.message);
     })
 }

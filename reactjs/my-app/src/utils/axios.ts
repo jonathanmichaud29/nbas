@@ -20,6 +20,20 @@ axiosProtected.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+/* 
+axiosProtected.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async(error) => {
+    const originalConfig = error.config;
+    if (error.response && error.response.status === 401 && !originalConfig._retry) {
+      // Call refresh token
+
+      return axiosProtected(originalConfig);
+    }
+  }
+); */
 
 axiosPublic.interceptors.request.use(
   async (config) => {
@@ -36,4 +50,6 @@ axiosPublic.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+
 export { axiosPublic, axiosProtected}
