@@ -21,11 +21,7 @@ import { resetPlayers } from "../redux/playerSlice";
 import { resetTeams } from "../redux/teamSlice";
 
 interface IChangeAdminLeague {
-  /* leagues?:ILeague[];
-  defaultLeagueId?:number;
-  hideAllLeagueOption?:boolean;
-  playersLeagues?:ILeaguePlayer[];
-  onLeagueChange?(idLeague: number): void; */
+  
 }
 function ChangeAdminLeague(props:IChangeAdminLeague) {
   const dispatch = useDispatch<AppDispatch>();

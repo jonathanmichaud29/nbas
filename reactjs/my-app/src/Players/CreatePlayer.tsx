@@ -18,8 +18,6 @@ import FormTextInput from '../Forms/FormTextInput';
 import FormRadioButtons from '../Forms/FormRadioButtons';
 import LoaderInfo from '../Generic/LoaderInfo';
 
-import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
-
 interface IFormInput {
   name: string;
   existingPlayer: string;
@@ -31,9 +29,6 @@ function CreatePlayer() {
   const stateAdminContext = useSelector((state: RootState) => state.adminContext )
   const currentLeagueId = stateAdminContext.currentLeague?.id || 0;
   const currentLeagueName = stateAdminContext.currentLeague?.name || '';
-  const currentLeagueSeasonId = stateAdminContext.currentLeagueSeason?.id || 0;
-  /* const currentLeagueId = getStorageLeagueId();
-  const currentLeagueName = getStorageLeagueName(); */
   
   const [apiInfo, changeApiInfo] = useState<string>("");
   const [apiError, changeApiError] = useState<string>("");
@@ -88,19 +83,15 @@ function CreatePlayer() {
       .catch(error => {
         
         if( error.code === 'playerExists' ){
-          // changeApiInfo(error.message);
           let listActions = [
             {label:"Create new player profile", value:'0'}
           ]
+
           // Find Player Ids that are already in the current league
           const currentLeaguePlayerIds = error.data.players.filter((playerLeagueDetails: ILeaguePlayerDetails) => {
             return playerLeagueDetails.leagueId === currentLeagueId /* && ! currentLeagueSeasonPlayerIds.includes(playerLeagueDetails.playerId) */
           }).map((playerLeagueDetails: ILeaguePlayerDetails) => playerLeagueDetails.playerId);
-          
-          /* if( currentLeaguePlayerIds.length > 0 ){
-            changeApiInfo("This player name is already in this league.");
-          } */
-          
+                    
           error.data.players.forEach((playerLeagueDetails: ILeaguePlayerDetails) => {
             if( currentLeaguePlayerIds.includes(playerLeagueDetails.playerId)) return;
 
