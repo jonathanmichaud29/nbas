@@ -1,4 +1,4 @@
-import { ILeague, ILeaguePlayer, /* ILeagueSeason, */ ILeagueTeam } from "../Interfaces/league";
+import { ILeague, ILeaguePlayer, ILeagueSeason, ILeagueTeam } from "../Interfaces/league";
 import { IMatch, IMatchLineup } from "../Interfaces/match";
 import { IPlayer } from "../Interfaces/player";
 import { ITeam } from "../Interfaces/team";
@@ -25,6 +25,24 @@ export const filterPlayersByName = (listPlayers: IPlayer[], searchTerm: string) 
     return listPlayers;
   }
   return listPlayers.filter((player:IPlayer) => player.name.toLowerCase().includes(searchTerm.toLowerCase()) ) || []
+}
+
+export const filterTeamsBySeason = (listTeams: ITeam[], listLeagueTeams: ILeagueTeam[], leagueSeason: ILeagueSeason | null) => {
+  // Find players from the same league and the same season
+  const returnLeagueTeams = listLeagueTeams.filter((leagueTeam) => {
+    return ( leagueTeam.idSeason === leagueSeason?.id )
+  })
+  
+  // Map player IDs 
+  const leagueTeamIds = returnLeagueTeams.map((leagueTeam) => leagueTeam.idTeam)
+
+  // Filter players by found IDs
+  const returnTeams = listTeams.filter((team) => leagueTeamIds.includes(team.id))
+  
+  return {
+    teams : returnTeams,
+    leagueTeams : returnLeagueTeams
+  };
 }
 
 export const filterTeamLineups = (matchLineups: IMatchLineup[], idTeam: number) => {

@@ -1,7 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
-import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Alert, Box, 
+  Card, CardActions, CardHeader, 
+  Grid, IconButton, Paper, 
+  Stack, Tooltip, Typography } from "@mui/material";
 import { Delete } from '@mui/icons-material';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -14,24 +17,36 @@ import { addLeagueTeams, removeLeagueTeam } from "../redux/leagueTeamSlice";
 import { ITeam, ITeamProps } from "../Interfaces/team";
 import { ILeagueTeam } from '../Interfaces/league';
 
-import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, IApiFetchLeagueTeamsParams, deleteLeagueTeam, IApiDeleteLeagueTeamParams } from "../ApiCall/teams";
+import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, 
+  IApiFetchLeagueTeamsParams, IApiDeleteLeagueTeamParams,
+  deleteLeagueTeam } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
+import { filterTeamsBySeason } from '../utils/dataFilter';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [apiError, changeApiError] = useState("");
-  const [apiSuccess, changeApiSuccess] = useState("");
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  const listTeams = useSelector((state: RootState) => state.teams )
+  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+
+  const currentLeagueSeasonName = stateAdminContext.currentLeagueSeason?.name || '';
 
   const {isAdmin, isAddPlayers, isViewPlayers } = props;
 
-  const listTeams = useSelector((state: RootState) => state.teams )
-  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+  const [apiError, changeApiError] = useState("");
+  const [apiSuccess, changeApiSuccess] = useState("");
+  const [displayTeams, setDisplayTeams] = useState<ITeam[]>([]);
+
+  useMemo(()=>{
+    const {teams, leagueTeams} = filterTeamsBySeason(listTeams, listLeagueTeams, stateAdminContext.currentLeagueSeason);
+    setDisplayTeams(teams);
+  },[listTeams, stateAdminContext.currentLeagueSeason])
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -116,7 +131,25 @@ function ListTeams(props: ITeamProps) {
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
-        dispatch(addLeagueTeams(response.data));
+        const listLeagueTeams: ILeagueTeam[] = response.data || [];
+        dispatch(addLeagueTeams(listLeagueTeams));
+
+        const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+        const paramsFetchTeams: IApiFetchTeamsParams = {
+          teamIds: teamIds
+        }
+
+        fetchTeams(paramsFetchTeams)
+          .then(response => {
+            const listTeams: ITeam[] = response.data || [];
+            dispatch(addTeams(listTeams));
+          })
+          .catch(error => {
+            changeApiError(error);
+          })
+          .finally(() => {
+            
+          });
       })
       .catch(error => {
         changeApiError(error);
@@ -124,36 +157,17 @@ function ListTeams(props: ITeamProps) {
       .finally(() => {
         
       });
-  }, [dispatch]);
+  }, [stateAdminContext.currentLeague]);
 
-  useMemo(() => {
-    if( listLeagueTeams.length === 0 ) return;
 
-    const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: teamIds
-    }
-
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        dispatch(addTeams(response.data));
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [dispatch, listLeagueTeams])
-
-  const htmlTeams = ( listTeams.length > 0 ? (
+  const htmlTeams = ( displayTeams.length > 0 ? (
     <Box p={3} width="100%">
       <Grid container spacing={3} flexWrap="wrap"
         sx={{
           flexDirection:{xs:"column", sm:"row"}
         }}
       >
-        { listTeams.map((team: ITeam, index:number) => {
+        { displayTeams.map((team: ITeam, index:number) => {
           let listActions = [];
           let actionLabel=`${team.name} Profile`;
           listActions.push(
@@ -245,7 +259,7 @@ function ListTeams(props: ITeamProps) {
   return (
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={3} alignItems="center" pb={3}>
-        <Typography variant="h2">League Teams</Typography>
+        <Typography variant="h2">{currentLeagueSeasonName} Teams</Typography>
         <LoaderInfo
           msgError={apiError}
         />

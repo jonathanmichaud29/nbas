@@ -21,9 +21,11 @@ export interface ILeaguePlayerDetails {
   leagueName: string;
 }
 
+// TODO: idSeason should be mandatory
 export interface ILeagueTeam {
   idTeam: number;
   idLeague: number;
+  idSeason?: number;
 }
 
 export interface ILeagueSeason {

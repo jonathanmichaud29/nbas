@@ -38,6 +38,7 @@ exports.createTeam = async (req, res, next) => {
     return next(new AppError(`Missing body parameters`, 404));
   }
   const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
 
   const resultTeams = await getLeagueTeamByName(req.body.name, selectedLeagueId);
   if( resultTeams.data.length > 0 ){
@@ -65,7 +66,7 @@ exports.createTeam = async (req, res, next) => {
     })
 
   try{
-    await promiseConn.query("INSERT INTO team_league (idLeague, idTeam) VALUES ?", [[[selectedLeagueId, teamId]]])
+    await promiseConn.query("INSERT INTO team_league (idLeague, idTeam, idSeason) VALUES ?", [[[selectedLeagueId, teamId, selectedSeasonId]]])
       .then( () => {
         return Promise.resolve(true);
       })
@@ -85,7 +86,8 @@ exports.createTeam = async (req, res, next) => {
       teamId: teamId,
       teamName: req.body.name,
       leagueId: selectedLeagueId,
-      leagueName: req.userAccessLeagues.find((league) => league.id === selectedLeagueId).name
+      leagueName: req.userAccessLeagues.find((league) => league.id === selectedLeagueId).name,
+      seasonId: selectedSeasonId,
     }
     const customMessage = `Team '${req.body.name}' created!`
     return appResponse(res, next, success, customData, null, customMessage);

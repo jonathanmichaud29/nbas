@@ -8,7 +8,7 @@ const teamSlice = createSlice({
   initialState,
   reducers: {
     
-    addTeams: (state, action: PayloadAction<[ITeam]>) => {
+    addTeams: (state, action: PayloadAction<ITeam[]>) => {
       action.payload.forEach((newTeam: ITeam) => {
         if ( state.find(element => element.id === newTeam.id) === undefined ){
           state.push(newTeam);

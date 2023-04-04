@@ -1,10 +1,10 @@
 import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Box,Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
+import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 
-import { AppDispatch } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { addTeam } from "../redux/teamSlice";
 import { addLeagueTeam } from '../redux/leagueTeamSlice';
 
@@ -16,9 +16,6 @@ import { createTeam, IApiCreateTeamParams } from '../ApiCall/teams';
 import FormTextInput from '../Forms/FormTextInput';
 import LoaderInfo from '../Generic/LoaderInfo';
 
-import { getStorageLeagueName } from '../utils/localStorage';
-
-
 interface IFormInput {
   name: string;
 }
@@ -26,7 +23,9 @@ interface IFormInput {
 function CreateTeam() {
   const dispatch = useDispatch<AppDispatch>();
   
-  const currentLeagueName = getStorageLeagueName();
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+
+  const currentLeagueName = stateAdminContext.currentLeague?.name || '';
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
@@ -57,6 +56,7 @@ function CreateTeam() {
       .then((response) =>{
         reset()
         changeApiSuccess(response.message);
+        
         const dataTeam: ITeam = {
           id: response.data.teamId,
           name: response.data.teamName,
@@ -64,7 +64,9 @@ function CreateTeam() {
         const dataLeagueTeam: ILeagueTeam = {
           idTeam: response.data.teamId,
           idLeague: response.data.leagueId,
+          idSeason: response.data.seasonId,
         }
+        
         dispatch(addTeam(dataTeam));
         dispatch(addLeagueTeam(dataLeagueTeam));
       })
@@ -79,37 +81,35 @@ function CreateTeam() {
 
 
   return (
-    <Paper component={Box} p={3} m={3}>
-      <Stack spacing={1} alignItems="center" pb={3}>
-        <Typography variant="h1">{currentLeagueName} Teams</Typography>
-        <Typography variant="subtitle1">Add new team into league</Typography>
-        <LoaderInfo
-          msgError={apiError}
-        />
-        <FormProvider {...methods}>
-          <Stack spacing={2} alignItems="center">
-            <FormTextInput
-              label={`New team name`}
-              controllerName={`name`}
-              type="text"
-              isRequired={true}
-            />
-            <Button 
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              disabled={requestStatus}
-              startIcon={requestStatus && (
-                <CircularProgress size={14}/>
-              )}
-            >{requestStatus ? 'Request Sent' : 'Add new team'}</Button>
+    <Stack spacing={1} alignItems="center" pb={3}>
+      <Typography variant="h1">Create new team</Typography>
+      <Typography variant="subtitle1">{currentLeagueName}</Typography>
+      <LoaderInfo
+        msgError={apiError}
+      />
+      <FormProvider {...methods}>
+        <Stack spacing={2} alignItems="center">
+          <FormTextInput
+            label={`New team name`}
+            controllerName={`name`}
+            type="text"
+            isRequired={true}
+          />
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
+            disabled={requestStatus}
+            startIcon={requestStatus && (
+              <CircularProgress size={14}/>
+            )}
+          >{requestStatus ? 'Request Sent' : 'Add new team'}</Button>
 
-            <LoaderInfo
-              msgSuccess={apiSuccess}
-            />
-          </Stack>
-        </FormProvider>
-      </Stack>
-    </Paper>
+          <LoaderInfo
+            msgSuccess={apiSuccess}
+          />
+        </Stack>
+      </FormProvider>
+    </Stack>
   );
 }
 

@@ -8,8 +8,8 @@ const leagueTeamSlice = createSlice({
   name:"leagueTeams",
   initialState,
   reducers: {
-    addLeagueTeams: (state, action: PayloadAction<[ILeagueTeam]>) => {
-      action.payload.forEach((leagueTeam: ILeagueTeam) => {
+    addLeagueTeams: (state, action: PayloadAction<ILeagueTeam[]>) => {
+      action.payload.forEach((leagueTeam) => {
         if ( state.find(element => element === leagueTeam) === undefined ){
           state.push(leagueTeam);
         }
