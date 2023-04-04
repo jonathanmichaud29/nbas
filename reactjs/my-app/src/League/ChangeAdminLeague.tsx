@@ -15,6 +15,10 @@ import { IApiFetchUserLeaguesParams, fetchUserLeagues } from "../ApiCall/users";
 import { getStorageLeagueId, getStorageLeagueSeasonId } from "../utils/localStorage";
 
 import LoaderInfo from "../Generic/LoaderInfo";
+import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
+import { resetLeagueTeams } from "../redux/leagueTeamSlice";
+import { resetPlayers } from "../redux/playerSlice";
+import { resetTeams } from "../redux/teamSlice";
 
 interface IChangeAdminLeague {
   /* leagues?:ILeague[];
@@ -81,22 +85,26 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
   const handleLeagueChange = (event: SelectChangeEvent) => {
     const newLeagueId = event.target.value as unknown as number;
     const newLeague = stateAdminContext.leagues.find((league: ILeague) => league.id === newLeagueId) || null;
-    dispatch(setAdminLeague(newLeague));
+    
+    // Find latest season for the choosen league
     let newLeagueSeason = null;
     const leagueSeasons = stateAdminContext.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === newLeagueId);
     if( leagueSeasons && leagueSeasons.length ){
-      newLeagueSeason = leagueSeasons[0];
+      newLeagueSeason = leagueSeasons[leagueSeasons.length - 1];
     }
+
+    // Dispatch new current League & Season
+    dispatch(setAdminLeague(newLeague));
     dispatch(setAdminLeagueSeason(newLeagueSeason));
     
     window.localStorage.setItem("currentLeagueId", newLeagueId.toString());
     window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeason?.id.toString() || '0');
     
-    /* dispatch(resetPlayers());
+    dispatch(resetPlayers());
     dispatch(resetLeaguePlayers());
     dispatch(resetTeams());
-    dispatch(resetLeagueTeams());
-    dispatch(resetLeagueSeasons()); */
+    dispatch(resetLeagueTeams()); 
+    // dispatch(resetLeagueSeasons());
   }
 
   const handleLeagueSeasonChange = (event: SelectChangeEvent) => {
