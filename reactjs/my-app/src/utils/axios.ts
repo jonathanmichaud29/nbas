@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { getStorageLeagueId, getStorageUserToken } from './localStorage';
+import { getStorageLeagueId, getStorageLeagueSeasonId, getStorageUserToken } from './localStorage';
 
 const axiosPublic = axios.create();
 const axiosProtected = axios.create();
@@ -9,11 +9,13 @@ axiosProtected.interceptors.request.use(
   async (config) => {
     const userToken = getStorageUserToken();
     const idLeague = getStorageLeagueId();
+    const idLeagueSeason = getStorageLeagueSeasonId();
     
     config.headers = {
       ...config.headers,
       Authorization: `Bearer ${userToken}`,
-      idleague: idLeague
+      idleague: idLeague,
+      idseason: idLeagueSeason,
     };
 
     return config;
@@ -39,11 +41,13 @@ axiosPublic.interceptors.request.use(
   async (config) => {
     const userToken = getStorageUserToken();
     const idLeague = getStorageLeagueId();
+    const idLeagueSeason = getStorageLeagueSeasonId();
     
     config.headers = {
       ...config.headers,
       Authorization: `Bearer ${userToken}`,
-      idleague: idLeague
+      idleague: idLeague,
+      idseason: idLeagueSeason,
     };
 
     return config;
