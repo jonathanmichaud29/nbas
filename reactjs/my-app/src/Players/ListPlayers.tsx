@@ -9,19 +9,20 @@ import { AppDispatch, RootState } from "../redux/store";
 import { addPlayers, removePlayer } from "../redux/playerSlice";
 import { addLeaguePlayers, removeLeaguePlayer } from "../redux/leaguePlayerSlice";
 
+import { IPlayer, IPlayerProps } from '../Interfaces/player';
+import { ILeaguePlayer } from '../Interfaces/league';
+
 import { 
   deleteLeaguePlayer, fetchLeaguePlayers, fetchPlayers, 
   IApiDeleteLeaguePlayerParams, IApiFetchLeaguePlayersParams, IApiFetchPlayersParams 
 } from '../ApiCall/players'
-
-import { IPlayer, IPlayerProps } from '../Interfaces/player';
-import { ILeaguePlayer } from '../Interfaces/league';
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
 
 import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 import SearchPlayer from './SearchPlayer';
+import { filterPlayersByName } from '../utils/dataFilter';
 
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,12 +33,12 @@ function ListPlayers(props: IPlayerProps) {
   const [apiSuccess, changeApiSuccess] = useState<string>("");
   const [filterTerm, setFilterTerm] = useState<string>("");
 
-  const listPlayers = useSelector((state: RootState) => state.players )
-  const listLeaguePlayers = useSelector((state: RootState) => state.leaguePlayers )
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext );
 
-  const orderedPlayers = [...listPlayers]
-  orderedPlayers.sort((a:IPlayer, b:IPlayer) => a.name.localeCompare(b.name));
-  const filteredPlayers = filterTerm === '' ? orderedPlayers : orderedPlayers.filter((player:IPlayer) => player.name.toLowerCase().includes(filterTerm.toLowerCase()) )
+  const listPlayers = useSelector((state: RootState) => state.players )
+  
+  let filteredPlayers = filterPlayersByName([...listPlayers], filterTerm);
+  filteredPlayers.sort((a:IPlayer, b:IPlayer) => a.name.localeCompare(b.name));
 
   const changeFilterTerm = (term: string) => {
     setFilterTerm(term);
@@ -71,31 +72,29 @@ function ListPlayers(props: IPlayerProps) {
 
       });
   }
-  
-  useMemo(() => {
+
+  const getLeaguePlayers = async() => {
     const paramsFetchLeaguePlayers: IApiFetchLeaguePlayersParams = {
       
     }
-    fetchLeaguePlayers(paramsFetchLeaguePlayers)
+    const myLeaguePlayers: [ILeaguePlayer] = await fetchLeaguePlayers(paramsFetchLeaguePlayers)
       .then(response => {
         dispatch(addLeaguePlayers(response.data));
+        return response.data;
       })
       .catch(error => {
         changeApiError(error);
+        return [];
       })
       .finally(() => {
-        
+        return [];
       });
-  }, [dispatch]);
 
-  useMemo(() => {
-    if( listLeaguePlayers === null || listLeaguePlayers.length === 0 ) return;
-
-    const playerIds = listLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
+    const playerIds = myLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
     const paramsFetchPlayers: IApiFetchPlayersParams = {
       playerIds: playerIds
     }
-    fetchPlayers(paramsFetchPlayers)
+    await fetchPlayers(paramsFetchPlayers)
       .then(response => {
         dispatch(addPlayers(response.data));
       })
@@ -105,7 +104,12 @@ function ListPlayers(props: IPlayerProps) {
       .finally(() => {
         
       });
-  }, [dispatch, listLeaguePlayers])
+  }
+  
+  useMemo(() => {
+    getLeaguePlayers();    
+  }, [stateAdminContext.currentLeague]);
+
 
   /**
    * Handle multiples modals
@@ -202,6 +206,7 @@ function ListPlayers(props: IPlayerProps) {
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={3} alignItems="center">
         <Typography variant="h2">Player list</Typography>
+        <Alert severity='info'>This list show all players from the current league. The season does not change the list.</Alert>
         { hasFilter && (
           <SearchPlayer 
             onChangeName={changeFilterTerm}
@@ -217,6 +222,7 @@ function ListPlayers(props: IPlayerProps) {
         )}
         
         { htmlPlayers }
+        
         { currentPlayerView && isAdmin && (
           <ConfirmDelete
             isOpen={isModalOpenConfirmDelete}

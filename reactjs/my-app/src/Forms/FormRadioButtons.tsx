@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import { FormControlLabel, FormHelperText, Radio, RadioGroup } from "@mui/material";
 import { IFieldPlayerExistsActions } from '../Interfaces/forms';
 
 interface IFormRadioButtonsProps {
@@ -28,14 +28,17 @@ function FormRadioButtons(props: IFormRadioButtonsProps) {
       rules={listRules}
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <RadioGroup value={value} onChange={onChange}>
-          { listValues.map((listValue) => (
-            <FormControlLabel 
-              key={`${controllerName}-${listValue.value}`}
-              value={listValue.value}
-              label={listValue.label} 
-              control={<Radio />}
-            />
-          ))}
+          {error?.message ? <FormHelperText error={true}>Please select an option</FormHelperText> : ''}
+          { listValues.map((listValue) => {
+            return (
+              <FormControlLabel 
+                key={`${controllerName}-${listValue.value}`}
+                value={listValue.value}
+                label={listValue.label} 
+                control={<Radio />}
+              />
+            )
+          })}
         </RadioGroup>
       )}
     />

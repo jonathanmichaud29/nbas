@@ -1,10 +1,10 @@
 import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
-import { AppDispatch } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { addPlayer } from '../redux/playerSlice';
 import { addLeaguePlayer } from "../redux/leaguePlayerSlice";
 
@@ -22,14 +22,18 @@ import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage'
 
 interface IFormInput {
   name: string;
-  existingPlayer: number;
+  existingPlayer: string;
 }
 
 function CreatePlayer() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentLeagueId = getStorageLeagueId();
-  const currentLeagueName = getStorageLeagueName();
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  const currentLeagueId = stateAdminContext.currentLeague?.id || 0;
+  const currentLeagueName = stateAdminContext.currentLeague?.name || '';
+  const currentLeagueSeasonId = stateAdminContext.currentLeagueSeason?.id || 0;
+  /* const currentLeagueId = getStorageLeagueId();
+  const currentLeagueName = getStorageLeagueName(); */
   
   const [apiInfo, changeApiInfo] = useState<string>("");
   const [apiError, changeApiError] = useState<string>("");
@@ -40,7 +44,7 @@ function CreatePlayer() {
 
   const defaultValues = {
     name: "",
-    existingPlayer:0
+    existingPlayer:''
   }
 
   const reinitializeApiMessages = () => {
@@ -84,33 +88,33 @@ function CreatePlayer() {
       .catch(error => {
         
         if( error.code === 'playerExists' ){
-          changeApiWarning(error.message);
+          // changeApiInfo(error.message);
           let listActions = [
-            {label:"New player", value:0}
+            {label:"Create new player profile", value:'0'}
           ]
           // Find Player Ids that are already in the current league
           const currentLeaguePlayerIds = error.data.players.filter((playerLeagueDetails: ILeaguePlayerDetails) => {
-            return playerLeagueDetails.leagueId === currentLeagueId
+            return playerLeagueDetails.leagueId === currentLeagueId /* && ! currentLeagueSeasonPlayerIds.includes(playerLeagueDetails.playerId) */
           }).map((playerLeagueDetails: ILeaguePlayerDetails) => playerLeagueDetails.playerId);
-
-          if( currentLeaguePlayerIds.length > 0 ){
+          
+          /* if( currentLeaguePlayerIds.length > 0 ){
             changeApiInfo("This player name is already in this league.");
-          }
+          } */
           
           error.data.players.forEach((playerLeagueDetails: ILeaguePlayerDetails) => {
             if( currentLeaguePlayerIds.includes(playerLeagueDetails.playerId)) return;
 
-            if( playerLeagueDetails.leagueId !== currentLeagueId ){
+            if( playerLeagueDetails.leagueId !== null ){
               if( playerLeagueDetails.leagueId !== null ) {
                 listActions.push({
                   label:`Add ${playerLeagueDetails.playerName} from ${playerLeagueDetails.leagueName}`, 
-                  value:playerLeagueDetails.playerId
+                  value:playerLeagueDetails.playerId.toString()
                 })
               }
               else {
                 listActions.push({
                   label:`Add ${data.name} without league association`, 
-                  value:playerLeagueDetails.playerId
+                  value:playerLeagueDetails.playerId.toString()
                 })
               }
             }
@@ -126,6 +130,12 @@ function CreatePlayer() {
         setRequestStatus(false);
       })
       
+  }
+
+  const resetPlayerActions = () => {
+    changeApiInfo('');
+    changeApiWarning('');
+    setPlayerExistsActions([]);
   }
 
   return (
@@ -146,14 +156,20 @@ function CreatePlayer() {
               controllerName={`name`}
               type="text"
               isRequired={true}
+              cbChange={resetPlayerActions}
             />
 
             { playerExistsActions && playerExistsActions.length > 0 && (
-              <FormRadioButtons
-                listValues={playerExistsActions}
-                controllerName={`existingPlayer`}
-                isRequired={true}
-              />
+              <>
+                <LoaderInfo
+                  msgWarning={`This player name exists in the system. Select the appropriate option or change the player name.`}
+                />
+                <FormRadioButtons
+                  listValues={playerExistsActions}
+                  controllerName={`existingPlayer`}
+                  isRequired={true}
+                />
+              </>
             )}
 
             <Button 

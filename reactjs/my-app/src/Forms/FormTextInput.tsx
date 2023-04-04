@@ -11,10 +11,11 @@ interface IFormTextInputProps {
   controllerKey?: string;
   isRequired?: boolean;
   pattern?: string;
+  cbChange?: () => void;
 }
 
 function FormTextInput(props: IFormTextInputProps) {
-  const { label, controllerName, controllerKey, type, isRequired, pattern } = props;
+  const { label, controllerName, controllerKey, type, isRequired, pattern, cbChange } = props;
   const { control } = useFormContext();
 
   let listRules = {} as any;
@@ -33,7 +34,12 @@ function FormTextInput(props: IFormTextInputProps) {
       rules={listRules}
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <TextField 
-          onChange={onChange} 
+          onChange={(e)=>{
+            if( cbChange ){
+              cbChange();
+            }
+            return onChange(e);
+          }} 
           value={value} 
           type={type}
           label={label} 

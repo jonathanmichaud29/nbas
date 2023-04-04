@@ -45,6 +45,7 @@ exports.createPlayer = async (req, res, next) => {
     return next(new AppError(`Missing body parameters`, 404));
   }
   const selectedLeagueId = castNumber(req.headers.idleague);
+  /* const selectedSeasonId = castNumber(req.headers.idseason); */
 
   if( req.body.existingPlayer === undefined ){
     const resultPlayers = await getSystemPlayersByName(req.body.name);
@@ -52,7 +53,7 @@ exports.createPlayer = async (req, res, next) => {
       const customData = {
         players: resultPlayers.data
       }
-      return appResponseActions(res, next, false, customData, `${req.body.name} exists in the system. What do you want to do?`, 'playerExists');
+      return appResponseActions(res, next, false, customData, `${req.body.name} exists in the system.`, 'playerExists');
     }
   }
 

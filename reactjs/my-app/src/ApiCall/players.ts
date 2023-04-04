@@ -39,7 +39,7 @@ export const fetchLeaguePlayers = async (bodyParams: IApiFetchPlayersParams) => 
 
 export interface IApiCreatePlayerParams {
   name: string;
-  existingPlayer?: number;
+  existingPlayer?: string;
 }
 export const createPlayer = async (bodyParams: IApiCreatePlayerParams) => {
   
