@@ -48,7 +48,9 @@ function AddTeamPlayer(props: ITeamPlayersProps) {
 
     fetchUnassignedPlayers()
       .then(response => {
-        setUnassignedPlayers(response.data);
+        const listPlayers: IPlayer[] = response.data || [];
+        listPlayers.sort((a,b) => a.name.localeCompare(b.name))
+        setUnassignedPlayers(listPlayers);
       })
       .catch(error => {
         changeApiError(error);

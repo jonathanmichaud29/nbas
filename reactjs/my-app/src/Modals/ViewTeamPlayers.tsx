@@ -59,11 +59,15 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
   }, [isOpen])
   
 
-  useMemo(() => {
-    if ( selectedTeam === null ) return;
+  useEffect(() => {
+    if ( selectedTeam === null ) {
+      setListTeamPlayers([])
+      return;
+    }
 
     const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
       teamIds: [selectedTeam.id],
+      isAdminContext:isAdmin
     }
     fetchTeamsPlayers(paramsFetchTeamsPlayers)
       .then(response => {

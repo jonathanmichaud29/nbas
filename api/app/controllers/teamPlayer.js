@@ -7,18 +7,29 @@ const { is_missing_keys, castNumber } = require("../utils/validation")
 
 exports.getTeamsPlayers = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
+
   const selectedLeagueId = castNumber(req.headers.idleague);
-  const listLeagueIds = req.body.leagueIds !== undefined ? req.body.leagueIds : [selectedLeagueId]
+  const selectedSeasonId = castNumber(req.headers.idseason);
+  const listLeagueIds = req.body.leagueIds !== undefined ? ( req.body.leagueIds.length > 0 ? req.body.leagueIds : [0]) : [selectedLeagueId]
+
   let query = '';
   let values = [];
-
-  if( req.body.allTeamsPlayers !== undefined && req.body.allTeamsPlayers) {
+  if( req.body.isAdminContext ){
     query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
       FROM team_player as tp 
       INNER JOIN teams as t ON (tp.idTeam=t.id) 
-      INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague=?) 
+      INNER JOIN players AS p ON (tp.idPlayer=p.id) 
+      WHERE tp.idLeagueSeason=? AND tp.idTeam IN ?`;
+    values = [selectedSeasonId, [req.body.teamIds]];
+  }
+  else if( req.body.allTeamsPlayers !== undefined && req.body.allTeamsPlayers) {
+    query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
+      FROM team_player as tp 
+      INNER JOIN teams as t ON (tp.idTeam=t.id) 
+      INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague=?)
+      INNER JOIN team_season as ts ON (ts.idTeam=tl.idTeam AND ts.idLeagueSeason=?) 
       INNER JOIN players AS p ON (tp.idPlayer=p.id)`;
-      values = [listLeagueIds];
+      values = [listLeagueIds, selectedSeasonId];
   }
   else if( req.body.teamIds !== undefined && req.body.teamIds.length > 0) {
     query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
@@ -48,19 +59,25 @@ exports.getTeamsPlayers = async (req, res, next) => {
 
 exports.getUnassignedPlayers = async (req, res, next) => {
   const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
+
   // Find all league players
   const queryPlayers = "SELECT idPlayer FROM player_league WHERE idLeague=?"
   const resultPlayers = await mysqlQuery(queryPlayers, [selectedLeagueId])
   const listPlayerIds = resultPlayers.data.map((row)=>row.idPlayer);
 
   // Find all league teams
-  const queryTeams = "SELECT idTeam FROM team_league WHERE idLeague=?"
-  const resultTeams = await mysqlQuery(queryTeams, [selectedLeagueId])
+  const queryTeams = `
+    SELECT tl.idTeam 
+    FROM team_league as tl 
+    INNER JOIN team_season AS ts ON (tl.idTeam=ts.idTeam AND ts.idLeagueSeason=?)
+    WHERE tl.idLeague=?`
+  const resultTeams = await mysqlQuery(queryTeams, [selectedSeasonId, selectedLeagueId])
   const listTeamIds = resultTeams.data.map((row)=>row.idTeam);
 
   // Find all players attached to a team in this league
-  const queryTeamPlayers = "SELECT idPlayer FROM team_player WHERE idTeam IN ? AND idPlayer IN ?"
-  const resultTeamPlayers = await mysqlQuery(queryTeamPlayers, [[listTeamIds], [listPlayerIds]])
+  const queryTeamPlayers = "SELECT idPlayer FROM team_player WHERE idLeagueSeason=? AND idTeam IN ? AND idPlayer IN ?"
+  const resultTeamPlayers = await mysqlQuery(queryTeamPlayers, [selectedSeasonId, [listTeamIds], [listPlayerIds]])
   const listTeamPlayerIds = resultTeamPlayers.data.map((row)=>row.idPlayer);
 
   // Player IDs that are active in this league without being associated to a team
@@ -76,17 +93,19 @@ exports.getUnassignedPlayers = async (req, res, next) => {
 };
 
 exports.createTeamPlayer = async (req, res, next) => {
-  if (!req.body.teamId) {
-    return next(new AppError("No team id found", 404));
-  }
-  if (!req.body.playerId) {
-    return next(new AppError("No player id found", 404));
+  
+  const bodyRequiredKeys = ["teamId", "playerId"]
+  if( is_missing_keys(bodyRequiredKeys, req.body) ) {
+    return next(new AppError(`Missing body parameters`, 404));
   }
 
+  const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
+
   const values = [
-    [[req.body.teamId, req.body.playerId]]
+    [[req.body.teamId, req.body.playerId, selectedSeasonId]]
   ];
-  const resultMainQuery = await mysqlQuery("INSERT INTO team_player (idTeam, idPlayer) VALUES ?", values)
+  const resultMainQuery = await mysqlQuery("INSERT INTO team_player (idTeam, idPlayer, idLeagueSeason) VALUES ?", values)
   
 
   const customData={
@@ -115,17 +134,19 @@ exports.deleteTeamPlayer = async (req, res, next) => {
     return next(new AppError(`Missing params parameters`, 404));
   }
 
+  const selectedSeasonId = castNumber(req.headers.idseason);
+
   const resultPlayerData = await getPlayerData(req.params.playerId);
   const resultTeamData = await getTeamData(req.params.teamId);
   
-  const values = [req.params.teamId, req.params.playerId]
-  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE idTeam=? AND idPlayer=?", values);
+  const values = [req.params.teamId, req.params.playerId, selectedSeasonId];
+  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE idTeam=? AND idPlayer=? AND idLeagueSeason=?", values);
 
   let customMessage = '';
   if( resultMainQuery.status ) {
-    customMessage = `This player has been removed from this team`;
+    customMessage = `This player has been removed from this team season`;
     if( resultPlayerData.status && resultTeamData.status ){
-      customMessage = `'${resultPlayerData.data.name}' has been removed from the '${resultTeamData.data.name}'!`
+      customMessage = `'${resultPlayerData.data.name}' has been removed from the '${resultTeamData.data.name}' season!`
     }
   }
   return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);

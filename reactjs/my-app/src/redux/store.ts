@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import teamReducer from './teamSlice'
 import teamSeasonReducer from './teamSeasonSlice'
 import playerReducer from './playerSlice'
+import teamPlayerReducer from './teamPlayerSlice'
 import leagueReducer from './leagueSlice'
 import matchPlayerReducer from './matchPlayerSlice'
 import matchReducer from './matchSlice'
@@ -17,6 +18,7 @@ export const store = configureStore({
     teamSeasons: teamSeasonReducer,
     leagueTeams: leagueTeamReducer,
     players: playerReducer,
+    teamPlayers: teamPlayerReducer,
     leagues: leagueReducer,
     leaguePlayers: leaguePlayerReducer,
     leagueSeasons: leagueSeasonReducer,

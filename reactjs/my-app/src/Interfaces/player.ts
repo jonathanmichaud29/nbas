@@ -7,6 +7,12 @@ export interface IPlayer{
   name: string;
 }
 
+export interface ITeamPlayer{
+  idTeam: number;
+  idPlayer: number;
+  idLeagueSeason: number;
+}
+
 export interface IPlayerProps{
   isAdmin?: boolean;
   hasFilter?: boolean;

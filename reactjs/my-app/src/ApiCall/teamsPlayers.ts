@@ -6,6 +6,7 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
  */
 
 export interface IApiFetchTeamsPlayersParams {
+  isAdminContext?: boolean;
   playerIds?: Array<number>;
   teamIds?: Array<number>;
   allTeamsPlayers?: boolean;
