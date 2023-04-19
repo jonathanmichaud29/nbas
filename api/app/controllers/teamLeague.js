@@ -133,3 +133,35 @@ exports.addTeamSeason = async (req, res, next) => {
   }
   
 };
+
+
+exports.deleteTeamSeason = async (req, res, next) => {
+  if (!req.params.idTeam) {
+    return next(new AppError("No team id found", 404));
+  }
+  const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
+  
+  /* const query = "DELETE tl, t " +
+    "FROM team_league as tl " +
+    "INNER JOIN teams as t ON (tl.idTeam=t.id) "+ 
+    "WHERE tl.idTeam=? AND tl.idLeague=?";
+  const values = [req.params.idTeam, selectedLeagueId]; */
+  const query = "DELETE ts " +
+    "FROM team_season as ts " +
+    "WHERE ts.idTeam=? AND ts.idLeagueSeason=?";
+  const values = [req.params.idTeam, selectedSeasonId];
+  
+  const resultMainQuery = await mysqlQuery(query, values);
+  let customData = {}
+  let customMessage = '';
+  if( resultMainQuery.status ){
+    customData = {
+      teamId: req.params.idTeam,
+      leagueId: selectedLeagueId,
+      seasonId: selectedSeasonId
+    };
+    customMessage = `team deleted from this league season!`;
+  }
+  return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
+};

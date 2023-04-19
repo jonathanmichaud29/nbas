@@ -128,6 +128,10 @@ router
   .route("/m/team-season/")
   .post(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.addTeamSeason);
 
+router
+  .route("/m/team-season/:idTeam")
+  .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.deleteTeamSeason);
+
 /**
  * Matches routes
  */

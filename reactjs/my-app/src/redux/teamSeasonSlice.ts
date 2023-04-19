@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { ITeam, ITeamSeason } from '../Interfaces/team';
+import { ITeamSeason } from '../Interfaces/team';
 const initialState = [] as ITeamSeason[];
 
 const teamSeasonSlice = createSlice({

@@ -14,10 +14,10 @@ import { AppDispatch, RootState } from "../redux/store";
 import { removeTeam } from "../redux/teamSlice";
 import { removeLeagueTeam } from "../redux/leagueTeamSlice";
 
-import { ITeam, ITeamProps } from "../Interfaces/team";
+import { ITeam, ITeamProps, ITeamSeason } from "../Interfaces/team";
 import { ILeagueTeam } from '../Interfaces/league';
 
-import { IApiDeleteLeagueTeamParams, deleteLeagueTeam } from "../ApiCall/teams";
+import { IApiDeleteLeagueTeamParams, IApiDeleteTeamSeasonParams, deleteLeagueTeam, deleteTeamSeason } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
@@ -26,6 +26,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { filterTeamsBySeason } from '../utils/dataFilter';
+import { removeTeamSeason } from '../redux/teamSeasonSlice';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -53,17 +54,17 @@ function ListTeams(props: ITeamProps) {
   const confirmDeleteTeam = (team: ITeam) => {
     reinitializeApiMessages();
 
-    const paramsDeleteLeagueTeam: IApiDeleteLeagueTeamParams = {
+    const paramsDeleteTeamSeason: IApiDeleteTeamSeasonParams = {
       idTeam: team.id
     }
-    deleteLeagueTeam(paramsDeleteLeagueTeam)
+    deleteTeamSeason(paramsDeleteTeamSeason)
       .then(response => {
-        dispatch(removeTeam(team.id));
-        const leagueTeamToRemove: ILeagueTeam = {
-          idTeam: response.data.idTeam,
-          idLeague: response.data.idLeague,
+        
+        const teamSeasonToRemove: ITeamSeason = {
+          idTeam: response.data.teamId,
+          idLeagueSeason: response.data.seasonId,
         }
-        dispatch(removeLeagueTeam(leagueTeamToRemove));
+        dispatch(removeTeamSeason(teamSeasonToRemove));
         changeApiSuccess(response.message);
       })
       .catch(error => {
@@ -253,7 +254,7 @@ function ListTeams(props: ITeamProps) {
           callbackCloseModal={cbCloseModalDelete}
           callbackConfirmDelete={cbCloseConfirmDelete}
           title={`Confirm team delete`}
-          description={`Are-you sure you want to delete the team '${currentTeamView.name}'?`}
+          description={`Are-you sure you want to delete the team '${currentTeamView.name}' for the current season?`}
           />
       ) }
     </Paper>

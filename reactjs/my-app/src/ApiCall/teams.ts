@@ -119,3 +119,16 @@ export const deleteLeagueTeam = async (bodyParams: IApiDeleteLeagueTeamParams) =
       return Promise.reject(error.response.data.message);
     })
 }
+
+export interface IApiDeleteTeamSeasonParams {
+  idTeam: number;
+}
+export const deleteTeamSeason = async (bodyParams: IApiDeleteTeamSeasonParams) => {
+  return await axiosProtected.delete(`${process.env.REACT_APP_API_DOMAIN}/m/team-season/${bodyParams.idTeam}`)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
