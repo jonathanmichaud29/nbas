@@ -49,17 +49,16 @@ ALTER TABLE `nbas`.`match_lineup`
 
 
 
-ALTER TABLE `nbas`.`team_league` 
+/* ALTER TABLE `nbas`.`team_league` 
   ADD COLUMN `idSeason` INT NULL AFTER `idLeague`;
 
 UPDATE `nbas`.`team_league` SET `idSeason`=1 WHERE idLeague=1;
-/* UPDATE `nbas`.`team_league` SET `idSeason`=2 WHERE idLeague=2; */
 
 ALTER TABLE `nbas`.`team_league` 
 CHANGE COLUMN `idSeason` `idSeason` INT NOT NULL ,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`idTeam`, `idLeague`, `idSeason`);
-
+ */
 
 
 

@@ -93,14 +93,13 @@ router
 /**
  * Team League routes
  */
- router
- .route("/r/team-league/")
- .post(teamLeagueControllers.getLeagueTeams);
+router
+  .route("/r/team-league/")
+  .post(teamLeagueControllers.getLeagueTeams);
 
 router
- .route("/m/team-league/:idTeam")
- .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.deleteLeagueTeam);
-
+  .route("/m/team-league/:idTeam")
+  .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.deleteLeagueTeam);
 
 /**
  * Teams routes
@@ -108,6 +107,10 @@ router
 router
   .route("/r/team/")
   .post(teamControllers.getTeams);
+
+router
+  .route("/r/team-season/")
+  .post(teamLeagueControllers.getAllTeamSeasons);
 
 router
   .route("/r/team/standing/")
@@ -120,6 +123,10 @@ router
 router
   .route("/m/team/:id")
   .delete(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamControllers.deleteTeam);
+
+router
+  .route("/m/team-season/")
+  .post(firebaseAuthMiddleware.decodeToken, validateUserLeague, teamLeagueControllers.addTeamSeason);
 
 /**
  * Matches routes

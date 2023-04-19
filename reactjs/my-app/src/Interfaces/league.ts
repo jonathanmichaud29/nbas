@@ -25,7 +25,6 @@ export interface ILeaguePlayerDetails {
 export interface ILeagueTeam {
   idTeam: number;
   idLeague: number;
-  idSeason?: number;
 }
 
 export interface ILeagueSeason {
@@ -34,7 +33,6 @@ export interface ILeagueSeason {
   name: string;
   year: number;
 }
-
 
 export interface ILeagueTeamDetails {
   teamId: number;

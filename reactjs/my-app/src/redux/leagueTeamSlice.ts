@@ -10,7 +10,7 @@ const leagueTeamSlice = createSlice({
   reducers: {
     addLeagueTeams: (state, action: PayloadAction<ILeagueTeam[]>) => {
       action.payload.forEach((leagueTeam) => {
-        if ( state.find(element => element === leagueTeam) === undefined ){
+        if ( state.find(element => element.idTeam === leagueTeam.idTeam ) === undefined ){
           state.push(leagueTeam);
         }
       });
@@ -28,7 +28,10 @@ const leagueTeamSlice = createSlice({
     },
     removeLeagueTeam: {
       reducer: (state, action: PayloadAction<ILeagueTeam>) => {
-        const index = state.findIndex((leagueTeam) => leagueTeam.idTeam === action.payload.idTeam && leagueTeam.idLeague === action.payload.idLeague);
+        const index = state.findIndex((leagueTeam) => {
+          return leagueTeam.idTeam === action.payload.idTeam 
+            && leagueTeam.idLeague === action.payload.idLeague
+        });
         state.splice(index, 1);
       },
       prepare: (leagueTeam: ILeagueTeam) => ({

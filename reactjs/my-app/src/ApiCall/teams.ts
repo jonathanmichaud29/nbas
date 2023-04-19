@@ -19,6 +19,20 @@ export const fetchTeams = async (bodyParams: IApiFetchTeamsParams) => {
     })
 }
 
+export interface IApiFetchTeamSeasonsParams {
+  teamIds: Array<number>;
+  leagueIds?: number;
+}
+export const fetchTeamSeasons = async (bodyParams: IApiFetchTeamSeasonsParams) => {
+  return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/team-season/`,bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
 export interface IApiFetchStandingTeamsParams {
   teamIds?: Array<number>;
   allTeams?: boolean;
@@ -56,6 +70,19 @@ export interface IApiCreateTeamParams {
 }
 export const createTeam = async (bodyParams: IApiCreateTeamParams) => {  
   return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/team/`, bodyParams)
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      return Promise.reject(error.response.data.message);
+    })
+}
+
+export interface IApiAddTeamSeasonParams {
+  idTeam: number;
+}
+export const createTeamSeason = async (bodyParams: IApiAddTeamSeasonParams) => {  
+  return await axiosProtected.post(`${process.env.REACT_APP_API_DOMAIN}/m/team-season/`, bodyParams)
     .then(response => {
       return Promise.resolve(response.data);
     })

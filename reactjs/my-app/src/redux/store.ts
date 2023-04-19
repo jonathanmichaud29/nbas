@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import teamReducer from './teamSlice'
+import teamSeasonReducer from './teamSeasonSlice'
 import playerReducer from './playerSlice'
 import leagueReducer from './leagueSlice'
 import matchPlayerReducer from './matchPlayerSlice'
@@ -13,6 +14,7 @@ import adminContextReducer from './adminContextSlice'
 export const store = configureStore({
   reducer: {
     teams: teamReducer,
+    teamSeasons: teamSeasonReducer,
     leagueTeams: leagueTeamReducer,
     players: playerReducer,
     leagues: leagueReducer,

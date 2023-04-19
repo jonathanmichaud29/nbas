@@ -66,7 +66,16 @@ exports.createTeam = async (req, res, next) => {
     })
 
   try{
-    await promiseConn.query("INSERT INTO team_league (idLeague, idTeam, idSeason) VALUES ?", [[[selectedLeagueId, teamId, selectedSeasonId]]])
+    await promiseConn.query("INSERT INTO team_league (idLeague, idTeam) VALUES ?", [[[selectedLeagueId, teamId]]])
+      .then( () => {
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        success = false;
+        return Promise.reject(err);
+      })
+    await promiseConn.query("INSERT INTO team_season (idTeam, idLeagueSeason) VALUES ?", [[[teamId, selectedSeasonId]]])
       .then( () => {
         return Promise.resolve(true);
       })

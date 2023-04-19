@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 
 import { Alert, Box, 
@@ -11,42 +11,39 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { AppDispatch, RootState } from "../redux/store";
-import { addTeams, removeTeam } from "../redux/teamSlice";
-import { addLeagueTeams, removeLeagueTeam } from "../redux/leagueTeamSlice";
+import { removeTeam } from "../redux/teamSlice";
+import { removeLeagueTeam } from "../redux/leagueTeamSlice";
 
 import { ITeam, ITeamProps } from "../Interfaces/team";
 import { ILeagueTeam } from '../Interfaces/league';
 
-import { fetchTeams, IApiFetchTeamsParams, fetchLeagueTeams, 
-  IApiFetchLeagueTeamsParams, IApiDeleteLeagueTeamParams,
-  deleteLeagueTeam } from "../ApiCall/teams";
+import { IApiDeleteLeagueTeamParams, deleteLeagueTeam } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
 import ConfirmDelete from "../Modals/ConfirmDelete";
 import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
+
 import { filterTeamsBySeason } from '../utils/dataFilter';
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  const {isAdmin, isAddPlayers, isViewPlayers, leagueSeason } = props;
+  
   const listTeams = useSelector((state: RootState) => state.teams )
   const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+  const listTeamSeasons = useSelector((state: RootState) => state.teamSeasons )
 
-  const currentLeagueSeasonName = stateAdminContext.currentLeagueSeason?.name || '';
-
-  const {isAdmin, isAddPlayers, isViewPlayers } = props;
+  const currentLeagueSeasonName = leagueSeason?.name || '';
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
-  const [displayTeams, setDisplayTeams] = useState<ITeam[]>([]);
-
-  useMemo(()=>{
-    const {teams, leagueTeams} = filterTeamsBySeason(listTeams, listLeagueTeams, stateAdminContext.currentLeagueSeason);
-    setDisplayTeams(teams);
-  },[listTeams, stateAdminContext.currentLeagueSeason])
+  
+  const filteredTeams = filterTeamsBySeason(listTeams, listLeagueTeams, listTeamSeasons, leagueSeason);
+  filteredTeams.sort((a, b) => a.name.localeCompare(b.name));
+  
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -125,49 +122,14 @@ function ListTeams(props: ITeamProps) {
     setCurrentTeamView(null);
   }
 
-  useMemo(() => {
-    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
-      
-    }
-    fetchLeagueTeams(paramsFetchLeagueTeams)
-      .then(response => {
-        const listLeagueTeams: ILeagueTeam[] = response.data || [];
-        dispatch(addLeagueTeams(listLeagueTeams));
-
-        const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
-        const paramsFetchTeams: IApiFetchTeamsParams = {
-          teamIds: teamIds
-        }
-
-        fetchTeams(paramsFetchTeams)
-          .then(response => {
-            const listTeams: ITeam[] = response.data || [];
-            dispatch(addTeams(listTeams));
-          })
-          .catch(error => {
-            changeApiError(error);
-          })
-          .finally(() => {
-            
-          });
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [stateAdminContext.currentLeague]);
-
-
-  const htmlTeams = ( displayTeams.length > 0 ? (
+  const htmlTeams = ( filteredTeams.length > 0 ? (
     <Box p={3} width="100%">
       <Grid container spacing={3} flexWrap="wrap"
         sx={{
           flexDirection:{xs:"column", sm:"row"}
         }}
       >
-        { displayTeams.map((team: ITeam, index:number) => {
+        { filteredTeams.map((team: ITeam, index:number) => {
           let listActions = [];
           let actionLabel=`${team.name} Profile`;
           listActions.push(

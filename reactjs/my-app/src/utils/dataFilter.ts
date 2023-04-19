@@ -1,24 +1,7 @@
 import { ILeague, ILeaguePlayer, ILeagueSeason, ILeagueTeam } from "../Interfaces/league";
 import { IMatch, IMatchLineup } from "../Interfaces/match";
 import { IPlayer } from "../Interfaces/player";
-import { ITeam } from "../Interfaces/team";
-/* 
-export const filterPlayersBySeason = (listPlayers: IPlayer[], listLeaguePlayers: ILeaguePlayer[], leagueSeason: ILeagueSeason | null) => {
-  // Find players from the same league and the same season
-  const returnLeaguePlayers = listLeaguePlayers.filter((leaguePlayer: ILeaguePlayer) => {
-    return leaguePlayer.idLeague === leagueSeason?.idLeague && leaguePlayer.idLeagueSeason === leagueSeason?.id
-  })
-  
-  // Map player IDs 
-  const leaguePlayerIds = returnLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer)
-
-  // Filter players by found IDs
-  const returnPlayers = listPlayers.filter((player) => leaguePlayerIds.includes(player.id))
-  return {
-    players : returnPlayers,
-    leaguePlayers : returnLeaguePlayers
-  };
-} */
+import { ITeam, ITeamSeason } from "../Interfaces/team";
 
 export const filterPlayersByName = (listPlayers: IPlayer[], searchTerm: string) => {
   if( searchTerm === ''){
@@ -27,22 +10,22 @@ export const filterPlayersByName = (listPlayers: IPlayer[], searchTerm: string) 
   return listPlayers.filter((player:IPlayer) => player.name.toLowerCase().includes(searchTerm.toLowerCase()) ) || []
 }
 
-export const filterTeamsBySeason = (listTeams: ITeam[], listLeagueTeams: ILeagueTeam[], leagueSeason: ILeagueSeason | null) => {
-  // Find players from the same league and the same season
-  const returnLeagueTeams = listLeagueTeams.filter((leagueTeam) => {
-    return ( leagueTeam.idSeason === leagueSeason?.id )
-  })
-  
-  // Map player IDs 
-  const leagueTeamIds = returnLeagueTeams.map((leagueTeam) => leagueTeam.idTeam)
+export const filterTeamsBySeason = (listTeams: ITeam[], listLeagueTeams: ILeagueTeam[], listTeamSeasons: ITeamSeason[], leagueSeason: ILeagueSeason | null) => {
+  const teamIds = listTeamSeasons.filter((teamSeason) => {
+    return ( teamSeason.idLeagueSeason === leagueSeason?.id )
+  }).map((teamSeason) => teamSeason.idTeam);
 
-  // Filter players by found IDs
-  const returnTeams = listTeams.filter((team) => leagueTeamIds.includes(team.id))
+  return listTeams.filter((team) => teamIds.includes(team.id))
+
+}
+
+export const filterTeamsNotInSeason = (listTeams: ITeam[], listLeagueTeams: ILeagueTeam[], listTeamSeasons: ITeamSeason[], leagueSeason: ILeagueSeason | null) => {
+  const teamIds = listTeamSeasons.filter((teamSeason) => {
+    return ( teamSeason.idLeagueSeason === leagueSeason?.id )
+  }).map((teamSeason) => teamSeason.idTeam);
+
+  return listTeams.filter((team) => ! teamIds.includes(team.id))
   
-  return {
-    teams : returnTeams,
-    leagueTeams : returnLeagueTeams
-  };
 }
 
 export const filterTeamLineups = (matchLineups: IMatchLineup[], idTeam: number) => {

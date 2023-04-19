@@ -1,10 +1,15 @@
 import { IPlayer } from './player';
 import { IMatch, IMatchLineup } from './match';
-import { ILeague } from './league';
+import { ILeague, ILeagueSeason } from './league';
 
 export interface ITeam{
   id: number;
   name: string;
+}
+
+export interface ITeamSeason{
+  idTeam: number;
+  idLeagueSeason: number;
 }
 
 
@@ -13,6 +18,7 @@ export interface ITeamProps{
   isAdmin?: boolean;
   isAddPlayers?: boolean;
   isViewPlayers?: boolean;
+  leagueSeason: ILeagueSeason | null;
 }
 
 export interface ITeamPlayers{
