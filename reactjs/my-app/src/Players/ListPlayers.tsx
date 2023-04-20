@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Tooltip, Typography  } from "@mui/material";
 import { Delete } from '@mui/icons-material';
@@ -23,6 +23,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 import SearchPlayer from './SearchPlayer';
 import { filterPlayersByName } from '../utils/dataFilter';
+
 
 function ListPlayers(props: IPlayerProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -57,12 +58,15 @@ function ListPlayers(props: IPlayerProps) {
     }
     deleteLeaguePlayer(paramsDeletePlayer)
       .then(response => {
-        dispatch(removePlayer(response.data.playerId));
+        
         const leaguePlayerToRemove: ILeaguePlayer = {
           idPlayer: response.data.idPlayer,
           idLeague: response.data.idLeague,
         }
-        dispatch(removeLeaguePlayer(leaguePlayerToRemove));
+        batch(() =>{
+          dispatch(removePlayer(response.data.playerId));
+          dispatch(removeLeaguePlayer(leaguePlayerToRemove));
+        })
         changeApiSuccess(response.message)
       })
       .catch(error => {

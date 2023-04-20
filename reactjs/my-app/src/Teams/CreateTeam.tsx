@@ -1,12 +1,13 @@
 import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addTeam } from "../redux/teamSlice";
 import { addLeagueTeam } from '../redux/leagueTeamSlice';
+import { addTeamSeason } from '../redux/teamSeasonSlice';
 
 import { ILeagueTeam } from '../Interfaces/league';
 import { ITeam, ITeamSeason } from '../Interfaces/team';
@@ -15,7 +16,6 @@ import { createTeam, IApiCreateTeamParams } from '../ApiCall/teams';
 
 import FormTextInput from '../Forms/FormTextInput';
 import LoaderInfo from '../Generic/LoaderInfo';
-import { addTeamSeason } from '../redux/teamSeasonSlice';
 
 interface IFormInput {
   name: string;
@@ -70,10 +70,11 @@ function CreateTeam() {
           idTeam: response.data.teamId,
           idLeagueSeason: response.data.seasonId,
         }
-        
-        dispatch(addTeam(dataTeam));
-        dispatch(addLeagueTeam(dataLeagueTeam));
-        dispatch(addTeamSeason(dataTeamSeason));
+        batch(() => {
+          dispatch(addTeam(dataTeam));
+          dispatch(addLeagueTeam(dataLeagueTeam));
+          dispatch(addTeamSeason(dataTeamSeason));
+        })
       })
       .catch(error => {
         changeApiError(error);

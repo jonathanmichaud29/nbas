@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { Stack, Typography, Button, CircularProgress } from '@mui/material';
@@ -79,9 +79,10 @@ function AddTeamSeason() {
           idTeam: response.data.teamId,
           idLeagueSeason: response.data.seasonId,
         }
-
-        dispatch(addLeagueTeam(dataLeagueTeam));
-        dispatch(addTeamSeason(dataTeamSeason));
+        batch(() => {
+          dispatch(addLeagueTeam(dataLeagueTeam));
+          dispatch(addTeamSeason(dataTeamSeason));
+        })
       })
       .catch(error => {
         changeApiError(error);

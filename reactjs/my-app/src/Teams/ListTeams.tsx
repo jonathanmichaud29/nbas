@@ -11,13 +11,11 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { AppDispatch, RootState } from "../redux/store";
-import { removeTeam } from "../redux/teamSlice";
-import { removeLeagueTeam } from "../redux/leagueTeamSlice";
+import { removeTeamSeason } from '../redux/teamSeasonSlice';
 
 import { ITeam, ITeamProps, ITeamSeason } from "../Interfaces/team";
-import { ILeagueTeam } from '../Interfaces/league';
 
-import { IApiDeleteLeagueTeamParams, IApiDeleteTeamSeasonParams, deleteLeagueTeam, deleteTeamSeason } from "../ApiCall/teams";
+import { IApiDeleteTeamSeasonParams, deleteTeamSeason } from "../ApiCall/teams";
 
 import ViewTeamPlayers from "../Modals/ViewTeamPlayers";
 import AddTeamPlayer from "../Modals/AddTeamPlayer";
@@ -26,7 +24,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { filterTeamsBySeason } from '../utils/dataFilter';
-import { removeTeamSeason } from '../redux/teamSeasonSlice';
+
 
 function ListTeams(props: ITeamProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -64,6 +62,7 @@ function ListTeams(props: ITeamProps) {
           idTeam: response.data.teamId,
           idLeagueSeason: response.data.seasonId,
         }
+        
         dispatch(removeTeamSeason(teamSeasonToRemove));
         changeApiSuccess(response.message);
 

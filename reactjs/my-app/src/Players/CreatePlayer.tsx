@@ -1,6 +1,6 @@
 import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
@@ -17,6 +17,7 @@ import { createPlayer, IApiCreatePlayerParams } from '../ApiCall/players';
 import FormTextInput from '../Forms/FormTextInput';
 import FormRadioButtons from '../Forms/FormRadioButtons';
 import LoaderInfo from '../Generic/LoaderInfo';
+
 
 interface IFormInput {
   name: string;
@@ -76,8 +77,10 @@ function CreatePlayer() {
           idPlayer: response.data.playerId,
           idLeague: response.data.leagueId,
         }
-        dispatch(addPlayer(dataPlayer));
-        dispatch(addLeaguePlayer(dataLeaguePlayer));
+        batch(()=>{
+          dispatch(addPlayer(dataPlayer));
+          dispatch(addLeaguePlayer(dataLeaguePlayer));
+        })
         setPlayerExistsActions([]);
       })
       .catch(error => {
