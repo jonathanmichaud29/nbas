@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,20 +6,14 @@ import { Button, Box, CircularProgress, Stack, Typography, Paper } from "@mui/ma
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatch } from "../redux/matchSlice";
-import { addTeams } from "../redux/teamSlice";
-import { addLeagueTeams } from '../redux/leagueTeamSlice';
-
-import { ITeam } from '../Interfaces/team';
-import { ILeagueTeam } from '../Interfaces/league';
 
 import { createMatch, IApiCreateMatchParams } from '../ApiCall/matches';
-import { fetchLeagueTeams, fetchTeams, IApiFetchLeagueTeamsParams, IApiFetchTeamsParams } from '../ApiCall/teams';
 
 import FormSelect from '../Forms/FormSelect';
 import FormDateTimePicker from '../Forms/FormDateTimePicker';
 import LoaderInfo from '../Generic/LoaderInfo';
 
-import { getStorageLeagueName } from '../utils/localStorage';
+import { filterTeamsBySeason } from '../utils/dataFilter';
 
 
 const dateNow = new Date();
@@ -40,14 +34,26 @@ interface IFormInput {
 function CreateMatch() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentLeagueName = getStorageLeagueName();
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  const listTeams = useSelector((state: RootState) => state.teams )
+  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+  const listTeamSeasons = useSelector((state: RootState) => state.teamSeasons )
+
+  const currentLeagueName = stateAdminContext.currentLeague?.name || '';
 
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
   
-  const listTeams = useSelector((state: RootState) => state.teams )
-  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
+  const filteredTeams = filterTeamsBySeason(listTeams, listLeagueTeams, listTeamSeasons, stateAdminContext.currentLeagueSeason);
+  filteredTeams.sort((a, b) => a.name.localeCompare(b.name));
+  
+  const teamOptions = filteredTeams.map((team) => {
+    return {
+      value:team.id, 
+      label:team.name
+    }
+  })
 
   const reinitializeApiMessages = () => {
     changeApiError('');
@@ -101,42 +107,6 @@ function CreateMatch() {
       
   }
 
-  useMemo(() => {
-    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
-      
-    }
-    fetchLeagueTeams(paramsFetchLeagueTeams)
-      .then(response => {
-        dispatch(addLeagueTeams(response.data));
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [dispatch]);
-
-  useMemo(() => {
-    if( listLeagueTeams.length === 0 ) return;
-
-    const teamIds = listLeagueTeams.map((leagueTeam: ILeagueTeam) => leagueTeam.idTeam);
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: teamIds
-    }
-
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        dispatch(addTeams(response.data));
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [dispatch, listLeagueTeams])
-
   return (
     
     <Paper component={Box} p={3} m={3}>
@@ -156,12 +126,7 @@ function CreateMatch() {
               isRequired={true}
               fieldMinValue={1}
               fieldMinValueMessage={`Select an home team`}
-              options={listTeams.map((team: ITeam)=> {
-                return {
-                  value:team.id, 
-                  label:team.name
-                }
-              })}
+              options={teamOptions}
               optionKeyPrefix={`home-team-`}
               defaultOptions={[{
                 value: 0,
@@ -174,12 +139,7 @@ function CreateMatch() {
               isRequired={true}
               fieldMinValue={1}
               fieldMinValueMessage={`Select an away team`}
-              options={listTeams.map((team: ITeam)=> {
-                return {
-                  value:team.id, 
-                  label:team.name
-                }
-              })}
+              options={teamOptions}
               optionKeyPrefix={`away-team-`}
               defaultOptions={[{
                 value: 0,
@@ -198,8 +158,8 @@ function CreateMatch() {
               isRequired={true}
               inputFormat={"yyyy-MM-dd hh:mm a"}
               minutesStep={5}
-              minDate={new Date('2022-05-01')} // TODO: We should get Season first date
-              maxDate={new Date('2022-10-31')} // TODO: We should get Season last date
+              // minDate={new Date('2022-05-01')} // TODO: We should get Season first date
+              // maxDate={new Date('2022-10-31')} // TODO: We should get Season last date
             />
             <Button 
               onClick={handleSubmit(onSubmit)}

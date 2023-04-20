@@ -7,6 +7,7 @@ import { axiosPublic, axiosProtected } from '../utils/axios'
  */
 
 export interface IApiFetchMatchesParams {
+  isAdminContext? : boolean;
   matchIds?       : Array<number>;
   quantity?       : number;
   isPast?         : boolean;

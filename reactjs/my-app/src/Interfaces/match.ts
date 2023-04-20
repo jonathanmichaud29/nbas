@@ -6,6 +6,7 @@ import { IBattingStatsExtended } from './stats';
 export interface IMatch{
   id: number;
   idLeague: number;
+  idSeason: number;
   idTeamHome: number;
   idTeamAway: number;
   date: Date;

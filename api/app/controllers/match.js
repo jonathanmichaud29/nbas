@@ -11,10 +11,17 @@ exports.getMatches = async (req, res, next) => {
     return next(new AppError("No parameters received to fetch a match", 404));
   }
   const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
+
   let values = [];
   let wheres = [];
   let orderBy = [];
   
+  if( req.body.isAdminContext ){
+    wheres.push('`idLeague`=?')
+    values.push(selectedLeagueId);
+  }
+
   if( req.body.isIgnoringLeague !== true ) {
     wheres.push('`idLeague` IN ?');
     if( req.body.leagueIds !== undefined ){

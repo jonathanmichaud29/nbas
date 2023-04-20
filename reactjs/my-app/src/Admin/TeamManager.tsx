@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Paper, Box, Grid } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 
 import { AppDispatch, RootState } from '../redux/store';
 import { addLeagueTeams } from '../redux/leagueTeamSlice';
@@ -33,7 +33,6 @@ function TeamManager() {
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
         const listLeagueTeams: ILeagueTeam[] = response.data || [];
-        dispatch(addLeagueTeams(listLeagueTeams));
 
         const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
 
@@ -44,8 +43,11 @@ function TeamManager() {
           teamIds: teamIds
         }
         Promise.all([fetchTeams(paramsFetchTeams), fetchTeamSeasons(paramsFetchTeamSeasons)]).then((values) => {
-          dispatch(addTeams(values[0].data));
-          dispatch(addTeamSeasons(values[1].data));
+          batch(() => {
+            dispatch(addLeagueTeams(listLeagueTeams));
+            dispatch(addTeams(values[0].data));
+            dispatch(addTeamSeasons(values[1].data));
+          })
         });
       })
       .catch(error => {

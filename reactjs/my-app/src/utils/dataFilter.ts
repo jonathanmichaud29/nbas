@@ -44,6 +44,11 @@ export const filterMatchesByLeague = (listMatches:IMatch[], idLeague:number): IM
   if(idLeague === 0) return listMatches 
   return listMatches?.filter((match) => match.idLeague === idLeague) || []
 }
+export const filterMatchesBySeason = (leagueSeason: ILeagueSeason | null, listMatches:IMatch[]): IMatch[] => {
+  if(listMatches === null || leagueSeason === null  ) return [];
+  
+  return listMatches.filter((match) => match.idSeason === leagueSeason.id) || []
+}
 
 export const filterMatchesLineupsByLeague = (listMatchLineups: IMatchLineup[], idLeague:number): IMatchLineup[] => {
   if(listMatchLineups === null ) return [];

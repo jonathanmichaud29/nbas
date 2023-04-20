@@ -25,6 +25,7 @@ const matchSlice = createSlice({
         payload: {
           id: newMatch.id,
           idLeague: newMatch.idLeague,
+          idSeason: newMatch.idSeason,
           idTeamHome: newMatch.idTeamHome,
           idTeamAway: newMatch.idTeamAway,
           date: newMatch.date,
@@ -40,9 +41,10 @@ const matchSlice = createSlice({
       const index = state.findIndex((match) => match.id === action.payload);
       state.splice(index, 1);
     },
+    resetMatches: () => initialState
   }
 });
 
-export const { addMatches, addMatch, removeMatch } = matchSlice.actions;
+export const { addMatches, addMatch, removeMatch, resetMatches } = matchSlice.actions;
 
 export default matchSlice.reducer;
