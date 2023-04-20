@@ -66,7 +66,3 @@ export const fetchUnassignedPlayers = async () => {
     })
 }
 
-/**
- * Uncleaned calls
- */
-

@@ -66,6 +66,7 @@ function ListTeams(props: ITeamProps) {
         }
         dispatch(removeTeamSeason(teamSeasonToRemove));
         changeApiSuccess(response.message);
+
       })
       .catch(error => {
         changeApiError(error);
@@ -253,6 +254,7 @@ function ListTeams(props: ITeamProps) {
           isOpen={isModalOpenConfirmDeleteTeam}
           callbackCloseModal={cbCloseModalDelete}
           callbackConfirmDelete={cbCloseConfirmDelete}
+          warning={`The '${currentTeamView.name}' players will also be removed for this season`}
           title={`Confirm team delete`}
           description={`Are-you sure you want to delete the team '${currentTeamView.name}' for the current season?`}
           />

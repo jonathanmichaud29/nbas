@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { Button, Typography, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Button, Typography, Stack, Dialog, DialogActions, DialogContent, DialogTitle, Alert } from "@mui/material";
 
 import { IConfirmDeleteProps } from "../Interfaces/generic";
 
 
 function ConfirmDelete(props: IConfirmDeleteProps) {
 
-  const { isOpen, title, description, callbackConfirmDelete, callbackCloseModal } = props;
+  const { isOpen, title, description, warning, callbackConfirmDelete, callbackCloseModal } = props;
 
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -35,6 +35,9 @@ function ConfirmDelete(props: IConfirmDeleteProps) {
           <Typography variant="body1">
             {description}
           </Typography>
+          { warning ? (
+            <Alert severity="warning">{warning}</Alert>
+          ) : ''}
         </Stack>
       </DialogContent>
       <DialogActions sx={{flexDirection:{xs:'column', sm:'row'}}}>

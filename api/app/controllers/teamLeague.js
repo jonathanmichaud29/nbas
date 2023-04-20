@@ -147,9 +147,10 @@ exports.deleteTeamSeason = async (req, res, next) => {
     "INNER JOIN teams as t ON (tl.idTeam=t.id) "+ 
     "WHERE tl.idTeam=? AND tl.idLeague=?";
   const values = [req.params.idTeam, selectedLeagueId]; */
-  const query = "DELETE ts " +
-    "FROM team_season as ts " +
-    "WHERE ts.idTeam=? AND ts.idLeagueSeason=?";
+  const query = `DELETE ts, tp
+    FROM team_season as ts
+    INNER JOIN team_player as tp ON (ts.idTeam=tp.idTeam AND ts.idLeagueSeason=tp.idLeagueSeason)
+    WHERE ts.idTeam=? AND ts.idLeagueSeason=?`;
   const values = [req.params.idTeam, selectedSeasonId];
   
   const resultMainQuery = await mysqlQuery(query, values);
