@@ -11,12 +11,16 @@ import { IAdminMatchHeaderProps } from "../Interfaces/match";
 
 import CompleteMatch from '../Modals/CompleteMatch';
 
-import { getStorageLeagueName } from '../utils/localStorage';
 import { createHumanDate } from '../utils/dateFormatter';
 
 export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
 
   const {match, teamHome, teamAway} = props;
+
+  const stateAdminContext = useSelector((state: RootState) => state.adminContext )
+  
+  const currentLeagueName = stateAdminContext.currentLeague?.name || '';
+  const currentSeasonName = stateAdminContext.currentLeagueSeason?.name || '';
 
   const listPlayers = useSelector((state: RootState) => state.players )
 
@@ -32,14 +36,15 @@ export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
     setModalOpenCompleteMatch(false);
   }
 
-  const currentLeagueName = getStorageLeagueName();
   const dateReadable = createHumanDate(match.date);
 
   return (
     <>
       <Paper component={Box} p={3} m={3}>
         <Stack spacing={3} alignItems="center" >
-          <Typography variant="h1" textAlign="center">{currentLeagueName} <br/> {teamHome.name}<br/>vs<br/>{teamAway.name}</Typography>
+          <Typography variant="h1" textAlign="center">{currentLeagueName}</Typography>
+          <Typography variant="h3" textAlign="center">{currentSeasonName}</Typography>
+          <Typography variant="h6" textAlign="center">{teamHome.name}<br/>vs<br/>{teamAway.name}</Typography>
           <Typography variant="subtitle1">{dateReadable}</Typography>
           <Button 
             variant="contained" 

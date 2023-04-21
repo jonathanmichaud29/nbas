@@ -7,7 +7,7 @@ const playerSlice = createSlice({
   name:"players",
   initialState,
   reducers: {
-    addPlayers: (state, action: PayloadAction<[IPlayer]>) => {
+    addPlayers: (state, action: PayloadAction<IPlayer[]>) => {
       action.payload.forEach((newPlayer: IPlayer) => {
         if ( state.find(element => element.id === newPlayer.id) === undefined ){
           state.push(newPlayer);

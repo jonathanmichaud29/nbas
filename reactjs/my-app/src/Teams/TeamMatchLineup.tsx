@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
@@ -26,15 +26,15 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const { isAdmin, match, team } = props;
 
   const [apiError, changeApiError] = useState("");
-  const [lineupTeam, setLineupTeam] = useState<IMatchLineup[]>([]);
 
   const listPlayers = useSelector((state: RootState) => state.players )
   const selectCurrentMatchPlayers = createSelector(
     (state: RootState) => state.matchPlayers,
     (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
-  )
-  const allMatchPlayers = useSelector(selectCurrentMatchPlayers) || null;
+  ) 
+  const allMatchPlayers = useSelector(selectCurrentMatchPlayers);
 
+  const lineupTeam = allMatchPlayers?.lineupPlayers.filter((lineupPlayer: IMatchLineup) => lineupPlayer.idTeam === team.id ) || []
 
   /**
    * Handle multiples modals
@@ -93,13 +93,6 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
         
       });
   }
-
-  
-
-  useMemo( () => {
-    const teamPlayers = allMatchPlayers?.lineupPlayers.filter((lineupPlayer: IMatchLineup) => lineupPlayer.idTeam === team.id ) || []
-    setLineupTeam(teamPlayers);
-  }, [allMatchPlayers, team.id]);
 
   return (
     <>

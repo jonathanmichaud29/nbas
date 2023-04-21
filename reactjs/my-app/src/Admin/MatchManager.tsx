@@ -1,22 +1,28 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
+import { batch, useDispatch } from 'react-redux';
 
-import { IMatch, IMatchLineup } from "../Interfaces/match";
+import { Box, Grid } from '@mui/material';
 
-import { fetchMatches, fetchMatchLineups, IApiFetchMatchesParams, IApiFetchMatchLineups } from '../ApiCall/matches';
+import { AppDispatch } from '../redux/store';
+import { addPlayers } from '../redux/playerSlice';
+import { addMatchPlayers } from '../redux/matchPlayerSlice';
+
+import { IMatch, IMatchEncounter, IMatchLineup } from "../Interfaces/match";
+import { ITeam } from '../Interfaces/team';
+
+import { fetchMatches, fetchMatchLineups, 
+  IApiFetchMatchesParams, IApiFetchMatchLineups } from '../ApiCall/matches';
+import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
+import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
+
 
 import AdminMatchHeader from '../Matchs/AdminMatchHeader';
 import LoaderInfo from '../Generic/LoaderInfo';
-import { castNumber } from '../utils/castValues';
-import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
-import { ITeam } from '../Interfaces/team';
-import { Box, Grid } from '@mui/material';
 import TeamMatchLineup from '../Teams/TeamMatchLineup';
-import { addMatchPlayers } from '../redux/matchPlayerSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../redux/store';
-import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { addPlayers } from '../redux/playerSlice';
+
+import { castNumber } from '../utils/castValues';
+import { IPlayer } from '../Interfaces/player';
 
 function MatchManager() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,78 +30,59 @@ function MatchManager() {
   let { id } = useParams();
   const idMatch = castNumber(id);
 
-  const [match, setMatch] = useState<IMatch | null>(null);
-  const [teamHome, setTeamHome] = useState<ITeam | null>(null);
-  const [teamAway, setTeamAway] = useState<ITeam | null>(null);
+  const [matchEncounter, setMatchEncounter] = useState<IMatchEncounter>();
   const [apiError, changeApiError] = useState("");
   
-  const isLoaded = match !== null && teamHome !== null && teamAway !== null;
-
-  /**
-   * Fetch Match details & Teams
-   */
-  useMemo( () => {
+  const isLoaded = !!matchEncounter;
+  
+  const fetchAllMatchDetails = () => {
+    let matchData: IMatch;
+    let teamHomeData: ITeam;
+    let teamAwayData: ITeam;
     const paramsFetchMatches: IApiFetchMatchesParams = {
       matchIds: [idMatch]
     }
     fetchMatches(paramsFetchMatches)
       .then(response => {
-        const rowMatch: IMatch = response.data[0];
-        setMatch(rowMatch);
+        matchData = response.data[0];
 
-        // Fetch All Players from this league
         const paramsFetchPlayers: IApiFetchPlayersParams = {
           allPlayers:true
         }
-        fetchPlayers(paramsFetchPlayers)
-          .then(response => {
-            dispatch(addPlayers(response.data));
-          })
-          .catch((error) => {
-            changeApiError(error);
-          })
-          .finally(() =>{
-            
-          })
-        
-        // Fetch Teams
         const paramsFetchTeams: IApiFetchTeamsParams = {
-          teamIds: [rowMatch.idTeamHome, rowMatch.idTeamAway]
+          teamIds: [matchData.idTeamHome, matchData.idTeamAway]
         }
-        fetchTeams(paramsFetchTeams)
-          .then(response => {
-            response.data.forEach((team: ITeam) => {
-              if ( team.id === rowMatch.idTeamHome) {
-                setTeamHome(team);
+        const paramsMatchLineups: IApiFetchMatchLineups = {
+          matchId: matchData.id
+        }
+        
+        
+        Promise.all([fetchPlayers(paramsFetchPlayers), fetchTeams(paramsFetchTeams), fetchMatchLineups(paramsMatchLineups)]).then((values) => {
+          const allPlayers: IPlayer[] = values[0].data;
+          const teamsData: ITeam[] = values[1].data;
+          const matchLineups: IMatchLineup[] = values[2].data;
+          batch(() => {
+            
+            dispatch(addPlayers(allPlayers));
+            
+            teamsData.forEach((team: ITeam) => {
+              if ( team.id === matchData.idTeamHome) {
+                teamHomeData = team;
               }
               else {
-                setTeamAway(team);
+                teamAwayData = team
               }
             })
-          })
-          .catch(error => {
-            changeApiError(error);
-          })
-          .finally(() => {
+                        
+            dispatch(addMatchPlayers(matchData, matchLineups));
             
-          });
-        
-        // Fetch Match Lineups
-        const paramsMatchLineups: IApiFetchMatchLineups = {
-          matchId: rowMatch.id
-        }
-        fetchMatchLineups(paramsMatchLineups)
-          .then(response => {
-            const matchLineups: IMatchLineup[] = response.data;
-            dispatch(addMatchPlayers(rowMatch, matchLineups));
-            
+            setMatchEncounter({
+              match: matchData,
+              teamHome: teamHomeData,
+              teamAway: teamAwayData,
+            })
           })
-          .catch(error => {
-            changeApiError(error);
-          })
-          .finally(() => {
-            
-          });
+        });
       })
       .catch(error => {
         changeApiError(error);
@@ -103,20 +90,24 @@ function MatchManager() {
       .finally(() => {
         
       });
-  }, [dispatch, idMatch]);
+  }
+
+  useEffect(()=>{
+    fetchAllMatchDetails()
+  },[])
 
   return (
     <>
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={!!matchEncounter}
         msgError={apiError}
         hasWrapper={true}
       />
       { isLoaded && (
         <AdminMatchHeader
-          match={match}
-          teamHome={teamHome}
-          teamAway={teamAway}
+          match={matchEncounter.match}
+          teamHome={matchEncounter.teamHome}
+          teamAway={matchEncounter.teamAway}
         />
       ) }
       { isLoaded && (
@@ -126,16 +117,16 @@ function MatchManager() {
               <TeamMatchLineup 
                 isAdmin={true}
                 isHomeTeam={true}
-                match={match}
-                team={teamHome}
+                match={matchEncounter.match}
+                team={matchEncounter.teamHome}
               />
             </Grid>
             <Grid item xs={12} sm={6} alignItems="center">
               <TeamMatchLineup 
                 isAdmin={true}
                 isHomeTeam={false}
-                match={match}
-                team={teamAway}
+                match={matchEncounter.match}
+                team={matchEncounter.teamAway}
               />
             </Grid>
           </Grid>

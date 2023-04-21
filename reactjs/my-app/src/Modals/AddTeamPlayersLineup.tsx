@@ -3,12 +3,12 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
 
-import { Button, Checkbox, FormGroup, FormControlLabel, FormHelperText, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Button, Checkbox, FormGroup, FormControlLabel, FormHelperText, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Alert } from "@mui/material";
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
-import { IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
+import { defaultMatchLineupData, IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
 import { ITeamPlayers } from '../Interfaces/team'
 
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
@@ -104,31 +104,15 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
         reset()
         let newPlayers = []
         for( const dataTeamPlayer of response.data){
-          newPlayers.push({
+          const newItem = {
             id: dataTeamPlayer.id,
             idMatch: dataTeamPlayer.idMatch,
             idTeam: dataTeamPlayer.idTeam,
-            idPlayer: dataTeamPlayer.idPlayer,
-            atBats: 0,
-            single: 0,
-            double: 0,
-            triple: 0,
-            homerun: 0,
-            out: 0,
-            hitOrder: 0,
-            hitByPitch: 0,
-            walk: 0,
-            strikeOut: 0,
-            stolenBase: 0,
-            caughtStealing: 0,
-            plateAppearance: 0,
-            sacrificeBunt: 0,
-            sacrificeFly: 0,
-            runsBattedIn: 0,
-            hit: 0,
-          } as IMatchLineup);
-          
+            idPlayer: dataTeamPlayer.idPlayer
+          }
+          newPlayers.push({...defaultMatchLineupData, ...newItem})
         }
+        
         dispatch(addMatchPlayers(match,newPlayers));
         handleModalClose();
       })
@@ -161,7 +145,7 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
             msgSuccess={apiSuccess}
             msgError={apiError}
           />
-          { listTeamsPlayers && (
+          { listTeamsPlayers && listTeamsPlayers.length ? (
             <FormGroup>
               {errors.players && ( <FormHelperText error={true}>{(errors.players as any).message}</FormHelperText> ) }
               
@@ -194,6 +178,8 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
                 )}
               />
             </FormGroup>
+          ) : (
+            <Alert severity="info">No players available</Alert>
           )}
         </Stack>
       </DialogContent>

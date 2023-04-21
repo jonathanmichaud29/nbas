@@ -17,6 +17,12 @@ export interface IMatch{
   idTeamLost: number;
 }
 
+export type IMatchEncounter = {
+  match : IMatch,
+  teamHome: ITeam,
+  teamAway: ITeam,
+}
+
 export interface IMatchProps{
   match: IMatch;
   isAdmin?: boolean;
@@ -59,6 +65,7 @@ export interface IMatchLineup {
   idTeam: number;
   idPlayer: number;
   idLeague: number;
+  idSeason: number;
   atBats: number;
   single: number;
   double: number;
@@ -143,3 +150,29 @@ export const batResultOptions = [
   {value:EBatResult.sacrificeBunt, label:"Sacrifice Bunt"},
   {value:EBatResult.sacrificeFly, label:"Sacrifice Fly"}
 ]
+
+export const defaultMatchLineupData = {
+  id: 0,
+  idMatch: 0,
+  idTeam: 0,
+  idPlayer: 0,
+  idLeague: 0,
+  idSeason: 0,
+  atBats: 0,
+  single: 0,
+  double: 0,
+  triple: 0,
+  homerun: 0,
+  out: 0,
+  hitOrder: 0,
+  hitByPitch: 0,
+  walk: 0,
+  strikeOut: 0,
+  stolenBase: 0,
+  caughtStealing: 0,
+  plateAppearance: 0,
+  sacrificeBunt: 0,
+  sacrificeFly: 0,
+  runsBattedIn: 0,
+  hit: 0,
+} as IMatchLineup

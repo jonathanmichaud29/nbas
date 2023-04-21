@@ -58,20 +58,21 @@ exports.createMatchLineups = async (req, res, next) => {
     return next(new AppError(`Missing body parameters`, 404));
   }
   const selectedLeagueId = castNumber(req.headers.idleague);
+  const selectedSeasonId = castNumber(req.headers.idseason);
 
   let values = []
   const listIds = req.body.playerIds;
   listIds.forEach((playerId) => {
-    values.push([[req.body.matchId, req.body.teamId, playerId, selectedLeagueId]])
+    values.push([[req.body.matchId, req.body.teamId, playerId, selectedLeagueId, selectedSeasonId]])
   });
-  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer, idLeague) VALUES (?)"
+  const query = "INSERT INTO match_lineup (idMatch, idTeam, idPlayer, idLeague, idSeason) VALUES (?)"
   const resultMainQuery = await mysqlQueryPoolInserts(query, values);
   
   let customMessage = '';
   let customData = {}
   if( resultMainQuery.status ){
     customMessage = `added ${resultMainQuery.data.length} player(s) to match lineup!`;
-    const resultLineupQuery = await mysqlQuery("SELECT id, idMatch, idTeam, idPlayer, idLeague FROM match_lineup WHERE id IN (?)", [resultMainQuery.data]);
+    const resultLineupQuery = await mysqlQuery("SELECT id, idMatch, idTeam, idPlayer, idLeague, idSeason FROM match_lineup WHERE id IN (?)", [resultMainQuery.data]);
     customData = resultLineupQuery.data;
   }
   return appResponse(res, next, resultMainQuery.status, customData, resultMainQuery.error, customMessage);
