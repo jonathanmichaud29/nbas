@@ -68,7 +68,7 @@ export const filterTeamsByLeague = (teams: ITeam[], leaguesTeams: ILeagueTeam[],
 
 export const findAvailabilityMatchPlayers = (matchPlayers: IMatchPlayers | null, listTeamPlayers: ITeamPlayer[], selectedTeam: ITeam) => {
   const assignedLineupPlayerIds = matchPlayers?.lineupPlayers?.map((lineupPlayer) => lineupPlayer.idPlayer) || [];
-  const unassignedTeamPlayerIds = listTeamPlayers
+  const unassignedLineupPlayerIds = listTeamPlayers
     .filter((teamPlayer) => {
       return teamPlayer.idTeam === selectedTeam.id && ! assignedLineupPlayerIds.includes(teamPlayer.idPlayer)
     })
@@ -76,6 +76,20 @@ export const findAvailabilityMatchPlayers = (matchPlayers: IMatchPlayers | null,
   
   return {
     assignedLineupPlayerIds,
-    unassignedTeamPlayerIds
+    unassignedLineupPlayerIds
+  }
+}
+
+export const findAvailabilityMatchAllPlayers = (matchPlayers: IMatchPlayers | null, listPlayers: IPlayer[], selectedTeam: ITeam) => {
+  const assignedLineupPlayerIds = matchPlayers?.lineupPlayers?.map((lineupPlayer) => lineupPlayer.idPlayer) || [];
+  const unassignedLineupPlayerIds = listPlayers
+    .filter((player) => {
+      return ! assignedLineupPlayerIds.includes(player.id)
+    })
+    .map((player) => player.id) || []
+  
+  return {
+    assignedLineupPlayerIds,
+    unassignedLineupPlayerIds
   }
 }

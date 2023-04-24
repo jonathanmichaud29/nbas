@@ -44,8 +44,8 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   const listTeamPlayers = useSelector((state: RootState) => state.teamPlayers);
   const listPlayers = useSelector((state: RootState) => state.players);
 
-  const { unassignedTeamPlayerIds } = findAvailabilityMatchPlayers(matchPlayers, listTeamPlayers, selectedTeam)
-  const availablePlayers = listPlayers.filter((player) => unassignedTeamPlayerIds.includes(player.id)) || [];
+  const { unassignedLineupPlayerIds } = findAvailabilityMatchPlayers(matchPlayers, listTeamPlayers, selectedTeam)
+  const availablePlayers = listPlayers.filter((player) => unassignedLineupPlayerIds.includes(player.id)) || [];
   
 
   const reinitializeApiMessages = () => {

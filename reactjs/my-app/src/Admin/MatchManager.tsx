@@ -25,6 +25,7 @@ import { castNumber } from '../utils/castValues';
 import { IPlayer, ITeamPlayer } from '../Interfaces/player';
 import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from '../ApiCall/teamsPlayers';
 import { addTeamPlayers } from '../redux/teamPlayerSlice';
+import { addTeams } from '../redux/teamSlice';
 
 function MatchManager() {
   const dispatch = useDispatch<AppDispatch>();
@@ -96,6 +97,7 @@ function MatchManager() {
             })
                         
             dispatch(addMatchPlayers(matchData, matchLineups));
+            dispatch(addTeams(teamsData));
             dispatch(addTeamPlayers(allTeamPlayers));
             
             setMatchEncounter({
