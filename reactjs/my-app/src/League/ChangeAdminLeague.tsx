@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Paper, AppBar, Alert, FormControl } from "@mui/material";
+import { Paper, AppBar, FormControl } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -19,6 +19,8 @@ import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
 import { resetLeagueTeams } from "../redux/leagueTeamSlice";
 import { resetPlayers } from "../redux/playerSlice";
 import { resetTeams } from "../redux/teamSlice";
+import { batch } from "react-redux";
+import { castNumber } from "../utils/castValues";
 
 interface IChangeAdminLeague {
   
@@ -41,34 +43,48 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
           return;
         }
 
-        dispatch(addAdminLeagues(response.data.leagues));
-        dispatch(addAdminLeagueSeasons(response.data.leagueSeasons));
         
+        let currentAdminLeague: ILeague | null = null;
+        let currentAdminLeagueSeason: ILeagueSeason| null = null;
+
         response.data.leagues.every((league: ILeague) => {
-          if( currentLeagueId === null  || currentLeagueId === league.id ){
+          
+          if( !currentLeagueId || currentLeagueId === league.id ){
             let newLeagueSeason = null;
-            if( response.data.leagueSeasons && response.data.leagueSeasons.length ){
-              response.data.leagueSeasons.every((leagueSeason: ILeagueSeason) => {
-                if( currentLeagueSeasonId === null  || currentLeagueSeasonId === leagueSeason.id ){
-                  newLeagueSeason = leagueSeason;
-                  return false;
-                }
-                return true;
-              })
+            const listLeagueSeasons: ILeagueSeason[] = response.data.leagueSeasons || []
+            if( listLeagueSeasons && listLeagueSeasons.length ){
+              listLeagueSeasons
+                .filter((leagueSeason)=>leagueSeason.idLeague === league.id)
+                .sort((a,b) => b.id - a.id)
+                .every((leagueSeason: ILeagueSeason) => {
+                  if( !currentLeagueSeasonId || currentLeagueSeasonId === leagueSeason.id ){
+                    newLeagueSeason = leagueSeason;
+                    return false;
+                  }
+                  return true;
+                })
               if( newLeagueSeason === null ){
-                newLeagueSeason = response.data.leagueSeasons[0];
+                newLeagueSeason = listLeagueSeasons[0];
               }
             }
-            dispatch(setAdminLeague(league));
-            dispatch(setAdminLeagueSeason(newLeagueSeason));
-
+            currentAdminLeague = league;
+            currentAdminLeagueSeason = newLeagueSeason
+            
             window.localStorage.setItem("currentLeagueId", league.id.toString());
-            window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeason.id.toString());
+            window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeason?.id.toString() || '0');
 
             return false;
           }
           return true;
         })
+        
+        batch(()=>{
+          dispatch(addAdminLeagues(response.data.leagues));
+          dispatch(addAdminLeagueSeasons(response.data.leagueSeasons));
+          dispatch(setAdminLeague(currentAdminLeague));
+          dispatch(setAdminLeagueSeason(currentAdminLeagueSeason));
+        })
+        
       })
       .catch((error) => {
         changeApiError(error);
@@ -79,27 +95,30 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
   },[]);
 
   const handleLeagueChange = (event: SelectChangeEvent) => {
-    const newLeagueId = event.target.value as unknown as number;
+    const newLeagueId = castNumber(event.target.value);
     const newLeague = stateAdminContext.leagues.find((league: ILeague) => league.id === newLeagueId) || null;
     
     // Find latest season for the choosen league
-    let newLeagueSeason = null;
+    let newLeagueSeason: ILeagueSeason | null = null;
     const leagueSeasons = stateAdminContext.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === newLeagueId);
     if( leagueSeasons && leagueSeasons.length ){
-      newLeagueSeason = leagueSeasons[leagueSeasons.length - 1];
+      newLeagueSeason = leagueSeasons.sort((a,b) => b.id - a.id)[0];
     }
 
     // Dispatch new current League & Season
-    dispatch(setAdminLeague(newLeague));
-    dispatch(setAdminLeagueSeason(newLeagueSeason));
+    
     
     window.localStorage.setItem("currentLeagueId", newLeagueId.toString());
     window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeason?.id.toString() || '0');
+    batch(() => {
+      dispatch(setAdminLeague(newLeague));
+      dispatch(setAdminLeagueSeason(newLeagueSeason));
+      dispatch(resetPlayers());
+      dispatch(resetLeaguePlayers());
+      dispatch(resetTeams());
+      dispatch(resetLeagueTeams()); 
+    })
     
-    dispatch(resetPlayers());
-    dispatch(resetLeaguePlayers());
-    dispatch(resetTeams());
-    dispatch(resetLeagueTeams()); 
     // dispatch(resetLeagueSeasons());
   }
 
@@ -121,7 +140,7 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
             <Select
               labelId="label-switch-admin-league"
               id="switch-admin-league"
-              value={stateAdminContext.currentLeague.id as unknown as string}
+              value={(stateAdminContext.currentLeague.id).toString()}
               onChange={handleLeagueChange}
             >
               {stateAdminContext.leagues && stateAdminContext.leagues.map((league:ILeague) => (
@@ -138,7 +157,7 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
             <Select
               labelId="label-switch-admin-season"
               id="switch-admin-season"
-              value={stateAdminContext.currentLeagueSeason.id as unknown as string}
+              value={(stateAdminContext.currentLeagueSeason.id).toString()}
               onChange={handleLeagueSeasonChange}
             >
               {stateAdminContext.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === stateAdminContext.currentLeague?.id).map((leagueSeason:ILeagueSeason) => (
