@@ -1,28 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from 'reselect'
 
-import { Button, Checkbox, FormGroup, FormControlLabel, FormHelperText, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Alert } from "@mui/material";
+import { Alert, Button, Checkbox, 
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  FormGroup, FormControlLabel, FormHelperText, 
+  Stack } from "@mui/material";
 
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
-import { defaultMatchLineupData, IAddMatchLineupProps, IMatchLineup } from "../Interfaces/match";
-import { ITeamPlayers } from '../Interfaces/team'
+import { defaultMatchLineupData, IAddMatchLineupProps } from "../Interfaces/match";
 
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
-import { fetchTeamsPlayers, IApiFetchTeamsPlayersParams } from "../ApiCall/teamsPlayers";
 
 import LoaderInfo from "../Generic/LoaderInfo";
+import { findAvailabilityMatchPlayers } from "../utils/dataFilter";
+import { IPlayer } from "../Interfaces/player";
 
 
 const defaultValues = {
-  players: [] as ITeamPlayers[],
+  players: [] as IPlayer[],
 }
 
 interface IFormInput {
-  players: ITeamPlayers[];
+  players: IPlayer[];
 }
 
 export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
@@ -34,16 +36,16 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
    * Set States
    */
   const [isModalOpen, setModalOpen] = useState(isOpen);
-  const [listTeamsPlayers, setListTeamsPlayers] = useState<ITeamPlayers[]>([]);
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
 
-  const selectCurrentMatchPlayers = createSelector(
-    (state: RootState) => state.matchPlayers,
-    (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
-  )
-  const allMatchPlayers = useSelector(selectCurrentMatchPlayers) || null;
+  const matchPlayers = useSelector((state: RootState) => state.matchPlayers).find((matchPlayers) => matchPlayers.match.id === match.id) || null;
+  const listTeamPlayers = useSelector((state: RootState) => state.teamPlayers);
+  const listPlayers = useSelector((state: RootState) => state.players);
+
+  const { unassignedTeamPlayerIds } = findAvailabilityMatchPlayers(matchPlayers, listTeamPlayers, selectedTeam)
+  const availablePlayers = listPlayers.filter((player) => unassignedTeamPlayerIds.includes(player.id)) || [];
   
 
   const reinitializeApiMessages = () => {
@@ -56,27 +58,6 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
     callbackCloseModal();
     reinitializeApiMessages();
   }
-
-  useMemo(() => {
-    if ( selectedTeam === null || allMatchPlayers === null ) return;
-    const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
-      teamIds: [selectedTeam.id],
-    }
-    fetchTeamsPlayers(paramsFetchTeamsPlayers)
-      .then(response => {
-        const lineupPlayerIds = allMatchPlayers.lineupPlayers.map((lineupPlayer) => lineupPlayer.idPlayer)
-        const listTeamPlayers: ITeamPlayers[] = response.data;
-        const newListTeamPlayers = listTeamPlayers.filter((player: ITeamPlayers) => lineupPlayerIds.includes(player.playerId) === false);
-        newListTeamPlayers.sort((a, b) => a.playerName.localeCompare(b.playerName))
-        setListTeamsPlayers(newListTeamPlayers);
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [allMatchPlayers, selectedTeam]);
 
   useEffect(() => {
     if( ! isOpen ) return;
@@ -91,9 +72,9 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
   
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus || ! selectedTeam ) return;
-    
     setRequestStatus(true);
-    const playerIds = data.players.map((teamPlayer: ITeamPlayers) => teamPlayer.playerId);
+
+    const playerIds = data.players.map((player) => player.id);
     const paramsAddMatchLineup: IApiAddMatchLineupsParams = {
       matchId: match.id,
       teamId: selectedTeam.id,
@@ -125,7 +106,7 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
     
   }
 
-  const handleCheckPlayer = (checkedPlayer:ITeamPlayers) => {
+  const handleCheckPlayer = (checkedPlayer:IPlayer) => {
     const { players: ids } = getValues();
     const newIds = ids?.includes(checkedPlayer)
       ? ids?.filter(id => id !== checkedPlayer)
@@ -145,7 +126,7 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
             msgSuccess={apiSuccess}
             msgError={apiError}
           />
-          { listTeamsPlayers && listTeamsPlayers.length ? (
+          { availablePlayers && availablePlayers.length ? (
             <FormGroup>
               {errors.players && ( <FormHelperText error={true}>{(errors.players as any).message}</FormHelperText> ) }
               
@@ -158,16 +139,16 @@ export default function AddTeamPlayersLineup(props: IAddMatchLineupProps) {
                 
                 render={({ field: { onChange, value } }) => (
                   <>
-                    { listTeamsPlayers.map((teamPlayer: ITeamPlayers) => {
+                    { availablePlayers.map((player) => {
                       
                       return (
                         <FormControlLabel 
-                          key={`player-checkbox-${teamPlayer.playerId}`} 
-                          label={`${teamPlayer.playerName}`}
+                          key={`player-checkbox-${player.id}`} 
+                          label={`${player.name}`}
                           control={
                             <Checkbox 
-                              value={teamPlayer}
-                              onChange={() => onChange(handleCheckPlayer(teamPlayer))}
+                              value={player}
+                              onChange={() => onChange(handleCheckPlayer(player))}
                             />
                           }  
                         />
