@@ -1,6 +1,6 @@
 import { ILeague, ILeaguePlayer, ILeagueSeason, ILeagueTeam } from "../Interfaces/league";
-import { IMatch, IMatchLineup } from "../Interfaces/match";
-import { IPlayer } from "../Interfaces/player";
+import { IMatch, IMatchLineup, IMatchPlayers } from "../Interfaces/match";
+import { IPlayer, ITeamPlayer } from "../Interfaces/player";
 import { ITeam, ITeamSeason } from "../Interfaces/team";
 
 export const filterPlayersByName = (listPlayers: IPlayer[], searchTerm: string) => {
@@ -64,4 +64,18 @@ export const filterPlayersByLeague = (players: IPlayer[], leaguesPlayers: ILeagu
 export const filterTeamsByLeague = (teams: ITeam[], leaguesTeams: ILeagueTeam[], league: ILeague) => {
   const leagueTeamIds = leaguesTeams.filter((leagueTeam) => leagueTeam.idLeague === league.id).map((leagueTeam) => leagueTeam.idTeam)
   return teams.filter((team) => leagueTeamIds.includes(team.id) )
+}
+
+export const findAvailabilityMatchPlayers = (matchPlayers: IMatchPlayers | null, listTeamPlayers: ITeamPlayer[], selectedTeam: ITeam) => {
+  const assignedLineupPlayerIds = matchPlayers?.lineupPlayers?.map((lineupPlayer) => lineupPlayer.idPlayer) || [];
+  const unassignedTeamPlayerIds = listTeamPlayers
+    .filter((teamPlayer) => {
+      return teamPlayer.idTeam === selectedTeam.id && ! assignedLineupPlayerIds.includes(teamPlayer.idPlayer)
+    })
+    .map((teamPlayer) => teamPlayer.idPlayer) || []
+  
+  return {
+    assignedLineupPlayerIds,
+    unassignedTeamPlayerIds
+  }
 }
