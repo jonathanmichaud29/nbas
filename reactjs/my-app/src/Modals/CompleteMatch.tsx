@@ -2,33 +2,33 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from 'reselect'
-import { SubmitHandler, useForm, useFieldArray, FormProvider, Controller } from "react-hook-form";
+import { SubmitHandler, useForm, useFieldArray, FormProvider } from "react-hook-form";
 
-import { Button, Grid, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stack, IconButton, Box, Tooltip, Accordion, AccordionSummary, AccordionDetails, TextField, CircularProgress } from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails, 
+  Box, Button, CircularProgress, 
+  Dialog, DialogActions, DialogContent, DialogTitle, 
+  IconButton, Grid, Stack, 
+  Tooltip, TextField, Typography } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-
 import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
-import { fetchMatchLineups, IApiFetchMatchLineups, IApiUpdateMatchLineupParams, updateMatchLineup } from '../ApiCall/matches';
-
 import { IPlayerLineupStats } from "../Interfaces/stats";
+import { ITeam } from "../Interfaces/team";
 import { ICompleteMatchProps, IMatchLineup, EBatResult, batResultOptions, IPlayerBatResult } from '../Interfaces/match'
 
+import { fetchMatchLineups, IApiFetchMatchLineups, IApiUpdateMatchLineupParams, updateMatchLineup } from '../ApiCall/matches';
+
 import FormNumberInput from '../Forms/FormNumberInput';
+import FormSelect from "../Forms/FormSelect";
+import LoaderInfo from "../Generic/LoaderInfo";
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { castNumber } from '../utils/castValues';
-import LoaderInfo from "../Generic/LoaderInfo";
-
-import { ITeam } from "../Interfaces/team";
 import { groupBatResultsPerLineup } from "../utils/statsAggregation";
-import FormSelect from "../Forms/FormSelect";
-
-
 
 
 
@@ -367,12 +367,13 @@ function CompleteMatch(props: ICompleteMatchProps) {
               if( currentFieldPlayerIndex === -1 ) return '';
               const currentFieldPlayer = fieldsPlayerStats[currentFieldPlayerIndex];
               return (
-                <Accordion key={`player-row-${lineup.id}`}>
+                <Accordion key={`player-row-${lineup.id}`} elevation={5}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                     sx={{
+                      backgroundColor:"#e4e4e4",
                       '&:hover':{
                         backgroundColor:"#f1f1f1"
                       }
@@ -499,12 +500,13 @@ function CompleteMatch(props: ICompleteMatchProps) {
               if( currentFieldPlayerIndex === -1 ) return '';
               const currentFieldPlayer = fieldsPlayerStats[currentFieldPlayerIndex];
               return (
-                <Accordion key={`player-row-${lineup.id}`}>
+                <Accordion key={`player-row-${lineup.id}`} elevation={5}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                     sx={{
+                      backgroundColor:"#e4e4e4",
                       '&:hover':{
                         backgroundColor:"#f1f1f1"
                       }
