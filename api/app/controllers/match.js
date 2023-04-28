@@ -22,7 +22,11 @@ exports.getMatches = async (req, res, next) => {
     values.push(selectedLeagueId);
   }
 
-  if( req.body.isIgnoringLeague !== true ) {
+  if (req.body.matchIds ){
+    wheres.push('`id` IN ?')
+    values.push([req.body.matchIds]);
+  }
+  /* if( req.body.isIgnoringLeague !== true ) {
     wheres.push('`idLeague` IN ?');
     if( req.body.leagueIds !== undefined ){
       values.push([req.body.leagueIds.length > 0 ? req.body.leagueIds : [0] ])
@@ -33,7 +37,7 @@ exports.getMatches = async (req, res, next) => {
       wheres.push('`id` IN ?')
       values.push([req.body.matchIds]);
     }
-  }
+  } */
 
   if( req.body.valueCompleted !== undefined ) {
     values.push(req.body.valueCompleted);

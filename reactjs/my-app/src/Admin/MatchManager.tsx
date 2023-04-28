@@ -104,6 +104,8 @@ function MatchManager() {
               match: matchData,
               teamHome: teamHomeData,
               teamAway: teamAwayData,
+              players:[],
+              matchLineups:[]
             })
           })
         });

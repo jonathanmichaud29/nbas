@@ -128,8 +128,37 @@ exports.getStandingTeams = async (req, res, next) => {
   
   let query = '';
   let values = [];
-  if( req.body.teamIds !== undefined && req.body.teamIds.length > 0 ){
-    query = `SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
+  let wheres = [];
+
+  
+  if( req.body.teamIds !== undefined ){
+    wheres.push('t.id IN ?');
+    values.push([req.body.teamIds.length > 0 ? req.body.teamIds : [0] ]);
+  }
+  if( req.body.seasonId !== undefined ){
+    wheres.push('m.idSeason=?');
+    values.push(castNumber(req.body.seasonId));
+  }
+  wheres.push('m.isCompleted=1');
+
+  query = `
+    SELECT 
+      t.id, COUNT(*) as nbGamePlayed, 
+      SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, 
+      SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, 
+      SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
+    FROM teams as t 
+    INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway)
+    ` + ( wheres.length > 0 ? "WHERE "+wheres.join(" AND ") + " " : '' ) + `
+    GROUP BY t.id`;
+
+  /* if( req.body.teamIds !== undefined && req.body.teamIds.length > 0 ){
+    query = `
+      SELECT 
+        t.id, COUNT(*) as nbGamePlayed, 
+        SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, 
+        SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, 
+        SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
       FROM teams as t 
       INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway)
       WHERE m.isCompleted=1 AND t.id IN ? 
@@ -137,15 +166,20 @@ exports.getStandingTeams = async (req, res, next) => {
     values = [[req.body.teamIds]];
   }
   else if(req.body.allTeams !== undefined && req.body.allTeams ) {
-    query = `SELECT t.id, COUNT(*) as nbGamePlayed, SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
-      FROM nbas.teams as t 
+    query = `
+      SELECT 
+        t.id, COUNT(*) as nbGamePlayed, 
+        SUM(if(m.idTeamWon=t.id, 1, 0)) as nbWins, 
+        SUM(if(m.idTeamLost=t.id, 1, 0)) as nbLosts, 
+        SUM(if(m.idTeamWon=0 AND m.idTeamLost=0, 1, 0)) as nbNulls 
+      FROM teams as t 
       INNER JOIN matches as m ON (t.id=m.idTeamHome OR t.id=m.idTeamAway) 
       WHERE m.isCompleted=1 
       GROUP BY t.id`;
   }
   else {
     return appResponse(res, next, true, {}, {});
-  }
+  } */
   
   const resultMainQuery = await mysqlQuery(query, values)
   return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);

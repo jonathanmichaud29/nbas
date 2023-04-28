@@ -21,6 +21,8 @@ export type IMatchEncounter = {
   match : IMatch,
   teamHome: ITeam,
   teamAway: ITeam,
+  players: IPlayer[],
+  matchLineups: IMatchLineup[],
 }
 
 export interface IMatchProps{
@@ -44,7 +46,8 @@ export interface IClosestMatchesProps {
 }
 
 export interface IMatchDetailsProps {
-  match: IMatch;
+  // match: IMatch;
+  matchEncounter: IMatchEncounter;
 }
 
 export interface IListMatchProps{

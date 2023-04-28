@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Box, Button, Paper, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,33 +28,37 @@ import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/d
 
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
-  const { match } = props;
+  const { matchEncounter } = props;
   
   const {isAdmin} = useAdminData();
   const [apiError, changeApiError] = useState("");
-  const [teamHome, setTeamHome] = useState<ITeam | null>(null);
-  const [teamAway, setTeamAway] = useState<ITeam | null>(null);
+  /*
+  const [teamHome, setTeamHome] = useState<ITeam>();
+  const [teamAway, setTeamAway] = useState<ITeam>();
   const [players, setPlayers] = useState<IPlayer[] | null>(null);
-  const [matchLineups, setMatchLineups] = useState<IMatchLineup[] | null>(null);
-  const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
+  const [matchLineups, setMatchLineups] = useState<IMatchLineup[] | null>(null); 
+  */
+  const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
 
-  const [matchRows, setMatchRows] = useState<Array<{}> | null>(null);
-  const [homeRows, setHomeRows] = useState<Array<{}> | null>(null);
-  const [awayRows, setAwayRows] = useState<Array<{}> | null>(null);
+  const [matchRows, setMatchRows] = useState<Array<{}>>([]);
+  const [homeRows, setHomeRows] = useState<Array<{}>>([]);
+  const [awayRows, setAwayRows] = useState<Array<{}>>([]);
   
-  const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended | null>(null);
-  const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended | null>(null);
+  const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended>();
+  const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended>();
 
-  const isLoaded =  matchLineups !== null && teamHome !== null && teamAway !== null && 
+  /* const isLoaded =  matchLineups !== null && teamHome !== null && teamAway !== null && 
                     players !== null && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
-                    matchRows !== null && homeRows !== null && awayRows !== null;
+                    matchRows !== null && homeRows !== null && awayRows !== null; */
+  const isLoaded =  ( matchEncounter && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
+    matchRows !== null && homeRows !== null && awayRows !== null ? true : false );
 
 
   useMemo(() => {
     /**
      * Fetch Match Lineups
      */
-    const paramsMatchLineups: IApiFetchMatchLineups = {
+    /* const paramsMatchLineups: IApiFetchMatchLineups = {
       matchId: match.id,
       leagueIds: [match.idLeague]
     }
@@ -68,11 +72,11 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
 
       })
-    
+     */
     /**
      * Fetch Match Teams
      */
-    const paramsFetchTeams: IApiFetchTeamsParams = {
+    /* const paramsFetchTeams: IApiFetchTeamsParams = {
       teamIds: [match.idTeamHome, match.idTeamAway],
       leagueIds: [match.idLeague]
     }
@@ -93,12 +97,13 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-
+ */
     /**
      * Fetch Teams Standing
      */
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway]
+      teamIds: [matchEncounter.teamHome.id, matchEncounter.teamAway.id],
+      seasonId: matchEncounter.match.idSeason
     }
     fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
@@ -110,23 +115,23 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [match])
+  }, [matchEncounter])
 
   /**
    * Set Meta Tags values
    */
-  useMemo(() => {
-    if( teamHome === null || teamAway === null) return;
+  useEffect(() => {
+    if( ! matchEncounter.teamHome || ! matchEncounter.teamAway ) return;
     setMetas({
-      title:`Match summary - ${teamHome.name} vs ${teamAway.name}`,
-      description:`NBAS match summary ${teamHome.name} vs ${teamAway.name} on date ${createDateReadable(match.date)}`
+      title:`Match summary - ${matchEncounter.teamHome.name} vs ${matchEncounter.teamAway.name}`,
+      description:`NBAS match summary ${matchEncounter.teamHome.name} vs ${matchEncounter.teamAway.name} on date ${createDateReadable(matchEncounter.match.date)}`
     });
-  }, [match, teamHome, teamAway])
+  }, [matchEncounter])
 
   /**
    * Fetch Players in Match Lineups
    */
-  useMemo(() => {
+  /* useMemo(() => {
     if( matchLineups === null ) return;
 
     const paramsFetchPlayers: IApiFetchPlayersParams = {
@@ -143,7 +148,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
       .finally(() => {
         
       });
-  }, [match, matchLineups])
+  }, [match, matchLineups]) */
 
 
   
@@ -151,14 +156,14 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
    * Aggregate data for DataGrid and Charts
    */
   useMemo(() => {
-    if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
+    // if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
     
     // Aggregate Match Data
-    const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchLineups);
+    const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchEncounter.matchLineups);
     const matchRows = ( allStats.map((playerStats) => {
       return {
         id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, players),
+        playerName: getPlayerName(playerStats.id, matchEncounter.players),
         atBats: playerStats.atBats,
         out: playerStats.out,
         single: playerStats.single,
@@ -175,7 +180,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     setMatchRows(matchRows);
 
     // Aggregate Home Team data
-    const teamHomeLineups = filterTeamLineups(matchLineups, teamHome.id);
+    const teamHomeLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamHome.id);
     teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const homeTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const homePlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamHomeLineups);
@@ -185,7 +190,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     const homeRows = ( homePlayerStats.map((playerStats) => {
       return {
         id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, players),
+        playerName: getPlayerName(playerStats.id, matchEncounter.players),
         atBats: playerStats.atBats,
         out: playerStats.out,
         single: playerStats.single,
@@ -202,7 +207,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     setHomeRows(homeRows);
     
     // Aggregate Away Team data
-    const teamAwayLineups = filterTeamLineups(matchLineups, teamAway.id);
+    const teamAwayLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamAway.id);
     teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const awayTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const awayPlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamAwayLineups);
@@ -211,7 +216,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     const awayRows = ( awayPlayerStats.map((playerStats) => {
       return {
         id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, players),
+        playerName: getPlayerName(playerStats.id, matchEncounter.players),
         atBats: playerStats.atBats,
         out: playerStats.out,
         single: playerStats.single,
@@ -227,7 +232,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     }) );
     setAwayRows(awayRows);
 
-  }, [matchLineups, teamAway, teamHome, players])
+  }, [matchEncounter/* matchLineups, teamAway, teamHome, players */])
 
 
 
@@ -243,17 +248,17 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" >
             <Scoreboard 
-              match={match}
+              match={matchEncounter.match}
               standingTeams={standingTeams}
-              teamAway={teamAway}
-              teamHome={teamHome}
+              teamAway={matchEncounter.teamAway}
+              teamHome={matchEncounter.teamHome}
               titleLevel={'h1'}
             />
             { isAdmin && (
               <Button 
                 variant="contained" 
                 startIcon={<EditIcon />} 
-                href={`/admin/match/${match.id}`}
+                href={`/admin/match/${matchEncounter.match.id}`}
               >Edit match</Button>
             )}
             { matchRows.length > 0 && (
@@ -262,17 +267,17 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
                 rows={matchRows}
                 columns={playerExtendedStatsColumns}
                 initialState={defaultStateStatsColumns}
-                getRowId={(row:any) => row.id + "-match-" + match.id}
+                getRowId={(row:any) => row.id + "-match-" + matchEncounter.match.id}
               />
             )}
           </Stack>
         </Paper>
       )}
       
-      { isLoaded && (
+      {/* { isLoaded && (
         <MatchTeamStats
-          match={match}
-          team={teamHome}
+          match={matchEncounter.match}
+          team={matchEncounter.teamHome}
           teamStats={teamHomeStats}
           dataGridRows={homeRows}
         />
@@ -280,12 +285,12 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
 
       { isLoaded && (
         <MatchTeamStats
-          match={match}
-          team={teamAway}
+          match={matchEncounter.match}
+          team={matchEncounter.teamAway}
           teamStats={teamAwayStats}
           dataGridRows={awayRows}
         />
-      )}
+      )} */}
     
     </>
   )
