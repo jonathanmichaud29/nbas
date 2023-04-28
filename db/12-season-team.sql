@@ -17,3 +17,5 @@ ALTER TABLE `nbas`.`team_season`
     REFERENCES `nbas`.`league_season` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
+
+INSERT INTO `nbas`.`team_season` (idTeam, idLeagueSeason) VALUES (1,1);
