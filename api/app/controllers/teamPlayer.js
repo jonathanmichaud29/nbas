@@ -151,3 +151,29 @@ exports.deleteTeamPlayer = async (req, res, next) => {
   }
   return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
 };
+
+exports.deleteSeasonTeamPlayers = async (req, res, next) => {
+  if (!req.params) return next(new AppError("No form data found", 404));
+  
+  const paramsRequiredKeys = ["teamId"]
+  if( is_missing_keys(paramsRequiredKeys, req.params) ) {
+    return next(new AppError(`Missing params parameters`, 404));
+  }
+
+  const selectedSeasonId = castNumber(req.headers.idseason);
+
+  const resultPlayerData = await getPlayerData(req.params.playerId);
+  const resultTeamData = await getTeamData(req.params.teamId);
+  
+  const values = [req.params.teamId, req.params.playerId, selectedSeasonId];
+  const resultMainQuery = await mysqlQuery("DELETE from team_player WHERE idTeam=? AND idPlayer=? AND idLeagueSeason=?", values);
+
+  let customMessage = '';
+  if( resultMainQuery.status ) {
+    customMessage = `This player has been removed from this team season`;
+    if( resultPlayerData.status && resultTeamData.status ){
+      customMessage = `'${resultPlayerData.data.name}' has been removed from the '${resultTeamData.data.name}' season!`
+    }
+  }
+  return appResponse(res, next, resultMainQuery.status, [], resultMainQuery.error, customMessage);
+};

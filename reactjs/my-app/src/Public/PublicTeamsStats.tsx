@@ -90,12 +90,12 @@ function PublicTeamsStats() {
         hasWrapper={true}
       />
       
-      <ChangePublicLeague
+      {/* <ChangePublicLeague
         leagues={listLeagues}
         hideAllLeagueOption={true}
         defaultLeagueId={selectedLeague?.id || publicLeagueId}
         onLeagueChange={changeSelectedLeague}
-      />
+      /> */}
       
       { listLeagueTeams.length > 0 && (
         <AllTeamsStanding 

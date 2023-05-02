@@ -7,26 +7,40 @@ const { getLeagueTeamByName } = require('../utils/simpleQueries');
 
 exports.getTeams = async (req, res, next) => {
   if (!req.body ) return next(new AppError("No form data found", 404));
+  
   const selectedLeagueId = castNumber(req.headers.idleague);
   const listLeagueIds = req.body.leagueIds !== undefined ? req.body.leagueIds : [selectedLeagueId]
+
   let query = '';
+  let queryJoinLeague = ``
   let values = [];
-  if( req.body.teamIds !== undefined ){
-    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague IN ?) WHERE t.id IN ?";
-    const listPlayerIds = req.body.teamIds.length > 0 ? req.body.teamIds : [0];
-    values = [[listLeagueIds], [listPlayerIds]];
-    const resultMainQuery = await mysqlQuery(query, values);
-    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
-  }
-  else if(req.body.allTeams !== undefined && req.body.allTeams ) {
-    query = "SELECT t.* FROM teams as t INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague IN ?) ";
-    values = [[listLeagueIds]]
-    const resultMainQuery = await mysqlQuery(query, values);
-    return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
+  let wheres = [];
+
+  if( req.body.leagueSeasonIds !== undefined ){
+    const listLeagueSeasonIds = req.body.leagueSeasonIds.length > 0 ? req.body.leagueSeasonIds : [0];
+    queryJoinLeague = `INNER JOIN team_season as ts ON (t.id=ts.idTeam AND ts.idLeagueSeason IN ?)`
+    values.push([listLeagueSeasonIds])
   }
   else {
-    return appResponse(res, next, true, {}, {});
+    queryJoinLeague = `INNER JOIN team_league as tl ON (t.id=tl.idTeam AND tl.idLeague IN ?)`
+    values.push([listLeagueIds])
   }
+
+  if( req.body.teamIds !== undefined ){
+    const listTeamIds = req.body.teamIds.length > 0 ? req.body.teamIds : [0];
+
+    wheres.push(`t.id IN ?`)
+    values.push([listTeamIds])
+  }
+  
+  query = `
+    SELECT t.* 
+    FROM teams as t 
+    ` + queryJoinLeague + `
+    ` + ( wheres.length > 0 ? "WHERE " + wheres.join(' ') : '' );
+  
+  const resultMainQuery = await mysqlQuery(query, values);
+  return appResponse(res, next, resultMainQuery.status, resultMainQuery.data, resultMainQuery.error);
 
 };
 

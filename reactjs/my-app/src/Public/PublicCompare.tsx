@@ -41,12 +41,12 @@ export default function PublicCompare(){
 
   return (
     <>
-      <ChangePublicLeague
+      {/* <ChangePublicLeague
         leagues={listLeagues}
         hideAllLeagueOption={true}
         defaultLeagueId={selectedLeague?.id || publicLeagueId}
         onLeagueChange={changeSelectedLeague}
-      />
+      /> */}
       <ToolCategoryCompare 
         category={selectedCategory}
         onCategoryChange={changeSelectedCategory}

@@ -23,12 +23,12 @@ function PublicPlayersStats() {
 
   return (
     <>
-      <ChangePublicLeague
+      {/* <ChangePublicLeague
         hideAllLeagueOption={true}
         leagues={listLeagues}
         defaultLeagueId={selectedLeague?.id || publicLeagueId}
         onLeagueChange={changeSelectedLeague}
-      />
+      /> */}
       { selectedLeague !== null && (
         <PlayersBattingStats
           key={`pbs-${selectedLeague.id}`}

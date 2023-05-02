@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Link, Paper, Stack, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
@@ -11,19 +11,23 @@ import LoaderInfo from "../Generic/LoaderInfo";
 
 import { getTeamName } from '../utils/dataAssociation'
 import { sxGroupStyles } from '../utils/theme';
+import { usePublicContext } from "../Public/PublicApp";
 
 function AllTeamsStanding(props: IAllTeamsStandingProps){
-  
+
   const {teams} = props;
+  
+  const { isAdmin, leagueSeason } = usePublicContext();
 
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
   const [apiError, changeApiError] = useState("");
 
   const isLoaded = standingTeams !== null;
 
-  useMemo(() => {
+  useEffect(() => {
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
-      teamIds: teams.map((team) => team.id) || [0]
+      teamIds: teams.map((team) => team.id) || [0],
+      seasonId: leagueSeason.id
     }
     fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
@@ -37,7 +41,7 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
       .finally(() => {
         
       });
-  },[teams])
+  },[leagueSeason.id, teams])
 
   return (
     <>

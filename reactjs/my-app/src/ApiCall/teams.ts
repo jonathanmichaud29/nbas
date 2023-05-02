@@ -8,6 +8,7 @@ export interface IApiFetchTeamsParams {
   teamIds?: Array<number>;
   allTeams?: boolean;
   leagueIds?: Array<number>;
+  leagueSeasonIds? : Array<number>;
 }
 export const fetchTeams = async (bodyParams: IApiFetchTeamsParams) => {
   return await axiosPublic.post(`${process.env.REACT_APP_API_DOMAIN}/r/team/`,bodyParams)

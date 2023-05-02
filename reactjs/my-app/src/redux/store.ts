@@ -11,6 +11,7 @@ import leaguePlayerReducer from './leaguePlayerSlice'
 import leagueTeamReducer from './leagueTeamSlice'
 import leagueSeasonReducer from './leagueSeasonSlice'
 import adminContextReducer from './adminContextSlice'
+import publicContextReducer from './publicContextSlice'
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     matches: matchReducer,
     matchPlayers: matchPlayerReducer,
     adminContext: adminContextReducer,
+    publicContext: publicContextReducer
   },
 })
 

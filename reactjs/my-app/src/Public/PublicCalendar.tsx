@@ -30,12 +30,12 @@ function PublicCalendar() {
 
   return (
     <>
-      <ChangePublicLeague
+      {/* <ChangePublicLeague
         leagues={listLeagues}
         hideAllLeagueOption={true}
         defaultLeagueId={selectedLeague?.id || publicLeagueId}
         onLeagueChange={changeSelectedLeague}
-      />
+      /> */}
       {selectedLeague !== null && (
         <ListMatches 
           league={selectedLeague}

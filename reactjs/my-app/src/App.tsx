@@ -8,7 +8,6 @@ import {
  * Public Components
  */
 import PublicApp from './Public/PublicApp';
-import HomePage from './Public/HomePage'
 import PublicCalendar from "./Public/PublicCalendar";
 import PublicCompare from './Public/PublicCompare'
 import PublicMatch from './Public/PublicMatch'
@@ -30,6 +29,7 @@ import LeagueManager from './Admin/LeagueManager';
 import CalendarManager from './Admin/CalendarManager';
 
 import { setDefaultMetas } from './utils/metaTags';
+import HomeLeague from "./Public/HomeLeague";
 
 
 
@@ -41,7 +41,7 @@ function App() {
         <Routes>
 
           <Route path="/" element={<PublicApp />}>
-            <Route path="" element={<HomePage />} />
+            <Route path="" element={<HomeLeague />} />
             <Route path="calendar" element={<PublicCalendar />} />
             <Route path="player/:id" element={<PublicPlayer />} />
             <Route path="team/:id" element={<PublicTeam />} />

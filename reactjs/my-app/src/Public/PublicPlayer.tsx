@@ -96,11 +96,11 @@ function PublicPlayer() {
         msgError={apiError}
         hasWrapper={true}
       />
-      <ChangePublicLeague
+      {/* <ChangePublicLeague
         leagues={filterLeaguesByPlayerLeagues()}
         defaultLeagueId={selectedLeague?.id || publicLeagueId}
         onLeagueChange={changeSelectedLeague}
-      />
+      /> */}
       { player && playersLeagues && (
         <ViewPlayerProfile 
           player={player}

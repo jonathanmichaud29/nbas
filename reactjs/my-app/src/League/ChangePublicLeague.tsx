@@ -1,87 +1,113 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "../redux/store";
-
-import { Tabs, Tab, Paper, AppBar, Alert, FormControl, /* InputLabel, Select, MenuItem */ } from "@mui/material";
+import { Paper, AppBar, FormControl } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
-/* import { SelectChangeEvent } from "@mui/material/Select" */
-import { ILeague, ILeaguePlayer } from "../Interfaces/league";
+import { AppDispatch, RootState } from "../redux/store";
+import { setPublicLeague, setPublicLeagueSeason } from "../redux/publicContextSlice";
+import { resetLeaguePlayers } from "../redux/leaguePlayerSlice";
+import { resetLeagueTeams } from "../redux/leagueTeamSlice";
+import { resetPlayers } from "../redux/playerSlice";
+import { resetTeams } from "../redux/teamSlice";
 
-import { getLeagueName } from "../utils/dataAssociation";
-import { sxGroupStyles } from "../utils/theme";
+import { ILeague, ILeagueSeason } from "../Interfaces/league";
+
+import LoaderInfo from "../Generic/LoaderInfo";
+
+import { getStoragePublicLeagueId, getStoragePublicLeagueSeasonId, 
+  setStoragePublicLeagueId, setStoragePublicLeagueSeasonId } from "../utils/localStorage";
+import { castNumber } from "../utils/castValues";
+
 
 interface IChangePublicLeague {
-  leagues?:ILeague[];
-  defaultLeagueId?:number;
-  hideAllLeagueOption?:boolean;
-  playersLeagues?:ILeaguePlayer[];
-  onLeagueChange?(idLeague: number): void;
+  
 }
 function ChangePublicLeague(props:IChangePublicLeague) {
-  const { leagues, defaultLeagueId, hideAllLeagueOption, playersLeagues, onLeagueChange } = props;
-  const sLeagueId = defaultLeagueId as unknown as string || '0';
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [selectedLeague, setSelectedLeague] = useState<string>(sLeagueId);
-
-  const listLeagues = useSelector((state: RootState) => state.leagues )
-
-  /* const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedLeague(newValue);
-    onLeagueChange && onLeagueChange(newValue);
-  } */
+  const currentLeagueId = getStoragePublicLeagueId();
+  const currentLeagueSeasonId = getStoragePublicLeagueSeasonId();
+  const statePublicContext = useSelector((state: RootState) => state.publicContext )
+  
+  const [apiError, changeApiError] = useState('');
 
   const handleLeagueChange = (event: SelectChangeEvent) => {
-    setSelectedLeague(event.target.value);
-    onLeagueChange && onLeagueChange(event.target.value as unknown as number);
+    const newLeagueId = castNumber(event.target.value);
+    const newLeague = statePublicContext.leagues.find((league: ILeague) => league.id === newLeagueId) || null;
+    
+    // Find latest season for the choosen league
+    let newLeagueSeason: ILeagueSeason | null = null;
+    const leagueSeasons = statePublicContext.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === newLeagueId);
+    if( leagueSeasons && leagueSeasons.length ){
+      newLeagueSeason = leagueSeasons.sort((a,b) => b.id - a.id)[0];
+    }
+
+    // Dispatch new current League & Season
+    
+    setStoragePublicLeagueId(newLeagueId);
+    setStoragePublicLeagueSeasonId(newLeagueSeason?.id || 0);
+
+    batch(() => {
+      dispatch(setPublicLeague(newLeague));
+      dispatch(setPublicLeagueSeason(newLeagueSeason));
+      dispatch(resetPlayers());
+      dispatch(resetLeaguePlayers());
+      dispatch(resetTeams());
+      dispatch(resetLeagueTeams()); 
+    })
+    
+    // dispatch(resetLeagueSeasons());
+  }
+
+  const handleLeagueSeasonChange = (event: SelectChangeEvent) => {
+    const newLeagueSeasonId = event.target.value as unknown as number;
+    const newLeagueSeason = statePublicContext.leagueSeasons.find((leagueSeason: ILeagueSeason) => leagueSeason.id === newLeagueSeasonId) || null;
+    dispatch(setPublicLeagueSeason(newLeagueSeason));
+    setStoragePublicLeagueSeasonId(newLeagueSeasonId);
   }
 
   return (
     <AppBar position="sticky" color="transparent">
       <Paper color="primary">
-        <FormControl size="small">
-          <Select
-            labelId="label-switch-public-league"
-            id="switch-public-league"
-            value={selectedLeague as string}
-            onChange={handleLeagueChange}
-          >
-            {leagues && leagues.map((league:ILeague) => (
-              <MenuItem value={league.id}>{league.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        {/* <Tabs 
-          value={selectedLeague} 
-          onChange={handleChange} 
-          aria-label="Filter results by league" 
-          variant="scrollable"
-          allowScrollButtonsMobile={true}
-          orientation='horizontal'
-        >
-          <Tab key={`tab-league-0`} label="All" value={0} disabled={hideAllLeagueOption} sx={sxGroupStyles.tabSwitchLeague}/>
-          {playersLeagues && playersLeagues.map((playerLeague:ILeaguePlayer) => (
-            <Tab 
-              key={`tab-league-${playerLeague.idLeague}`} 
-              label={getLeagueName(playerLeague.idLeague, listLeagues)} 
-              value={playerLeague.idLeague} 
-              sx={sxGroupStyles.tabSwitchLeague}
-            />
-          ))}
-          {leagues && leagues.map((league:ILeague) => (
-            <Tab 
-              key={`tab-league-${league.id}`} 
-              label={league.name} 
-              value={league.id} 
-              sx={sxGroupStyles.tabSwitchLeague}
-            />
-          ))}
-        </Tabs> */}
-        { hideAllLeagueOption && defaultLeagueId === 0 && (
-          <Alert severity="info">A league is required to display information</Alert>
+        <LoaderInfo
+          msgError={apiError}
+        />
+        { statePublicContext.leagues && statePublicContext.currentLeague && (
+          <FormControl size="small">
+            <Select
+              labelId="label-switch-public-league"
+              id="switch-public-league"
+              value={(statePublicContext.currentLeague.id).toString()}
+              onChange={handleLeagueChange}
+            >
+              {statePublicContext.leagues && statePublicContext.leagues.map((league:ILeague) => (
+                <MenuItem 
+                  key={`item-public-league-${league.id}`} 
+                  value={league.id}
+                >{league.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         )}
+        { ( statePublicContext.leagueSeasons && statePublicContext.currentLeagueSeason ) ? (
+          <FormControl size="small">
+            <Select
+              labelId="label-switch-public-season"
+              id="switch-public-season"
+              value={(statePublicContext.currentLeagueSeason.id).toString()}
+              onChange={handleLeagueSeasonChange}
+            >
+              {statePublicContext.leagueSeasons.filter((leagueSeason: ILeagueSeason) => leagueSeason.idLeague === statePublicContext.currentLeague?.id).map((leagueSeason:ILeagueSeason) => (
+                <MenuItem 
+                  key={`item-public-league-season-${leagueSeason.id}`} 
+                  value={leagueSeason.id}
+                >{leagueSeason.year} {leagueSeason.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : ''}
       </Paper>
     </AppBar>
     
