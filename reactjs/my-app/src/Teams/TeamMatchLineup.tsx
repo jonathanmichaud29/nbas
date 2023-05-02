@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from 'reselect'
 
 import { Alert, Button, IconButton, List, ListItem, Paper, Stack, Typography  } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -28,12 +27,8 @@ function TeamMatchLineup (props: ITeamMatchLineupProps) {
   const [apiError, changeApiError] = useState("");
 
   const listPlayers = useSelector((state: RootState) => state.players )
-  const selectCurrentMatchPlayers = createSelector(
-    (state: RootState) => state.matchPlayers,
-    (matchPlayers) => matchPlayers.find((myMatchPlayers) => myMatchPlayers.match.id === match.id)
-  ) 
-  const allMatchPlayers = useSelector(selectCurrentMatchPlayers);
-
+  const allMatchPlayers = useSelector((state: RootState) => state.matchPlayers ).find((matchPlayers) => matchPlayers.match.id === match.id)
+  
   const lineupTeam = allMatchPlayers?.lineupPlayers.filter((lineupPlayer: IMatchLineup) => lineupPlayer.idTeam === team.id ) || []
 
   /**

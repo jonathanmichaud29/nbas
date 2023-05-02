@@ -14,7 +14,7 @@ import { IOrderPlayers } from '../Interfaces/team'
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 
 import LoaderInfo from "../Generic/LoaderInfo";
-import { findAvailabilityMatchAllPlayers } from "../utils/dataFilter";
+import { findAvailabilityMatchAllPlayers, sortPlayersPerTeams } from "../utils/dataFilter";
 
 const defaultValues = {
   player: {},
@@ -33,7 +33,6 @@ export default function AddMatchLineup(props: IAddMatchLineupProps) {
    * Set States
    */
   const [isModalOpen, setModalOpen] = useState(isOpen);
-  // const [listTeamsPlayers, setListTeamsPlayers] = useState<ITeamPlayers[]>([]);
   const [apiError, changeApiError] = useState("");
   const [apiSuccess, changeApiSuccess] = useState("");
   const [requestStatus, setRequestStatus] = useState(false);
@@ -44,23 +43,7 @@ export default function AddMatchLineup(props: IAddMatchLineupProps) {
   const listTeams = useSelector((state: RootState) => state.teams);
   
   const { unassignedLineupPlayerIds } = findAvailabilityMatchAllPlayers(matchPlayers, listPlayers, selectedTeam)
-    
-  // Remove Players that are actually in this match lineup
-  // Then set Player's Categorisation and add new attributes helping to sort them in the list
-  // Sort players by the following: team association, team name, player name
-  let listOrderPlayers: IOrderPlayers[] = listPlayers
-    .filter((player) => unassignedLineupPlayerIds.includes(player.id))
-    .map((player: IPlayer) => {
-      const teamPlayerFound = listTeamPlayers.find((teamPlayer) => teamPlayer.idPlayer === player.id) || null;
-      const groupName = ( teamPlayerFound !== null ? listTeams.find((team) => team.id === teamPlayerFound.idTeam)?.name : 'Reservist');
-      
-      return {
-        currentTeamName: groupName,
-        priority: ( teamPlayerFound !== null ? 1 : 0 ),
-        ...player
-      } as IOrderPlayers
-    })
-    .sort((a,b) => a.priority - b.priority || -(b.currentTeamName).localeCompare(a.currentTeamName) || -(b.name).localeCompare(a.name) );
+  const listOrderPlayers: IOrderPlayers[] = sortPlayersPerTeams(listPlayers, listTeams, matchPlayers, listTeamPlayers, unassignedLineupPlayerIds)
   
 
   useEffect(() => {

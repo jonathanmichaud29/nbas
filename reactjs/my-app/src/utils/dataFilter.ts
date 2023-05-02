@@ -1,7 +1,7 @@
 import { ILeague, ILeaguePlayer, ILeagueSeason, ILeagueTeam } from "../Interfaces/league";
 import { IMatch, IMatchLineup, IMatchPlayers } from "../Interfaces/match";
 import { IPlayer, ITeamPlayer } from "../Interfaces/player";
-import { ITeam, ITeamSeason } from "../Interfaces/team";
+import { IOrderPlayers, ITeam, ITeamSeason } from "../Interfaces/team";
 
 export const filterPlayersByName = (listPlayers: IPlayer[], searchTerm: string) => {
   if( searchTerm === ''){
@@ -70,7 +70,9 @@ export const findAvailabilityMatchPlayers = (matchPlayers: IMatchPlayers | null,
   const assignedLineupPlayerIds = matchPlayers?.lineupPlayers?.map((lineupPlayer) => lineupPlayer.idPlayer) || [];
   const unassignedLineupPlayerIds = listTeamPlayers
     .filter((teamPlayer) => {
-      return teamPlayer.idTeam === selectedTeam.id && ! assignedLineupPlayerIds.includes(teamPlayer.idPlayer)
+      return matchPlayers?.match.idSeason === teamPlayer.idLeagueSeason 
+        && teamPlayer.idTeam === selectedTeam.id 
+        && ! assignedLineupPlayerIds.includes(teamPlayer.idPlayer)
     })
     .map((teamPlayer) => teamPlayer.idPlayer) || []
   
@@ -92,4 +94,25 @@ export const findAvailabilityMatchAllPlayers = (matchPlayers: IMatchPlayers | nu
     assignedLineupPlayerIds,
     unassignedLineupPlayerIds
   }
+}
+
+/**
+ * Remove Players that are actually in this match lineup
+ * Then set Player's Categorisation and add new attributes helping to sort them in the list
+ * Sort players by the following: team association, team name, player name
+ */ 
+export const sortPlayersPerTeams = (listPlayers:IPlayer[], listTeams:ITeam[], matchPlayers:IMatchPlayers | null, listTeamPlayers: ITeamPlayer[], unassignedLineupPlayerIds: Array<number>) : IOrderPlayers[] => {
+  return listPlayers
+    .filter((player) => unassignedLineupPlayerIds.includes(player.id))
+    .map((player: IPlayer) => {
+      const teamPlayerFound = listTeamPlayers.find((teamPlayer) => teamPlayer.idLeagueSeason === matchPlayers?.match.idSeason && teamPlayer.idPlayer === player.id) || null;
+      const groupName = ( teamPlayerFound !== null ? listTeams.find((team) => team.id === teamPlayerFound.idTeam)?.name : 'Reservist');
+      
+      return {
+        currentTeamName: groupName,
+        priority: ( teamPlayerFound !== null ? 1 : 0 ),
+        ...player
+      } as IOrderPlayers
+    })
+    .sort((a,b) => a.priority - b.priority || -(b.currentTeamName).localeCompare(a.currentTeamName) || -(b.name).localeCompare(a.name) );
 }
