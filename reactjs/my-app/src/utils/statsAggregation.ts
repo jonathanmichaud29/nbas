@@ -43,7 +43,7 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
         battingAverage: 0,
         onBasePercentage: 0,
         onBaseSluggingPercentage: 0,
-        runsBattedIn: 0,
+        runsBattedIn: matchLineup.runsBattedIn,
       });
     }
     else {

@@ -62,13 +62,13 @@ function HomeLeague() {
           key={`cm-${leagueSeason.id}`}
           league={leagueSeason}
         />
-      ) : ''}
+      ) : ''} */}
       { isLoaded ? (
         <BestLeaguePlayers
           key={`blp-${leagueSeason.id}`}
-          league={leagueSeason}
+          leagueSeason={leagueSeason}
         />
-      ) : ''} */}
+      ) : ''}
     </>
   )
 }
