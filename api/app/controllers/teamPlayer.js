@@ -14,7 +14,29 @@ exports.getTeamsPlayers = async (req, res, next) => {
 
   let query = '';
   let values = [];
-  if( req.body.isAdminContext ){
+  let wheres = [];
+  let joins = [];
+
+  if( req.body.isAdminContext || req.body.allTeamsPlayers ){
+    wheres.push('tp.idLeagueSeason=?')
+    values.push(selectedSeasonId)
+  } else if( req.body.leagueSeasonIds ) {
+    wheres.push('tp.idLeagueSeason IN ?')
+    values.push([ req.body.leagueSeasonIds.length > 0 ? req.body.leagueSeasonIds : [0] ])
+  }
+  if( req.body.teamIds ){
+    wheres.push('tp.idTeam IN ?')
+    values.push([ req.body.teamIds.length > 0 ? req.body.teamIds : [0] ])
+  }
+  // Perhaps useless?
+  
+  if( req.body.playerIds ) {
+    wheres.push('tp.idPlayer IN ?')
+    values.push([ req.body.playerIds.length > 0 ? req.body.playerIds : [0] ])
+  }
+
+
+  /* if( req.body.isAdminContext ){
     query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
       FROM team_player as tp 
       INNER JOIN teams as t ON (tp.idTeam=t.id) 
@@ -41,15 +63,22 @@ exports.getTeamsPlayers = async (req, res, next) => {
   }
   else if( req.body.playerIds !== undefined && req.body.playerIds.length > 0) {
     query = `SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
-      "FROM team_player as tp 
-      "INNER JOIN teams as t ON (tp.idTeam=t.id) 
-      "INNER JOIN players AS p ON (tp.idPlayer=p.id) 
-      "WHERE tp.idPlayer IN ?`;
+      FROM team_player as tp 
+      INNER JOIN teams as t ON (tp.idTeam=t.id) 
+      INNER JOIN players AS p ON (tp.idPlayer=p.id) 
+      WHERE tp.idPlayer IN ?`;
     values = [[req.body.playerIds]];
   }
   else {
     return appResponse(res, next, true, {}, {});
-  }
+  } */
+
+  query = `
+    SELECT t.id as teamId, t.name as teamName, p.id as playerId, p.name as playerName 
+    FROM team_player as tp 
+    INNER JOIN teams as t ON (tp.idTeam=t.id) 
+    INNER JOIN players AS p ON (tp.idPlayer=p.id)
+    ` + ( wheres.length > 0 ? "WHERE " + wheres.join(" AND ") : "")
 
   const resultMainQuery = await mysqlQuery(query, values)
 

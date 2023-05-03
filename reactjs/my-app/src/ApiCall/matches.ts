@@ -14,6 +14,7 @@ export interface IApiFetchMatchesParams {
   isUpcoming?     : boolean;
   valueCompleted? : number;
   leagueIds?      : Array<number>;
+  leagueSeasonIds?: Array<number>;
   isIgnoringLeague?: boolean;
 }
 export const fetchMatches = async (bodyParams: IApiFetchMatchesParams) => {

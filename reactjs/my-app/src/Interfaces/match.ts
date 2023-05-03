@@ -1,6 +1,6 @@
 import { ITeam } from './team'
 import { IPlayer } from './player'
-import { ILeague } from './league';
+import { ILeague, ILeagueSeason } from './league';
 import { IBattingStatsExtended } from './stats';
 
 export interface IMatch{
@@ -42,7 +42,7 @@ export interface IMatchResumeProps {
 }
 
 export interface IClosestMatchesProps {
-  league: ILeague;
+  leagueSeason: ILeagueSeason;
 }
 
 export interface IMatchDetailsProps {

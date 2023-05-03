@@ -62,13 +62,14 @@ export default function BestMatchPlayers(props: IBestMatchPlayersProps) {
     if( match.isCompleted === 0 ) {
       const paramsFetchTeamsPlayers: IApiFetchTeamsPlayersParams = {
         teamIds: [team.id],
-        leagueIds: [match.idLeague]
+        leagueSeasonIds: [match.idSeason]
       }
       fetchTeamsPlayers(paramsFetchTeamsPlayers)
         .then(response => {
           const listTeamPlayers: ITeamPlayers[] = response.data;
           const paramsMatchLineups: IApiFetchMatchLineups = {
             playerIds: listTeamPlayers.map((teamPlayer) => teamPlayer.playerId),
+            leagueSeasonIds: [match.idSeason]
           }
           fetchMatchLineups(paramsMatchLineups)
             .then(response => {

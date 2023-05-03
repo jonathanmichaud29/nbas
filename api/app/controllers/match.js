@@ -21,6 +21,10 @@ exports.getMatches = async (req, res, next) => {
     wheres.push('`idLeague`=?')
     values.push(selectedLeagueId);
   }
+  if( req.body.leagueSeasonIds ){
+    wheres.push('`idSeason` IN ?')
+    values.push([req.body.leagueSeasonIds.length > 0 ? req.body.leagueSeasonIds : [0]])
+  }
 
   if (req.body.matchIds ){
     wheres.push('`id` IN ?')

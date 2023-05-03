@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { batch } from "react-redux";
 
 import { Card, CardContent, Divider, Grid, Stack, Typography } from "@mui/material";
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
@@ -12,6 +13,7 @@ import Scoreboard from './Scoreboard';
 import BestMatchPlayers from '../Players/BestMatchPlayers'
 import LoaderInfo from "../Generic/LoaderInfo";
 
+
 function MatchResume(props: IMatchResumeProps) {
   
   const { title, match } = props;
@@ -19,49 +21,44 @@ function MatchResume(props: IMatchResumeProps) {
   const [apiError, changeApiError] = useState("");
   const [teamHome, setTeamHome] = useState<ITeam | null>(null);
   const [teamAway, setTeamAway] = useState<ITeam | null>(null);
-  const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
+  const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
+  
+  const isLoaded = teamHome !== null && teamAway !== null && standingTeams.length > 0;
 
-  const isLoaded = teamHome !== null && teamAway !== null && standingTeams !== null;
-
-  useMemo(() => {
+  useEffect(() => {
+    const listTeamIds = [match.idTeamHome, match.idTeamAway]
     const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway],
-      leagueIds: [match.idLeague]
+      teamIds: listTeamIds,
     }
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        response.data.forEach((team: ITeam) => {
-          if ( team.id === match.idTeamHome) {
-            setTeamHome(team);
-          }
-          else {
-            setTeamAway(team);
-          }
+    const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
+      teamIds: listTeamIds,
+      seasonId: match.idSeason
+    }
+    Promise.all([fetchStandingTeams(paramsFetchStandingTeams), fetchTeams(paramsFetchTeams)])
+      .catch((error)=>{
+        changeApiError(error);
+      })
+      .then((values) => {
+        if( ! values ) return;
+
+        batch(() => {
+          setStandingTeams(values[0].data)
+          values[1].data.forEach((team: ITeam) => {
+            if ( team.id === match.idTeamHome) {
+              setTeamHome(team);
+            }
+            else {
+              setTeamAway(team);
+            }
+          })
         })
       })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
+      .finally(()=>{
+
       });
+    
   }, [match])
 
-  useMemo(() => {
-    const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway]
-    }
-    fetchStandingTeams(paramsFetchStandingTeams)
-      .then(response => {
-        setStandingTeams(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [match])
 
 
   return (
@@ -85,7 +82,7 @@ function MatchResume(props: IMatchResumeProps) {
             isLoading={isLoaded}
             msgError={apiError}
           />
-          { isLoaded && (
+          { isLoaded ? (
             <Scoreboard
               teamHome={teamHome}
               teamAway={teamAway}
@@ -93,20 +90,20 @@ function MatchResume(props: IMatchResumeProps) {
               standingTeams={standingTeams}
               hasLinkMatchDetails={true}
             /> 
-          )}
+          ) : ''}
           <Typography variant="h3" textAlign="center">Best players this {match.isCompleted === 0 ? 'season' : 'game'}</Typography>
-          { isLoaded && (
+          { isLoaded ? (
             <BestMatchPlayers 
               match={match}
               team={teamHome}
             />
-          )}
-          { isLoaded && (
+          ) : ''}
+          { isLoaded ? (
             <BestMatchPlayers 
               match={match}
               team={teamAway}
             />
-          )}
+          ) : ''}
         </Stack>
       </CardContent>
     </Card>

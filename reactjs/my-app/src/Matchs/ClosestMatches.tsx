@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { batch } from "react-redux";
 
 import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
 
@@ -10,57 +11,50 @@ import LoaderInfo from "../Generic/LoaderInfo";
 import MatchResume from "./MatchResume";
 
 
+
 export default function ClosestMatches(props: IClosestMatchesProps) {
 
-  const { league } = props;
+  const { leagueSeason } = props;
 
   const [apiError, changeApiError] = useState<string>('');
   const [matchPast, setMatchPast] = useState<IMatch | null>(null);
   const [matchUpcoming, setMatchUpcoming] = useState<IMatch | null>(null);
-  const [matchPastLoaded, setMatchPastLoaded] = useState<boolean>(false);
-  const [matchUpcomingLoaded, setMatchUpcomingLoaded] = useState<boolean>(false);
+  const [matchesLoaded, setMatchesLoaded] = useState<boolean>(false);
 
-  const isLoaded = matchPastLoaded && matchUpcomingLoaded ? true : false;
+  const isLoaded = matchesLoaded ? true : false;
 
 
-  useMemo(() => {
-    
+  useEffect( () => {
     const queryPastParams: IApiFetchMatchesParams = {
       isPast: true,
       valueCompleted: 1,
       quantity: 1,
-      leagueIds: [league.id]
+      leagueSeasonIds: [leagueSeason.id]
     }
-    
-    fetchMatches(queryPastParams)
-      .then(response => {
-        setMatchPast(response.data[0] || null)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        setMatchPastLoaded(true);
-      });
-
     const queryUpcomingParams: IApiFetchMatchesParams = {
       isUpcoming: true,
       valueCompleted: 0,
       quantity: 1,
-      leagueIds: [league.id]
+      leagueSeasonIds: [leagueSeason.id]
     }
-      
-    fetchMatches(queryUpcomingParams)
-      .then(response => {
-        setMatchUpcoming(response.data[0] || null);
-      })
-      .catch(error => {
+    Promise.all([fetchMatches(queryPastParams), fetchMatches(queryUpcomingParams)])
+      .catch((error)=>{
         changeApiError(error);
       })
-      .finally(() => {
-        setMatchUpcomingLoaded(true);
+      .then((values) => {
+        if( ! values ) return;
+
+        batch(() => {
+          setMatchPast(values[0].data[0] || null)
+          setMatchUpcoming(values[1].data[0] || null);
+          setMatchesLoaded(true);
+        })
+      })
+      .finally(()=>{
+        setMatchesLoaded(true);
       });
-  }, [league])
+    
+  }, [leagueSeason])
 
   return (
     <>
@@ -69,11 +63,11 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
         msgError={apiError}
         hasWrapper={true}
       />
-      { (matchPast || matchUpcoming) && (
+      { ( matchesLoaded && ( matchPast || matchUpcoming ) ) ? (
         <Paper component={Box} m={3} p={3}>
           <Stack spacing={3} alignItems="center">
             <Typography variant="h1">
-              Closest Match for {league.name}
+              Closest Match
             </Typography>
             <Grid container justifyContent="space-around" rowSpacing={3}>
               { matchPast && (
@@ -95,7 +89,7 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
             </Grid>
           </Stack>
         </Paper>
-      ) }
+      ) : '' }
       
     </>
   )

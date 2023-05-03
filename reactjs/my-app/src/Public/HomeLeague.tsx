@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { batch } from "react-redux";
 
 import { ITeam } from "../Interfaces/team";
 
@@ -6,13 +7,12 @@ import { usePublicContext } from "./PublicApp";
 
 import { IApiFetchTeamsParams, fetchTeams } from "../ApiCall/teams";
 
-import ChangePublicLeague from "../League/ChangePublicLeague";
 import ClosestMatches from "../Matchs/ClosestMatches";
 import BestLeaguePlayers from "../Players/BestLeaguePlayers";
 import AllTeamsStanding from "../Teams/AllTeamsStanding";
 
-
 import LoaderInfo from "../Generic/LoaderInfo";
+
 
 function HomeLeague() {
   const { isAdmin, leagueSeason } = usePublicContext();
@@ -35,8 +35,10 @@ function HomeLeague() {
         setListTeams(response.data)
       })
       .catch(error => {
-        changeApiError(error);
-        setListTeams([]);
+        batch(() => {
+          changeApiError(error);
+          setListTeams([]);
+        })
       })
       .finally(() => {
         
@@ -57,12 +59,12 @@ function HomeLeague() {
         />
       ) : '' }
 
-      {/* { isLoaded ? (
+      { isLoaded ? (
         <ClosestMatches
           key={`cm-${leagueSeason.id}`}
-          league={leagueSeason}
+          leagueSeason={leagueSeason}
         />
-      ) : ''} */}
+      ) : ''}
       { isLoaded ? (
         <BestLeaguePlayers
           key={`blp-${leagueSeason.id}`}
