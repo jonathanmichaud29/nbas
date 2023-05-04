@@ -11,7 +11,7 @@ import Scoreboard from "../Matchs/Scoreboard";
 import CustomDataGrid from '../Generic/CustomDataGrid';
 
 import { getPlayerName } from '../utils/dataAssociation';
-import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
+import { generateDatagridPlayerRows, getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
 
 
@@ -33,7 +33,8 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
   }, [matchLineups])
 
   const playersStats = getCombinedPlayersStats(matchLineups);
-  const rows = ( playersStats && playersStats.map((playerStats) => {
+  const rows = generateDatagridPlayerRows(playersStats, players)
+  /* const rows = ( playersStats && playersStats.map((playerStats) => {
     return {
       id: playerStats.id,
       playerName: getPlayerName(playerStats.id, players),
@@ -49,7 +50,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
       sluggingPercentage: playerStats.sluggingPercentage,
       onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
     }
-  }) ) || [];
+  }) ) || []; */
   
   return (
     <Stack spacing={3} alignItems="center" width="100%">

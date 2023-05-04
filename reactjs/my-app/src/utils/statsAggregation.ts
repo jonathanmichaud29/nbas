@@ -1,5 +1,7 @@
 import { EBatResult, IMatchLineup, IPlayerBatResult } from '../Interfaces/match';
+import { IPlayer } from '../Interfaces/player';
 import { defaultBattingStatsExtended, defaultPlayerLineupStats, IBattingStatsExtended, IPlayerLineupStats } from '../Interfaces/stats'
+import { getPlayerName } from './dataAssociation';
 
 export const getStatHits = (single: number, double: number, triple: number, homerun: number) => {
   return single + double + triple + homerun;
@@ -238,4 +240,24 @@ export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) =
   })
   /* console.log(combinedLineupStats); */
   return combinedLineupStats;
+}
+
+export const generateDatagridPlayerRows = (allPlayersStats: IBattingStatsExtended[], listPlayers: IPlayer[]) => {
+  return allPlayersStats.map((playerStats) => {
+    return {
+      id: playerStats.id,
+      playerName: getPlayerName(playerStats.id, listPlayers),
+      atBats: playerStats.atBats,
+      out: playerStats.out,
+      single: playerStats.single,
+      double: playerStats.double,
+      triple: playerStats.triple,
+      homerun: playerStats.homerun,
+      runsBattedIn: playerStats.runsBattedIn,
+      battingAverage: playerStats.battingAverage,
+      onBasePercentage: playerStats.onBasePercentage,
+      sluggingPercentage: playerStats.sluggingPercentage,
+      onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
+    }
+  }) || [];
 }

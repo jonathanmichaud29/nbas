@@ -1,4 +1,4 @@
-import { ILeague, ILeaguePlayer } from './league';
+import { ILeague, ILeaguePlayer, ILeagueSeason } from './league';
 import { IMatch, IMatchLineup } from './match'
 import { ITeam } from './team';
 
@@ -37,5 +37,5 @@ export interface IPlayerYearStatsProps {
 }
 
 export interface IPlayersBattingStatsProps {
-  league: ILeague;
+  leagueSeason: ILeagueSeason;
 }

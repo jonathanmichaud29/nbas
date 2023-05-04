@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Box, Paper, Stack, Typography  } from "@mui/material";
 
@@ -12,80 +12,77 @@ import YearStats from '../Stats/YearStats';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { setMetas } from '../utils/metaTags';
+import { batch } from 'react-redux';
 
 function PlayersBattingStats(props: IPlayersBattingStatsProps) {
 
-  const { league } = props;
+  const { leagueSeason } = props;
 
   const [listPlayers, setListPlayers] = useState<IPlayer[]>([]);
   const [listMatchesLineups, setListMatchesLineups] = useState<IMatchLineup[]>([]);
-  const [playersLoaded, setPlayersLoaded] = useState<boolean>(false);
-  const [matchesLineupsLoaded, setMatchesLineupsLoaded] = useState<boolean>(false);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
   const [apiError, changeApiError] = useState("");
-
-  const isLoaded = playersLoaded === true && matchesLineupsLoaded === true;
   
   setMetas({
-    title:`${league.name} Players batting statistics`,
-    description:`${league.name} players batting statistics for the current season`
+    title:`${leagueSeason.name} Players batting statistics`,
+    description:`${leagueSeason.name} players batting statistics for the current season`
   });
   
   /**
    * Fetch Players and Matches Lineups for the current league
    */
-  useMemo( () => {
+  useEffect( () => {
+    let newListPlayers: IPlayer[] = []
+    let newListMatchLineups: IMatchLineup[] = []
     const paramsFetchPlayers: IApiFetchPlayersParams = {
       allPlayers: true,
-      leagueIds: [league.id]
+      leagueSeasonIds: [leagueSeason.id]
     }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        setListPlayers(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        setPlayersLoaded(true);
-      });
-
     const paramsMatchLineups: IApiFetchMatchLineups = {
       allLineups: true,
-      leagueIds: [league.id]
+      leagueSeasonIds: [leagueSeason.id]
     }
-    fetchMatchLineups(paramsMatchLineups)
-      .then(response => {
-        setListMatchesLineups(response.data)
-      })
-      .catch(error => {
+
+    Promise.all([fetchPlayers(paramsFetchPlayers), fetchMatchLineups(paramsMatchLineups)])
+      .catch((error) => {
         changeApiError(error);
       })
-      .finally(() => {
-        setMatchesLineupsLoaded(true);
-      });
-  }, [league]);
+      .then((values) =>{
+        if( ! values ) return;
+        newListPlayers = values[0].data || [];
+        newListMatchLineups = values[1].data || [];
+      })
+      .finally(()=>{
+        batch(()=>{
+          setListPlayers(newListPlayers)
+          setListMatchesLineups(newListMatchLineups)
+          setDataLoaded(true);
+        })
+      })
+
+  }, [leagueSeason]);
 
   return (
     <>
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
       <Paper component={Box} m={3} p={3}>
         <Stack spacing={3} alignItems="center">
           <Typography variant="h1">
-            {league.name} Players Stats
+            {leagueSeason.name} Players Stats
           </Typography>
 
-          {isLoaded && (
+          { (dataLoaded && listMatchesLineups.length && listPlayers.length ) ? (
             <YearStats
               key={`year-players-stat`}
               matchLineups={listMatchesLineups}
               players={listPlayers}
               title={`League batting stats`}
             />
-          )}
+          ) : ''}
         </Stack>
       </Paper>
     </>
