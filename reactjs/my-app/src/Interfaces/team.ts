@@ -70,7 +70,7 @@ export interface IAllTeamsStandingProps {
 
 export interface IAllTeamsStatsProps {
   teams: ITeam[];
-  matchesLineups?: IMatchLineup[]; // TODO DEPRECATED
+  leagueSeason: ILeagueSeason;
 }
 
 export interface ITeamMatchResumeProps {

@@ -16,7 +16,7 @@ import { getCombinedTeamsStats } from '../utils/statsAggregation';
 
 function AllTeamsStats(props: IAllTeamsStatsProps) {
 
-  const {teams} = props;
+  const {teams, leagueSeason} = props;
 
   const [allTeamsStats, setAllTeamsStats] = useState<IBattingStatsExtended[] | null>(null);
   const [apiError, changeApiError] = useState("");
@@ -30,6 +30,7 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
     
     const paramsMatchLineups: IApiFetchMatchLineups = {
       teamIds: teams.map((team) => team.id),
+      leagueSeasonIds: [leagueSeason.id]
     }
     fetchMatchLineups(paramsMatchLineups)
       .then(response => {
