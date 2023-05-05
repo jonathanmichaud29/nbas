@@ -51,7 +51,6 @@ export const fetchStandingTeams = async (bodyParams: IApiFetchStandingTeamsParam
 
 export interface IApiFetchLeagueTeamsParams {
   leagueIds?:Array<number>;
-  leagueSeasonIds?:Array<number>;
   teamIds?:Array<number>;
 }
 export const fetchLeagueTeams = async (bodyParams: IApiFetchLeagueTeamsParams) => {

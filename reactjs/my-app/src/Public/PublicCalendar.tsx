@@ -1,47 +1,92 @@
-import { useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useMemo, useEffect } from 'react';
+import { batch } from 'react-redux';
 
-import { RootState } from '../redux/store';
+import { usePublicContext } from './PublicApp';
 
-import { ILeague } from '../Interfaces/league';
+import { ILeagueTeam } from '../Interfaces/league';
+import { ITeam } from '../Interfaces/team';
 
-import ChangePublicLeague from '../League/ChangePublicLeague';
-import ListMatches from '../Matchs/ListMatches';
+import { IApiFetchLeagueTeamsParams, fetchLeagueTeams, IApiFetchTeamsParams, fetchTeams } from '../ApiCall/teams';
 
-import { getStoragePublicLeagueId, setStoragePublicLeagueId } from '../utils/localStorage';
+import LoaderInfo from '../Generic/LoaderInfo';
+import SeasonMatches from '../Matchs/SeasonMatches';
+
 import { setMetas } from '../utils/metaTags';
 
 function PublicCalendar() {
-  const publicLeagueId = getStoragePublicLeagueId();
-  const listLeagues = useSelector((state: RootState) => state.leagues )
-  const [selectedLeague, setSelectedLeague] = useState<ILeague | null>(listLeagues.find((league) => league.id === publicLeagueId) || null);
-  const changeSelectedLeague = (idLeague:number) => {
-    setStoragePublicLeagueId(idLeague);
-    const activeLeague = listLeagues.find((league) => league.id === idLeague) || null
-    setSelectedLeague(activeLeague);
-  }
+  
+  const { isAdmin, leagueSeason } = usePublicContext();
+
+  const [apiError, changeApiError] = useState("");
+  const [listTeams, setTeams] = useState<ITeam[]>([]);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+
+  const dataTeamsEmpty = listTeams.length === 0;
+  
+  useEffect(() => {
+    
+    const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
+      leagueIds:[leagueSeason.idLeague]
+    }
+    fetchLeagueTeams(paramsFetchLeagueTeams)
+      .then(response => {
+        const newLeagueTeams: ILeagueTeam[] = response.data || [];
+
+        const teamIds = newLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+
+        const paramsFetchTeams: IApiFetchTeamsParams = {
+          teamIds: teamIds
+        }
+        Promise.all([fetchTeams(paramsFetchTeams)])
+          .catch((error) => {
+            batch(() => {
+              changeApiError(error);
+              setDataLoaded(true);
+            })
+          })
+          .then((values) =>{
+            if( ! values ) return;
+            batch(() => {
+              setTeams(values[0].data);
+              setDataLoaded(true)
+            })
+          })
+          .finally(() => {
+            
+          });
+      })
+      .catch(error => {
+        batch(()=>{
+          changeApiError(error);
+          setDataLoaded(true)
+        })
+        
+      })
+      .finally(() => {
+        
+      });
+      
+  }, [leagueSeason.idLeague]);
 
   useMemo(() =>{
     setMetas({
-      title:`${selectedLeague?.name} Calendar`,
-      description:`${selectedLeague?.name} teams standing this season with team batting statistics`
+      title:`${leagueSeason.name} Calendar`,
+      description:`${leagueSeason.name} teams standing this season with team batting statistics`
     });
-  },[selectedLeague])
+  },[leagueSeason])
 
   return (
     <>
-      {/* <ChangePublicLeague
-        leagues={listLeagues}
-        hideAllLeagueOption={true}
-        defaultLeagueId={selectedLeague?.id || publicLeagueId}
-        onLeagueChange={changeSelectedLeague}
-      /> */}
-      {selectedLeague !== null && (
-        <ListMatches 
-          league={selectedLeague}
-          isAdmin={false}
+      <LoaderInfo
+          isLoading={dataLoaded}
+          msgError={apiError}
         />
-      )}
+      { ! dataTeamsEmpty ? (
+        <SeasonMatches 
+          leagueSeason={leagueSeason}
+          listTeams={listTeams}
+        />
+      ) : '' };
     </>
   )
 }
