@@ -12,6 +12,7 @@ import { IAdminMatchHeaderProps } from "../Interfaces/match";
 import CompleteMatch from '../Modals/CompleteMatch';
 
 import { createHumanDate } from '../utils/dateFormatter';
+import { quickLinkMatch } from '../utils/constants';
 
 export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
 
@@ -56,7 +57,7 @@ export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
             <Button 
               variant="outlined"
               startIcon={<PageviewIcon />} 
-              href={`/match/${match.id}`}
+              href={`${quickLinkMatch.link}/${match.id}`}
             >View match details</Button>
           )}
         </Stack>

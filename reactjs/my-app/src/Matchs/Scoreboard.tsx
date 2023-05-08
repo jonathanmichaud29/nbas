@@ -7,6 +7,7 @@ import { IMatch } from '../Interfaces/match';
 
 import { createHumanDate } from '../utils/dateFormatter'
 import { sxGroupStyles } from '../utils/theme';
+import { quickLinkMatch, quickLinkTeam } from "../utils/constants";
 
 interface IScoreboardProps {
   teamHome:       ITeam;
@@ -33,7 +34,7 @@ function Scoreboard(props: IScoreboardProps) {
     <Stack alignItems="center" spacing={1} sx={{width:'100%'}}>
       <Typography variant={titleLevel || 'h6'}>
         {hasLinkMatchDetails ? (
-        <Link href={`/match/${match.id}`}>{tableTitle}</Link>
+        <Link href={`${quickLinkMatch.link}/${match.id}`}>{tableTitle}</Link>
         ) : tableTitle }
       </Typography>
       <Typography variant="subtitle1">{dateReadable}</Typography>
@@ -55,7 +56,7 @@ function Scoreboard(props: IScoreboardProps) {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><Link href={`/team/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
+              <TableCell><Link href={`${quickLinkTeam.link}/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
               { match.isCompleted === 1 && (
                 <TableCell align="center">{match.teamHomePoints}</TableCell> 
               )}
@@ -68,7 +69,7 @@ function Scoreboard(props: IScoreboardProps) {
               )}
             </TableRow>
             <TableRow>
-            <TableCell><Link href={`/team/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
+            <TableCell><Link href={`${quickLinkTeam}/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
               { match.isCompleted === 1 && (
                 <TableCell align="center">{match.teamAwayPoints}</TableCell> 
               )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useOutletContext }from "react-router-dom"
+import { Outlet, useLocation, useOutletContext }from "react-router-dom"
 import { useAuthState } from "react-firebase-hooks/auth";
 import { batch, useDispatch, useSelector } from "react-redux";
 
@@ -19,6 +19,7 @@ import PublicMenu from "../Menu/PublicMenu";
 import ChangePublicLeague from "../League/ChangePublicLeague";
 
 import { getStoragePublicLeagueId, getStoragePublicLeagueSeasonId, setStoragePublicLeagueId, setStoragePublicLeagueSeasonId } from "../utils/localStorage";
+import Breadcrumb from "../Menu/Breadcrumb";
 
 type TAdminData = {
   leagueSeason: ILeagueSeason;
@@ -35,7 +36,11 @@ export function usePublicContext() {
 
 function PublicApp() {
   const dispatch = useDispatch<AppDispatch>();
-
+  const location = useLocation();
+  
+  const crumbs = location.pathname.split('/')
+    .filter((crumb) => crumb !== '')
+  
   const [user, loading] = useAuthState(auth);
   const [adminValidate, setAdminValidate] = useState<boolean>(false);
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
@@ -58,8 +63,10 @@ function PublicApp() {
             window.localStorage.clear();
           })
           .finally(() => {
-            setAdminData(true)
-            setAdminValidate(true);
+            batch(() => {
+              setAdminData(true)
+              setAdminValidate(true);
+            })
           })
       })
     }
@@ -144,7 +151,12 @@ function PublicApp() {
   return (
     <>
       <PublicMenu />
-      <ChangePublicLeague />
+      
+      {crumbs.length < 2 ? (
+        <ChangePublicLeague />
+        ) : '' }
+
+      <Breadcrumb />
       { dataRetrieved && (
         <Outlet 
           context={{
