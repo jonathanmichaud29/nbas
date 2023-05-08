@@ -8,6 +8,7 @@ import {
  * Public Components
  */
 import PublicApp from './Public/PublicApp';
+import HomeLeague from "./Public/HomeLeague";
 import PublicCalendar from "./Public/PublicCalendar";
 import PublicCompare from './Public/PublicCompare'
 import PublicMatch from './Public/PublicMatch'
@@ -29,7 +30,7 @@ import LeagueManager from './Admin/LeagueManager';
 import CalendarManager from './Admin/CalendarManager';
 
 import { setDefaultMetas } from './utils/metaTags';
-import HomeLeague from "./Public/HomeLeague";
+import { quickLinkCompare, quickLinkMatch, quickLinkPlayer, quickLinkTeam } from "./utils/constants";
 
 
 
@@ -42,13 +43,23 @@ function App() {
 
           <Route path="/" element={<PublicApp />}>
             <Route path="" element={<HomeLeague />} />
-            <Route path="calendar" element={<PublicCalendar />} />
-            <Route path="player/:id" element={<PublicPlayer />} />
-            <Route path="team/:id" element={<PublicTeam />} />
-            <Route path="match/:id" element={<PublicMatch />} />
-            <Route path="stats/players" element={<PublicPlayersStats />} />
-            <Route path="stats/teams" element={<PublicTeamsStats />} />
-            <Route path="stats/compare" element={<PublicCompare />} />
+            
+            <Route path={quickLinkMatch.link}>
+              <Route path="" element={<PublicCalendar />} />
+              <Route path=":id" element={<PublicMatch />} />
+            </Route>
+
+            <Route path={quickLinkPlayer.link}>
+              <Route path="" element={<PublicPlayersStats />} />
+              <Route path=":id" element={<PublicPlayer />} />
+            </Route>
+            
+            <Route path={quickLinkTeam.link}>
+              <Route path="" element={<PublicTeamsStats />} />
+              <Route path=":id" element={<PublicTeam />} />
+            </Route>
+            
+            <Route path={quickLinkCompare.link} element={<PublicCompare />} />
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>

@@ -20,6 +20,7 @@ import InfoDialog from '../Generic/InfoDialog';
 
 import { createHumanDate, extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
 import { filterMatchesBySeason } from '../utils/dataFilter';
+import { quickLinkMatch } from '../utils/constants';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -144,7 +145,7 @@ function ListMatches(props: IListMatchProps) {
                 key={`action-view-match-${match.id}`}
                 aria-label={actionLabel}
                 title={actionLabel}
-                href={`/match/${match.id}`}
+                href={`${quickLinkMatch.link}/${match.id}`}
                 >
                 <InfoIcon />
               </IconButton>

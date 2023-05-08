@@ -24,6 +24,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { filterTeamsBySeason } from '../utils/dataFilter';
+import { quickLinkTeam } from '../utils/constants';
 
 
 function ListTeams(props: ITeamProps) {
@@ -137,7 +138,7 @@ function ListTeams(props: ITeamProps) {
             <Tooltip title={actionLabel} key={`action-view-team-${team.id}`}>
               <IconButton color="primary"
                 aria-label={actionLabel}
-                href={`/team/${team.id}`}
+                href={`${quickLinkTeam.link}/${team.id}`}
                 >
                 <QueryStatsIcon />
               </IconButton>

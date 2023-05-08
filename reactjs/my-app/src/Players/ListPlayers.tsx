@@ -23,6 +23,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 import SearchPlayer from './SearchPlayer';
 import { filterPlayersByName } from '../utils/dataFilter';
+import { quickLinkPlayer } from '../utils/constants';
 
 
 function ListPlayers(props: IPlayerProps) {
@@ -152,7 +153,7 @@ function ListPlayers(props: IPlayerProps) {
             <Tooltip title={actionLabel} key={`action-view-leaguePlayer-${player.id}`}>
               <IconButton color="primary"
                 aria-label={actionLabel}
-                href={`/player/${player.id}`}
+                href={`${quickLinkPlayer.link}/${player.id}`}
                 >
                 <AccountBoxIcon />
               </IconButton>

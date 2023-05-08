@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Box, Link, Paper, Stack, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
+import { usePublicContext } from "../Public/PublicApp";
+
 import { IAllTeamsStandingProps, IStandingTeam }  from '../Interfaces/team'
 
 import { IApiFetchStandingTeamsParams, fetchStandingTeams } from "../ApiCall/teams";
@@ -11,7 +13,8 @@ import LoaderInfo from "../Generic/LoaderInfo";
 
 import { getTeamName } from '../utils/dataAssociation'
 import { sxGroupStyles } from '../utils/theme';
-import { usePublicContext } from "../Public/PublicApp";
+import { quickLinkTeam } from '../utils/constants';
+
 
 function AllTeamsStanding(props: IAllTeamsStandingProps){
 
@@ -72,7 +75,7 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
                     const teamName = getTeamName(standingTeam.id, teams);
                     return (
                       <TableRow key={`team-standing-${standingTeam.id}`}>
-                        <TableCell><Link href={`/team/${standingTeam.id}`}>{teamName}</Link></TableCell>
+                        <TableCell><Link href={`${quickLinkTeam.link}/${standingTeam.id}`}>{teamName}</Link></TableCell>
                         <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
                         <TableCell align="center">{standingTeam.nbWins}</TableCell>
                         <TableCell align="center">{standingTeam.nbLosts}</TableCell>

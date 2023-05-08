@@ -5,6 +5,8 @@ import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { IconButton } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
+import { listLinks, quickLinkPlayer } from '../utils/constants';
+
 const columnWidth = {
   xs: 75,
   sm: 100,
@@ -108,7 +110,7 @@ export const playerExtendedStatsColumns: GridColDef[] = [
           aria-label={`${params.row.playerName} Profile`}
           title={`${params.row.playerName} Profile`}
           >
-          <Link href={`/player/${params.row.id}`}>
+          <Link href={`${quickLinkPlayer.link}/${params.row.id}`}>
             <AccountBoxIcon />
           </Link>
         </IconButton>

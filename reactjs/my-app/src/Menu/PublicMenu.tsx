@@ -10,6 +10,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
+import { newlistLinks } from '../utils/constants';
+
 function PublicMenu() {
   
   const [user, loading] = useAuthState(auth);
@@ -17,26 +19,7 @@ function PublicMenu() {
 
 
   const renderPublicLinks = (isDrawer?:boolean) => {
-    const links = [
-      {
-        label:"Player Stats",
-        url: "/stats/players",
-      },
-      {
-        label:"Teams Stats",
-        url: "/stats/teams",
-      },
-      {
-        label:"Calendar",
-        url: "/calendar",
-      },
-      {
-        label:"Compare",
-        url: "/stats/compare",
-      }
-    ];
-
-    return links.map((link, index) => {
+    return newlistLinks.map((link, index) => {
       if( isDrawer ) {
         return (
           <ListItem key={`public-menu-${index}`} sx={{
@@ -45,7 +28,7 @@ function PublicMenu() {
           }}>
             <Link 
               component={NavLink} 
-              to={link.url} 
+              to={link.link} 
               onClick={() => setMobileMenuOpen(false)}
               p={1} 
               sx={{
@@ -67,7 +50,7 @@ function PublicMenu() {
           <ListItem key={`public-menu-${index}`}>
             <Link 
               component={NavLink} 
-              to={link.url} 
+              to={link.link} 
               sx={{ 
                 color:(theme) => theme.palette.primary.light,
                 textAlign: 'center',

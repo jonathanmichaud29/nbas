@@ -11,9 +11,9 @@ import { ILeagueSeason} from '../Interfaces/league';
 import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches'
 
 import LoaderInfo from '../Generic/LoaderInfo';
-import InfoDialog from '../Generic/InfoDialog';
 
 import { extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
+import { quickLinkMatch } from '../utils/constants';
 
 interface ISeasonMatchesProps{
   leagueSeason: ILeagueSeason;
@@ -82,7 +82,7 @@ function SeasonMatches(props: ISeasonMatchesProps) {
                 key={`action-view-match-${match.id}`}
                 aria-label={actionLabel}
                 title={actionLabel}
-                href={`/match/${match.id}`}
+                href={`${quickLinkMatch.link}/${match.id}`}
                 >
                 <InfoIcon />
               </IconButton>
