@@ -6,6 +6,7 @@ import { IconButton } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import { quickLinkPlayer } from '../utils/constants';
+
 const columnWidth = {
   xs: 75,
   sm: 100,
