@@ -1,18 +1,19 @@
 import { Paper, Box, Stack, Typography } from "@mui/material";
 
-import { ILeague } from "../Interfaces/league";
+import { ILeagueSeason } from "../Interfaces/league";
 
 import ToolComparePlayers from "./ToolComparePlayers";
 import ToolCompareTeams from "./ToolCompareTeams";
+import { ICompareCategory } from "./ToolCategoryCompare";
 
 interface IToolStatsProps{
-  league:ILeague;
-  category:string;
+  leagueSeason:ILeagueSeason;
+  category:ICompareCategory;
 }
 
 export default function ToolStats(props: IToolStatsProps){
   
-  const {league, category} = props;
+  const {leagueSeason, category} = props;
   
   return (
     <Paper component={Box} p={3} m={3}>
@@ -21,13 +22,13 @@ export default function ToolStats(props: IToolStatsProps){
         
         { category === "player" && (
           <ToolComparePlayers
-            league={league}
+            leagueSeason={leagueSeason}
           />
         )}
 
         { category === "team" && (
           <ToolCompareTeams
-            league={league}
+            leagueSeason={leagueSeason}
           />
         )}
         

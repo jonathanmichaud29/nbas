@@ -30,7 +30,7 @@ const defaultValues = {
 export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { league } = props;
+  const { leagueSeason } = props;
 
   const listTeams = useSelector((state: RootState) => state.teams )
   const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
@@ -41,7 +41,7 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
   useMemo(() => {
     
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
-      leagueIds:[league.id]
+      leagueIds:[leagueSeason.idLeague]
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
@@ -50,7 +50,7 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
         const teamIds = response.data.map((leagueTeam: ILeagueTeam) => leagueTeam.idTeam);
         const paramsFetchTeams: IApiFetchTeamsParams = {
           teamIds: teamIds,
-          leagueIds:[league.id]
+          leagueIds:[leagueSeason.idLeague]
         }
 
         fetchTeams(paramsFetchTeams)
@@ -70,9 +70,9 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
       .finally(() => {
         
       });
-  }, [dispatch, league.id]);
+  }, [dispatch, leagueSeason.idLeague]);
 
-  const filteredTeams = filterTeamsByLeague(listTeams, listLeagueTeams, league);
+  const filteredTeams = filterTeamsByLeague(listTeams, listLeagueTeams, leagueSeason);
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
@@ -82,7 +82,7 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
     setSelectedTeams([...selectedTeams, data.team]);
 
     const paramsMatchLineups: IApiFetchMatchLineups = {
-      leagueIds:[league.id],
+      leagueIds:[leagueSeason.idLeague],
       teamIds:[data.team.id]
     }
     fetchMatchLineups(paramsMatchLineups)

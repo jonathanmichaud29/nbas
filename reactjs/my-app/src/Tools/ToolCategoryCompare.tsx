@@ -4,16 +4,18 @@ import { AppBar, Box, Paper, Tab, Tabs } from "@mui/material";
 
 import { sxGroupStyles } from "../utils/theme";
 
-interface IToolCategoryCompareProps{
-  category:string;
+export type ICompareCategory = "player" | "team";
+
+type IToolCategoryCompareProps = {
+  category: ICompareCategory,
   onCategoryChange?(category: string): void;
-}
+};
 
 export default function ToolCategoryCompare(props: IToolCategoryCompareProps){
 
-  const [selectedCategory, setSelectedCategory] = useState<string>(props.category)
+  const [selectedCategory, setSelectedCategory] = useState<ICompareCategory>(props.category)
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: ICompareCategory) => {
     setSelectedCategory(newValue);
     props.onCategoryChange && props.onCategoryChange(newValue);
   }

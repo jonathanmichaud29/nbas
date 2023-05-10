@@ -44,7 +44,7 @@ export default function Breadcrumb(){
                 return <Link key={`breadcrumb-${index}`} href={crumb.link}>{crumb.label}</Link>
               }
               else {
-                return <Typography>{crumb.label}</Typography>
+                return <Typography key={`breadcrumb-${index}`}>{crumb.label}</Typography>
               }
             })}
           </Breadcrumbs>
