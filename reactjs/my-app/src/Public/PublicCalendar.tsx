@@ -30,11 +30,13 @@ function PublicCalendar() {
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
+        
         const newLeagueTeams: ILeagueTeam[] = response.data || [];
 
         const teamIds = newLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
 
         const paramsFetchTeams: IApiFetchTeamsParams = {
+          leagueIds:[leagueSeason.idLeague],
           teamIds: teamIds
         }
         Promise.all([fetchTeams(paramsFetchTeams)])
