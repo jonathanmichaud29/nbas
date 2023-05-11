@@ -1,15 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux';
-import CreateMatch from '../Matchs/CreateMatch';
-import ListMatches from '../Matchs/ListMatches';
 import { useState, useEffect } from 'react';
-import { IApiFetchLeagueTeamsParams, fetchLeagueTeams, IApiFetchTeamsParams, IApiFetchTeamSeasonsParams, fetchTeams, fetchTeamSeasons } from '../ApiCall/teams';
+import { batch, useDispatch, useSelector } from 'react-redux';
+
 import { ILeagueTeam } from '../Interfaces/league';
-import { addLeagueTeams } from '../redux/leagueTeamSlice';
+
 import { AppDispatch, RootState } from '../redux/store';
+import { addLeagueTeams } from '../redux/leagueTeamSlice';
 import { addTeamSeasons } from '../redux/teamSeasonSlice';
 import { addTeams } from '../redux/teamSlice';
+
+import { IApiFetchLeagueTeamsParams, fetchLeagueTeams, 
+  IApiFetchTeamsParams, IApiFetchTeamSeasonsParams, 
+  fetchTeams, fetchTeamSeasons } from '../ApiCall/teams';
+
+import CreateMatch from '../Matchs/CreateMatch';
+import ListMatches from '../Matchs/ListMatches';
 import LoaderInfo from '../Generic/LoaderInfo';
-import { batch } from 'react-redux';
+
 
 function CalendarManager() {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,13 +25,16 @@ function CalendarManager() {
   const stateAdminContext = useSelector((state: RootState) => state.adminContext );
   
   const fetchAllLeagueSeasonTeams = () => {
+    
+  }
+  
+  useEffect(() => {
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
         const listLeagueTeams: ILeagueTeam[] = response.data || [];
-        // dispatch(addLeagueTeams(listLeagueTeams));
 
         const teamIds = listLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
 
@@ -49,11 +58,7 @@ function CalendarManager() {
       .finally(() => {
         
       });
-  }
-  
-  useEffect(() => {
-    fetchAllLeagueSeasonTeams();
-  }, [stateAdminContext.currentLeague]);
+  }, [dispatch, stateAdminContext.currentLeague]);
 
   return (
     <>
