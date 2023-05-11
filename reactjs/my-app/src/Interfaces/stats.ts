@@ -129,8 +129,3 @@ export interface ICompareBattingStatsProps {
   teams?:ITeam[];
 }
 
-
-
-export interface IToolCompareTeamsProps{
-  leagueSeason: ILeagueSeason;
-}

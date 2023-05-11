@@ -1,23 +1,22 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { batch } from "react-redux";
 
 import { Autocomplete, TextField, Button } from "@mui/material";
 
-import { addLeagueTeams } from "../redux/leagueTeamSlice";
-import { AppDispatch, RootState } from "../redux/store";
-import { addTeams } from "../redux/teamSlice";
-
-import { ILeagueTeam } from "../Interfaces/league";
-import { IBattingStatsExtended, IToolCompareTeamsProps } from "../Interfaces/stats";
-import { ITeam } from "../Interfaces/team";
+import { ILeagueSeason, ILeagueTeam } from "../Interfaces/league";
+import { IBattingStatsExtended } from "../Interfaces/stats";
+import { ITeam, ITeamSeason } from "../Interfaces/team";
+import { IMatchLineup } from "../Interfaces/match";
 
 import { IApiFetchMatchLineups, fetchMatchLineups } from "../ApiCall/matches";
-import { IApiFetchLeagueTeamsParams, fetchLeagueTeams, IApiFetchTeamsParams, fetchTeams } from "../ApiCall/teams";
+import { IApiFetchLeagueTeamsParams, fetchLeagueTeams, 
+  IApiFetchTeamsParams, fetchTeams, 
+  IApiFetchTeamSeasonsParams, fetchTeamSeasons } from "../ApiCall/teams";
 
 import CompareBattingStats from "../Stats/CompareBattingStats";
 
-import { filterTeamsByLeague } from "../utils/dataFilter";
+import { filterTeamsBySeason } from "../utils/dataFilter";
 import { getCombinedTeamsStats } from "../utils/statsAggregation";
 
 interface IFormInput {
@@ -26,43 +25,45 @@ interface IFormInput {
 const defaultValues = {
   team: {},
 }
+interface IToolCompareTeamsProps{
+  leagueSeason: ILeagueSeason;
+}
 
 export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
-  const dispatch = useDispatch<AppDispatch>();
 
   const { leagueSeason } = props;
 
-  const listTeams = useSelector((state: RootState) => state.teams )
-  const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams )
-
+  const [listTeams, setListTeams] = useState<ITeam[]>([]);
+  const [listLeagueTeams, setListLeagueTeams] = useState<ILeagueTeam[]>([]);
+  const [listTeamSeasons, setListTeamSeasons] = useState<ITeamSeason[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<ITeam[]>([]);
+  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[]>([]);
   const [teamsBattingStats, setTeamsBattingStats] = useState<IBattingStatsExtended[]>([]);
 
   useMemo(() => {
-    
+    let newLeagueTeams: ILeagueTeam[] = []
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       leagueIds:[leagueSeason.idLeague]
     }
     fetchLeagueTeams(paramsFetchLeagueTeams)
       .then(response => {
-        dispatch(addLeagueTeams(response.data));
+        newLeagueTeams = response.data || [];
 
-        const teamIds = response.data.map((leagueTeam: ILeagueTeam) => leagueTeam.idTeam);
+        const teamIds = newLeagueTeams.map((leagueTeam) => leagueTeam.idTeam);
+
         const paramsFetchTeams: IApiFetchTeamsParams = {
-          teamIds: teamIds,
-          leagueIds:[leagueSeason.idLeague]
+          teamIds: teamIds
         }
-
-        fetchTeams(paramsFetchTeams)
-          .then(response => {
-            dispatch(addTeams(response.data));
+        const paramsFetchTeamSeasons: IApiFetchTeamSeasonsParams = {
+          teamIds: teamIds
+        }
+        Promise.all([fetchTeams(paramsFetchTeams), fetchTeamSeasons(paramsFetchTeamSeasons)]).then((values) => {
+          batch(() => {
+            setListLeagueTeams(newLeagueTeams);
+            setListTeams(values[0].data);
+            setListTeamSeasons(values[1].data);
           })
-          .catch(error => {
-            
-          })
-          .finally(() => {
-            
-          });
+        });
       })
       .catch(error => {
         
@@ -70,25 +71,26 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
       .finally(() => {
         
       });
-  }, [dispatch, leagueSeason.idLeague]);
+  }, [leagueSeason.idLeague]);
 
-  const filteredTeams = filterTeamsByLeague(listTeams, listLeagueTeams, leagueSeason);
+  const filteredTeams = filterTeamsBySeason(listTeams, listLeagueTeams, listTeamSeasons, leagueSeason);
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( selectedTeams.find((team) => team.id === data.team.id) !== undefined) return;
 
-    setSelectedTeams([...selectedTeams, data.team]);
+    let newSelectedTeams = selectedTeams.concat(data.team);
+    
 
     const paramsMatchLineups: IApiFetchMatchLineups = {
-      leagueIds:[leagueSeason.idLeague],
+      leagueSeasonIds:[leagueSeason.id],
       teamIds:[data.team.id]
     }
     fetchMatchLineups(paramsMatchLineups)
       .then(response => {
-        console.log("response", response.data)
-        setTeamsBattingStats( [...teamsBattingStats, getCombinedTeamsStats(response.data)[0]] );
+        setSelectedTeams(newSelectedTeams);
+        setListMatchLineups(listMatchLineups.concat(response.data));
       })
       .catch(error => {
         
@@ -98,7 +100,11 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
       });
   }
 
-  
+  useEffect(() => {
+    const filteredLineups = listMatchLineups.filter((matchLineup) => matchLineup.idSeason === leagueSeason.id)
+    const listBattingStats  = getCombinedTeamsStats(filteredLineups);
+    setTeamsBattingStats( listBattingStats );
+  }, [leagueSeason.id, listMatchLineups])
   
   
   return (
