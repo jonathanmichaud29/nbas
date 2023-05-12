@@ -92,7 +92,7 @@ function ChangeAdminLeague(props:IChangeAdminLeague) {
       .finally(() =>{
         
       })
-  },[]);
+  },[currentLeagueId, currentLeagueSeasonId, dispatch]);
 
   const handleLeagueChange = (event: SelectChangeEvent) => {
     const newLeagueId = castNumber(event.target.value);

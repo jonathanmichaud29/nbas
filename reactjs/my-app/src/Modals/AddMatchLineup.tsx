@@ -8,12 +8,12 @@ import { AppDispatch, RootState } from "../redux/store";
 import { addMatchPlayers } from "../redux/matchPlayerSlice";
 
 import { defaultMatchLineupData, IAddMatchLineupProps } from "../Interfaces/match";
-import { IPlayer } from "../Interfaces/player";
 import { IOrderPlayers } from '../Interfaces/team'
 
 import { addMatchLineups, IApiAddMatchLineupsParams } from '../ApiCall/matches';
 
 import LoaderInfo from "../Generic/LoaderInfo";
+
 import { findAvailabilityMatchAllPlayers, sortPlayersPerTeams } from "../utils/dataFilter";
 
 const defaultValues = {

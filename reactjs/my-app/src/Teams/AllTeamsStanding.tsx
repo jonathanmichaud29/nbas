@@ -20,7 +20,7 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
 
   const {teams} = props;
   
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
 
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[] | null>(null);
   const [apiError, changeApiError] = useState("");

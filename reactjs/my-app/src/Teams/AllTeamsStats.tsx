@@ -43,7 +43,7 @@ function AllTeamsStats(props: IAllTeamsStatsProps) {
       .finally(() => {
         
       });
-  }, [teams]);
+  }, [leagueSeason.id, teams]);
 
   return (
     <>

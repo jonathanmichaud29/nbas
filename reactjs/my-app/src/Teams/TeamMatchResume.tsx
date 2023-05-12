@@ -10,7 +10,6 @@ import StatBattingPercentage from '../Stats/StatBattingPercentage';
 import Scoreboard from "../Matchs/Scoreboard";
 import CustomDataGrid from '../Generic/CustomDataGrid';
 
-import { getPlayerName } from '../utils/dataAssociation';
 import { generateDatagridPlayerRows, getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
 
@@ -34,23 +33,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
 
   const playersStats = getCombinedPlayersStats(matchLineups);
   const rows = generateDatagridPlayerRows(playersStats, players)
-  /* const rows = ( playersStats && playersStats.map((playerStats) => {
-    return {
-      id: playerStats.id,
-      playerName: getPlayerName(playerStats.id, players),
-      atBats: playerStats.atBats,
-      out: playerStats.out,
-      single: playerStats.single,
-      double: playerStats.double,
-      triple: playerStats.triple,
-      homerun: playerStats.homerun,
-      runsBattedIn: playerStats.runsBattedIn,
-      battingAverage: playerStats.battingAverage,
-      onBasePercentage: playerStats.onBasePercentage,
-      sluggingPercentage: playerStats.sluggingPercentage,
-      onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
-    }
-  }) ) || []; */
+  
   
   return (
     <Stack spacing={3} alignItems="center" width="100%">

@@ -23,11 +23,7 @@ function CalendarManager() {
   const [apiError, changeApiError] = useState<string>("");
 
   const stateAdminContext = useSelector((state: RootState) => state.adminContext );
-  
-  const fetchAllLeagueSeasonTeams = () => {
     
-  }
-  
   useEffect(() => {
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       

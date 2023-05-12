@@ -29,12 +29,11 @@ function ListMatches(props: IListMatchProps) {
   const [apiSuccess, changeApiSuccess] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const { /* league, */ isAdmin } = props;
+  const { isAdmin } = props;
 
   const stateAdminContext = useSelector((state: RootState) => state.adminContext );
   const listMatches = useSelector((state: RootState) => state.matches )
   const listTeams = useSelector((state: RootState) => state.teams )
-  /* const listLeagueTeams = useSelector((state: RootState) => state.leagueTeams ) */
 
   const filteredMatches = filterMatchesBySeason(stateAdminContext.currentLeagueSeason, listMatches)
     .sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -62,13 +61,10 @@ function ListMatches(props: IListMatchProps) {
       });
   }
 
-  const fetchAllSeasonMatches = () => {
+  useEffect(() => {
     let paramsFetchMatches: IApiFetchMatchesParams = {
       isAdminContext:isAdmin
     }
-    /* if( league !== undefined ){
-      paramsFetchMatches.leagueIds = [league.id]
-    } */
     fetchMatches(paramsFetchMatches)
       .then(response => {
         dispatch(addMatches(response.data));
@@ -79,10 +75,7 @@ function ListMatches(props: IListMatchProps) {
       .finally(() => {
         setIsLoaded(true)
       });
-  }
-  useEffect(() => {
-    fetchAllSeasonMatches();
-  }, [stateAdminContext.currentLeague]);
+  }, [dispatch, isAdmin, stateAdminContext.currentLeague]);
   
   /**
    * Handle multiples modals

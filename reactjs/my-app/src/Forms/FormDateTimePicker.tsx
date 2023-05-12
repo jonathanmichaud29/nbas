@@ -5,8 +5,6 @@ import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-import { patterns } from "../utils/validation";
-
 interface IFormDateTimePickerProps {
   label: string;
   controllerName: string;

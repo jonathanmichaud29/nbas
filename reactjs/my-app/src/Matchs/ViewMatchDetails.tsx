@@ -4,20 +4,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Paper, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 
-import { fetchMatchLineups, IApiFetchMatchLineups } from '../ApiCall/matches';
-import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
-import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
+import { useAdminData } from '../Public/PublicApp';
 
-import { ITeam, IStandingTeam } from '../Interfaces/team'
-import { IMatchDetailsProps, IMatchLineup } from '../Interfaces/match'
-import { IPlayer } from '../Interfaces/player'
+import { IStandingTeam } from '../Interfaces/team'
+import { IMatchDetailsProps } from '../Interfaces/match'
 import { IBattingStatsExtended, defaultBattingStatsExtended } from '../Interfaces/stats';
+
+import { fetchStandingTeams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
 
 import Scoreboard from './Scoreboard';
 import LoaderInfo from '../Generic/LoaderInfo';
 import CustomDataGrid from '../Generic/CustomDataGrid';
-import { useAdminData } from '../Public/PublicApp';
-import MatchTeamStats from './MatchTeamStats';
 
 import { filterTeamLineups } from '../utils/dataFilter';
 import { createDateReadable } from '../utils/dateFormatter';
@@ -32,12 +29,6 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   
   const {isAdmin} = useAdminData();
   const [apiError, changeApiError] = useState("");
-  /*
-  const [teamHome, setTeamHome] = useState<ITeam>();
-  const [teamAway, setTeamAway] = useState<ITeam>();
-  const [players, setPlayers] = useState<IPlayer[] | null>(null);
-  const [matchLineups, setMatchLineups] = useState<IMatchLineup[] | null>(null); 
-  */
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
 
   const [matchRows, setMatchRows] = useState<Array<{}>>([]);
@@ -47,57 +38,13 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended>();
   const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended>();
 
-  /* const isLoaded =  matchLineups !== null && teamHome !== null && teamAway !== null && 
-                    players !== null && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
-                    matchRows !== null && homeRows !== null && awayRows !== null; */
+  
   const isLoaded =  ( matchEncounter && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
     matchRows !== null && homeRows !== null && awayRows !== null ? true : false );
 
 
   useMemo(() => {
-    /**
-     * Fetch Match Lineups
-     */
-    /* const paramsMatchLineups: IApiFetchMatchLineups = {
-      matchId: match.id,
-      leagueIds: [match.idLeague]
-    }
-    fetchMatchLineups(paramsMatchLineups)
-      .then((response) => {
-        setMatchLineups(response.data);
-      })
-      .catch((error) => {
-        changeApiError(error);
-      })
-      .finally(() => {
-
-      })
-     */
-    /**
-     * Fetch Match Teams
-     */
-    /* const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [match.idTeamHome, match.idTeamAway],
-      leagueIds: [match.idLeague]
-    }
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        response.data.forEach((team: ITeam) => {
-          if ( team.id === match.idTeamHome) {
-            setTeamHome(team);
-          }
-          else {
-            setTeamAway(team);
-          }
-        })
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
- */
+    
     /**
      * Fetch Teams Standing
      */
@@ -128,30 +75,6 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     });
   }, [matchEncounter])
 
-  /**
-   * Fetch Players in Match Lineups
-   */
-  /* useMemo(() => {
-    if( matchLineups === null ) return;
-
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: matchLineups.map((matchLineup) => matchLineup.idPlayer),
-      leagueIds: [match.idLeague]
-    }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        setPlayers(response.data)
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [match, matchLineups]) */
-
-
-  
   /**
    * Aggregate data for DataGrid and Charts
    */
@@ -232,7 +155,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     }) );
     setAwayRows(awayRows);
 
-  }, [matchEncounter/* matchLineups, teamAway, teamHome, players */])
+  }, [matchEncounter])
 
 
 

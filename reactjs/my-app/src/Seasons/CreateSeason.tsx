@@ -1,4 +1,4 @@
-import { useEffect, useState }  from 'react';
+import { useState }  from 'react';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -12,7 +12,6 @@ import FormTextInput from '../Forms/FormTextInput';
 import FormNumberInput from '../Forms/FormNumberInput';
 import LoaderInfo from '../Generic/LoaderInfo';
 
-import { getStorageLeagueId, getStorageLeagueName } from '../utils/localStorage';
 import { createLeagueSeason, IApiCreateLeagueSeasonParams } from '../ApiCall/seasons';
 import { addAdminLeagueSeasons, setAdminLeagueSeason } from '../redux/adminContextSlice';
 

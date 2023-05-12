@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Alert, List, ListItem, IconButton, Dialog, DialogContent, DialogTitle, Stack, Button, DialogActions } from "@mui/material";
 import { Delete } from '@mui/icons-material';
@@ -81,7 +81,7 @@ function ViewTeamPlayers(props: ITeamPlayersProps) {
       .finally(() => {
         
       });
-  }, [selectedTeam]);
+  }, [isAdmin, selectedTeam]);
 
   return (
     <Dialog

@@ -40,7 +40,11 @@ function MatchManager() {
   
   const isLoaded = !!matchEncounter;
   
-  const fetchAllMatchDetails = () => {
+  
+
+  useEffect(()=>{
+    if( stateAdminContext.currentLeagueSeason === null ) return;
+    
     let matchData: IMatch;
     let teamHomeData: ITeam;
     let teamAwayData: ITeam;
@@ -55,6 +59,7 @@ function MatchManager() {
           allPlayers:true
         }
         const paramsFetchTeams: IApiFetchTeamsParams = {
+          leagueSeasonIds: [stateAdminContext.currentLeagueSeason?.id || 0],
           teamIds: listTeamIds
         }
         const paramsMatchLineups: IApiFetchMatchLineups = {
@@ -119,12 +124,7 @@ function MatchManager() {
       .finally(() => {
         
       });
-  }
-
-  useEffect(()=>{
-    if( stateAdminContext.currentLeagueSeason === null ) return;
-    fetchAllMatchDetails()
-  },[stateAdminContext.currentLeagueSeason])
+  },[dispatch, idMatch, stateAdminContext.currentLeagueSeason])
 
   return (
     <>

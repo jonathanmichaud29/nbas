@@ -25,8 +25,8 @@ function TeamManager() {
   const [apiError, changeApiError] = useState<string>("");
 
   const stateAdminContext = useSelector((state: RootState) => state.adminContext );
-  
-  const fetchAllLeagueSeasonTeams = () => {
+    
+  useEffect(() => {
     const paramsFetchLeagueTeams: IApiFetchLeagueTeamsParams = {
       
     }
@@ -56,11 +56,7 @@ function TeamManager() {
       .finally(() => {
         
       });
-  }
-  
-  useEffect(() => {
-    fetchAllLeagueSeasonTeams();
-  }, [stateAdminContext.currentLeague]);
+  }, [dispatch, stateAdminContext.currentLeague]);
   
   return (
     <>

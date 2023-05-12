@@ -14,7 +14,7 @@ import LoaderInfo from "../Generic/LoaderInfo";
 
 
 function HomeLeague() {
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
 
   const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
   const [apiError, changeApiError] = useState('');

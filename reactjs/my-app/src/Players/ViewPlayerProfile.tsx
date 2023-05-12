@@ -12,20 +12,19 @@ import { ITeam } from '../Interfaces/team'
 import PlayerMatchResume from './PlayerMatchResume'
 import YearStats from '../Stats/YearStats';
 import ProgressionStats from '../Stats/ProgressionStats';
-import ChangePublicLeague from '../League/ChangePublicLeague';
 import LoaderInfo from '../Generic/LoaderInfo';
+
 import { filterMatchesByLeague, filterMatchesLineupsByLeague } from '../utils/dataFilter';
 
 
 function ViewPlayerProfile(props: IPlayerProfileProps) {
 
-  const { player, playersLeagues, league } = props;
+  const { player, league } = props;
 
   const [apiError, changeApiError] = useState("");
   const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
   const [listMatches, setListMatches] = useState<IMatch[]>([]);
   const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[]>([]);
-  /* const [selectedLeague, setSelectedLeague] = useState<number>(0); */
 
   const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null;
 

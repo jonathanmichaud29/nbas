@@ -12,10 +12,9 @@ import { fetchPlayersLeagues, IApiFetchPlayersLeaguesParams } from '../ApiCall/l
 
 import ViewPlayerProfile from '../Players/ViewPlayerProfile';
 import LoaderInfo from '../Generic/LoaderInfo';
-import ChangePublicLeague from '../League/ChangePublicLeague';
 
 import { setMetas } from '../utils/metaTags';
-import { getStoragePublicLeagueId, setStoragePublicLeagueId } from '../utils/localStorage';
+import { getStoragePublicLeagueId } from '../utils/localStorage';
 import { castNumber } from '../utils/castValues';
 
 function PublicPlayer() {
@@ -28,12 +27,8 @@ function PublicPlayer() {
 
   const publicLeagueId = getStoragePublicLeagueId();
   const listLeagues = useSelector((state: RootState) => state.leagues )
-  const [selectedLeague, setSelectedLeague] = useState<ILeague | null>(listLeagues.find((league) => league.id === publicLeagueId) || null);
-  const changeSelectedLeague = (idLeague:number) => {
-    setStoragePublicLeagueId(idLeague);
-    const activeLeague = listLeagues.find((league) => league.id === idLeague) || null
-    setSelectedLeague(activeLeague);
-  }
+  const selectedLeague: ILeague | null = listLeagues.find((league) => league.id === publicLeagueId) || null;
+
 
   const isLoaded = player !== null && playersLeagues !== null;
 
@@ -75,19 +70,13 @@ function PublicPlayer() {
         setPlayersLeagues(response.data);
       })
       .catch(error => {
-        /* changeApiError(error); */
+        
       })
       .finally(() => {
-        /* setIsLeaguePlayersLoaded(true); */
+        
       });
   }, [idPlayer])
 
-  const filterLeaguesByPlayerLeagues = () => {
-    const responseLeagueIds = playersLeagues?.map((league) => league.idLeague) || [];
-    return listLeagues.filter((league) => {
-      return responseLeagueIds.includes(league.id) 
-    })
-  }
 
   return (
     <>
@@ -96,11 +85,6 @@ function PublicPlayer() {
         msgError={apiError}
         hasWrapper={true}
       />
-      {/* <ChangePublicLeague
-        leagues={filterLeaguesByPlayerLeagues()}
-        defaultLeagueId={selectedLeague?.id || publicLeagueId}
-        onLeagueChange={changeSelectedLeague}
-      /> */}
       { player && playersLeagues && (
         <ViewPlayerProfile 
           player={player}

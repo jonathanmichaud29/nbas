@@ -17,18 +17,6 @@ export const createDateReadable = (argDate: Date): string => {
   });
 }
 
-const dayOfWeekLabel = (argDate: Date): string => {
-  const listValues = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-  ];
-  return listValues[argDate.getDay()];
-}
 
 const monthOfYearLabel = (argDate: Date): string => {
   const listValues = ["January", "February", "March", "April", "May", "June",

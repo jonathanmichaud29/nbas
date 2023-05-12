@@ -17,7 +17,7 @@ import { filterTeamsBySeason } from '../utils/dataFilter';
 
 function PublicTeamsStats() {
 
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
   
   const [listTeams, setListTeams] = useState<ITeam[]>([]);
   const [listLeaguesTeams, setListLeaguesTeams] = useState<ILeagueTeam[]>([]);

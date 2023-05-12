@@ -4,7 +4,7 @@ import PlayersBattingStats from '../Players/PlayersBattingStats';
 import { usePublicContext } from './PublicApp';
 
 function PublicPlayersStats() {
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
 
   return (
     <>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Paper, AppBar, FormControl } from "@mui/material";
@@ -14,9 +13,7 @@ import { resetTeams } from "../redux/teamSlice";
 
 import { ILeague, ILeagueSeason } from "../Interfaces/league";
 
-import LoaderInfo from "../Generic/LoaderInfo";
-
-import { getStoragePublicLeagueId, getStoragePublicLeagueSeasonId, 
+import { 
   setStoragePublicLeagueId, setStoragePublicLeagueSeasonId } from "../utils/localStorage";
 import { castNumber } from "../utils/castValues";
 
@@ -27,11 +24,7 @@ interface IChangePublicLeague {
 function ChangePublicLeague(props:IChangePublicLeague) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentLeagueId = getStoragePublicLeagueId();
-  const currentLeagueSeasonId = getStoragePublicLeagueSeasonId();
   const statePublicContext = useSelector((state: RootState) => state.publicContext )
-  
-  const [apiError, changeApiError] = useState('');
 
   const handleLeagueChange = (event: SelectChangeEvent) => {
     const newLeagueId = castNumber(event.target.value);
@@ -57,8 +50,6 @@ function ChangePublicLeague(props:IChangePublicLeague) {
       dispatch(resetTeams());
       dispatch(resetLeagueTeams()); 
     })
-    
-    // dispatch(resetLeagueSeasons());
   }
 
   const handleLeagueSeasonChange = (event: SelectChangeEvent) => {
@@ -71,9 +62,7 @@ function ChangePublicLeague(props:IChangePublicLeague) {
   return (
     <AppBar position="sticky" color="transparent">
       <Paper color="primary">
-        <LoaderInfo
-          msgError={apiError}
-        />
+        
         { statePublicContext.leagues && statePublicContext.currentLeague && (
           <FormControl size="small">
             <Select

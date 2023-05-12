@@ -1,4 +1,3 @@
-import { ILeague, ILeagueSeason } from './league';
 import { IMatch, IMatchLineup } from './match'
 import { IPlayer } from './player'
 import { ITeam } from './team';

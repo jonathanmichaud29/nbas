@@ -15,7 +15,7 @@ import { setMetas } from '../utils/metaTags';
 
 function PublicCalendar() {
   
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
 
   const [apiError, changeApiError] = useState("");
   const [listTeams, setTeams] = useState<ITeam[]>([]);

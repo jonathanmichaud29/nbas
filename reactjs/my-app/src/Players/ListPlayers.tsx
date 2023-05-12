@@ -18,10 +18,10 @@ import {
 } from '../ApiCall/players'
 
 import ConfirmDelete from "../Modals/ConfirmDelete";
-
 import InfoDialog from '../Generic/InfoDialog';
 import LoaderInfo from '../Generic/LoaderInfo';
 import SearchPlayer from './SearchPlayer';
+
 import { filterPlayersByName } from '../utils/dataFilter';
 import { quickLinkPlayer } from '../utils/constants';
 
@@ -34,8 +34,6 @@ function ListPlayers(props: IPlayerProps) {
   const [apiError, changeApiError] = useState<string>("");
   const [apiSuccess, changeApiSuccess] = useState<string>("");
   const [filterTerm, setFilterTerm] = useState<string>("");
-
-  const stateAdminContext = useSelector((state: RootState) => state.adminContext );
 
   const listPlayers = useSelector((state: RootState) => state.players )
   
@@ -78,42 +76,43 @@ function ListPlayers(props: IPlayerProps) {
       });
   }
 
-  const getLeaguePlayers = async() => {
-    const paramsFetchLeaguePlayers: IApiFetchLeaguePlayersParams = {
-      
-    }
-    const myLeaguePlayers: [ILeaguePlayer] = await fetchLeaguePlayers(paramsFetchLeaguePlayers)
-      .then(response => {
-        dispatch(addLeaguePlayers(response.data));
-        return response.data;
-      })
-      .catch(error => {
-        changeApiError(error);
-        return [];
-      })
-      .finally(() => {
-        return [];
-      });
-
-    const playerIds = myLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: playerIds
-    }
-    await fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        dispatch(addPlayers(response.data));
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }
+  
   
   useMemo(() => {
+    const getLeaguePlayers = async() => {
+      const paramsFetchLeaguePlayers: IApiFetchLeaguePlayersParams = {
+        
+      }
+      const myLeaguePlayers: [ILeaguePlayer] = await fetchLeaguePlayers(paramsFetchLeaguePlayers)
+        .then(response => {
+          dispatch(addLeaguePlayers(response.data));
+          return response.data;
+        })
+        .catch(error => {
+          changeApiError(error);
+          return [];
+        })
+        .finally(() => {
+          return [];
+        });
+  
+      const playerIds = myLeaguePlayers.map((leaguePlayer) => leaguePlayer.idPlayer);
+      const paramsFetchPlayers: IApiFetchPlayersParams = {
+        playerIds: playerIds
+      }
+      await fetchPlayers(paramsFetchPlayers)
+        .then(response => {
+          dispatch(addPlayers(response.data));
+        })
+        .catch(error => {
+          changeApiError(error);
+        })
+        .finally(() => {
+          
+        });
+    }
     getLeaguePlayers();    
-  }, [stateAdminContext.currentLeague]);
+  }, [dispatch]);
 
 
   /**

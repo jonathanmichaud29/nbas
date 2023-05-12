@@ -10,7 +10,7 @@ import { setMetas } from "../utils/metaTags";
 
 export default function PublicCompare(){
   
-  const { isAdmin, leagueSeason } = usePublicContext();
+  const { leagueSeason } = usePublicContext();
 
   setMetas({
     title:`Compare Stats`,
