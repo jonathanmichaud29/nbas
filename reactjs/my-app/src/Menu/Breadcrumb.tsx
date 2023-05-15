@@ -17,9 +17,15 @@ export default function Breadcrumb(){
     .map((crumb) => {
       currentLink += `/${crumb}`;
       const myLink = newlistLinks.filter((listLink) => listLink.link === `/${crumb}`)[0]
+      if( myLink !== undefined ){
+        return {
+          link: currentLink,
+          label: myLink.label
+        }
+      }
       return {
         link: currentLink,
-        label: myLink.label
+        label: crumb
       }
     })
 
