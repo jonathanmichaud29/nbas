@@ -73,8 +73,8 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   useEffect(() => {
     if( ! matchEncounter.teamHome || ! matchEncounter.teamAway ) return;
     setMetas({
-      title:`Match summary - ${matchEncounter.teamHome.name} vs ${matchEncounter.teamAway.name}`,
-      description:`NBAS match summary ${matchEncounter.teamHome.name} vs ${matchEncounter.teamAway.name} on date ${createDateReadable(matchEncounter.match.date)}`
+      title:`Match summary - ${matchEncounter.teamHome.name} receives ${matchEncounter.teamAway.name}`,
+      description:`NBAS match summary ${matchEncounter.teamHome.name} receives ${matchEncounter.teamAway.name} on date ${createDateReadable(matchEncounter.match.date)}`
     });
   }, [matchEncounter])
 

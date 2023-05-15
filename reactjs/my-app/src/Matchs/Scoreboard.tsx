@@ -23,7 +23,7 @@ function Scoreboard(props: IScoreboardProps) {
   const {titleLevel, teamHome, teamAway, match, standingTeams, hasLinkMatchDetails} = props;
 
   const dateReadable = match !== null ? createHumanDate(match.date) : '';
-  const tableTitle = `${teamHome.name} vs ${teamAway.name}`;
+  const tableTitle = `${teamHome.name} receives ${teamAway.name}`;
   const teamHomeStanding = standingTeams && standingTeams.find((standingTeam) => standingTeam.id === teamHome.id)
   const teamAwayStanding = standingTeams && standingTeams.find((standingTeam) => standingTeam.id === teamAway.id)
 

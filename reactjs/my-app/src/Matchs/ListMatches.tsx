@@ -189,7 +189,7 @@ function ListMatches(props: IListMatchProps) {
                   }}
                 >
                   <CardHeader 
-                    title={`${teamHome.name} \nvs\n ${teamAway.name}`}
+                    title={`${teamHome.name} \nreceives\n ${teamAway.name}`}
                     subheader={hourDate}
                     titleTypographyProps={{variant:'h6'}}
                     sx={{

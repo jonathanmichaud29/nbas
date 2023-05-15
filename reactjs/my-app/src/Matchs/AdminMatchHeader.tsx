@@ -45,7 +45,7 @@ console.info(props);
         <Stack spacing={3} alignItems="center" >
           <Typography variant="h1" textAlign="center">{currentLeagueName}</Typography>
           <Typography variant="h3" textAlign="center">{currentSeasonName}</Typography>
-          <Typography variant="h6" textAlign="center">{teamHome.name}<br/>vs<br/>{teamAway.name}</Typography>
+          <Typography variant="h6" textAlign="center">{teamHome.name}<br/>receives<br/>{teamAway.name}</Typography>
           <Typography variant="subtitle1">{dateReadable}</Typography>
           <Button 
             variant="contained" 

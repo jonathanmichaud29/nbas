@@ -47,7 +47,7 @@ function ProgressionStats(props: IProgressionStatsProps){
     if( matchLineup !== undefined && teamHome !== undefined && teamAway !== undefined) {
       
       // TODO: Should be "July 7 against X Team"
-      labels.push([createShortDateReadable(match.date), teamHome.name, ' vs ', teamAway.name]);
+      labels.push([createShortDateReadable(match.date), teamHome.name, ' receives ', teamAway.name]);
 
       stats.push(getCombinedPlayersStats([matchLineup])[0])
 
