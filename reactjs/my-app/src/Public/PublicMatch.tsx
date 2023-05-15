@@ -2,17 +2,18 @@ import { useState, useMemo } from 'react';
 import { useParams} from 'react-router-dom'
 import { batch } from 'react-redux';
 
+import { Alert } from '@mui/material';
+
 import { IMatch, IMatchEncounter, IMatchLineup } from "../Interfaces/match";
 import { IPlayer } from '../Interfaces/player';
 import { ITeam } from '../Interfaces/team';
 
 import { fetchMatches, fetchMatchLineups, IApiFetchMatchesParams, IApiFetchMatchLineups } from '../ApiCall/matches';
+import { IApiFetchPlayersParams, fetchPlayers } from '../ApiCall/players';
+import { IApiFetchTeamsParams, fetchTeams } from '../ApiCall/teams';
 
 import ViewMatchDetails from '../Matchs/ViewMatchDetails';
 import LoaderInfo from '../Generic/LoaderInfo';
-
-import { IApiFetchPlayersParams, fetchPlayers } from '../ApiCall/players';
-import { IApiFetchTeamsParams, fetchTeams } from '../ApiCall/teams';
 
 import { castNumber } from '../utils/castValues';
 
@@ -20,7 +21,7 @@ function PublicMatch() {
   let { id } = useParams();
   const idMatch = castNumber(id);
 
-  const [matchEncounter, setMatchEncounter] = useState<IMatchEncounter>();
+  const [matchEncounter, setMatchEncounter] = useState<IMatchEncounter | null>(null);
   const [apiError, changeApiError] = useState("");
   
   const isLoaded = !!matchEncounter;
@@ -102,10 +103,12 @@ function PublicMatch() {
         msgError={apiError}
         hasWrapper={true}
       />
-      { !!matchEncounter && (
+      { matchEncounter !== null ? (
         <ViewMatchDetails 
           matchEncounter={matchEncounter}
         />
+      ) : (
+        <Alert severity='info'>There is no match details</Alert>
       ) }
     </>
   )

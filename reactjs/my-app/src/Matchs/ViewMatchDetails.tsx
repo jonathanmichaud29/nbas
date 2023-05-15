@@ -1,7 +1,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
+import { batch } from 'react-redux';
 
-import { Box, Button, Paper, Stack } from "@mui/material";
+import { Alert, Box, Button, Paper, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 
 import { useAdminData } from '../Public/PublicApp';
@@ -15,13 +16,15 @@ import { fetchStandingTeams, IApiFetchStandingTeamsParams } from '../ApiCall/tea
 import Scoreboard from './Scoreboard';
 import LoaderInfo from '../Generic/LoaderInfo';
 import CustomDataGrid from '../Generic/CustomDataGrid';
+import MatchTeamStats from './MatchTeamStats';
 
 import { filterTeamLineups } from '../utils/dataFilter';
 import { createDateReadable } from '../utils/dateFormatter';
 import { setMetas } from '../utils/metaTags';
-import { getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
-import { getPlayerName } from '../utils/dataAssociation';
+import { generateDatagridPlayerRows, getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns';
+
+
 
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
@@ -35,8 +38,8 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   const [homeRows, setHomeRows] = useState<Array<{}>>([]);
   const [awayRows, setAwayRows] = useState<Array<{}>>([]);
   
-  const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended>();
-  const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended>();
+  const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended | null>(null);
+  const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended | null>(null);
 
   
   const isLoaded =  ( matchEncounter && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
@@ -78,83 +81,35 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   /**
    * Aggregate data for DataGrid and Charts
    */
-  useMemo(() => {
-    // if( matchLineups === null || teamHome === null || teamAway === null || players === null) return;
+  useEffect(() => {
     
     // Aggregate Match Data
     const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchEncounter.matchLineups);
-    const matchRows = ( allStats.map((playerStats) => {
-      return {
-        id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, matchEncounter.players),
-        atBats: playerStats.atBats,
-        out: playerStats.out,
-        single: playerStats.single,
-        double: playerStats.double,
-        triple: playerStats.triple,
-        homerun: playerStats.homerun,
-        runsBattedIn: playerStats.runsBattedIn,
-        battingAverage: playerStats.battingAverage,
-        onBasePercentage: playerStats.onBasePercentage,
-        sluggingPercentage: playerStats.sluggingPercentage,
-        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
-      }
-    }) );
-    setMatchRows(matchRows);
+    const matchRows = generateDatagridPlayerRows(allStats, matchEncounter.players);
+    
 
     // Aggregate Home Team data
     const teamHomeLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamHome.id);
     teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const homeTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const homePlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamHomeLineups);
-    setTeamHomeStats(homeTeamStats);
-
-
-    const homeRows = ( homePlayerStats.map((playerStats) => {
-      return {
-        id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, matchEncounter.players),
-        atBats: playerStats.atBats,
-        out: playerStats.out,
-        single: playerStats.single,
-        double: playerStats.double,
-        triple: playerStats.triple,
-        homerun: playerStats.homerun,
-        runsBattedIn: playerStats.runsBattedIn,
-        battingAverage: playerStats.battingAverage,
-        onBasePercentage: playerStats.onBasePercentage,
-        sluggingPercentage: playerStats.sluggingPercentage,
-        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
-      }
-    }) );
-    setHomeRows(homeRows);
+    const homeRows = generateDatagridPlayerRows(homePlayerStats, matchEncounter.players);
+    
     
     // Aggregate Away Team data
     const teamAwayLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamAway.id);
     teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const awayTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const awayPlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamAwayLineups);
-    setTeamAwayStats(awayTeamStats);
-    
-    const awayRows = ( awayPlayerStats.map((playerStats) => {
-      return {
-        id: playerStats.id,
-        playerName: getPlayerName(playerStats.id, matchEncounter.players),
-        atBats: playerStats.atBats,
-        out: playerStats.out,
-        single: playerStats.single,
-        double: playerStats.double,
-        triple: playerStats.triple,
-        homerun: playerStats.homerun,
-        runsBattedIn: playerStats.runsBattedIn,
-        battingAverage: playerStats.battingAverage,
-        onBasePercentage: playerStats.onBasePercentage,
-        sluggingPercentage: playerStats.sluggingPercentage,
-        onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
-      }
-    }) );
-    setAwayRows(awayRows);
+    const awayRows = generateDatagridPlayerRows(awayPlayerStats, matchEncounter.players);
 
+    batch(() => {
+      setMatchRows(matchRows);
+      setHomeRows(homeRows);
+      setAwayRows(awayRows);
+      setTeamHomeStats(homeTeamStats);
+      setTeamAwayStats(awayTeamStats);
+    })
   }, [matchEncounter])
 
 
@@ -167,7 +122,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
         hasWrapper={true}
       />
       
-      { isLoaded && (
+      { isLoaded ? (
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" >
             <Scoreboard 
@@ -195,25 +150,29 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
             )}
           </Stack>
         </Paper>
-      )}
+      ) : ''}
       
-      {/* { isLoaded && (
+      { teamHomeStats !== null && homeRows.length > 0 ? (
         <MatchTeamStats
           match={matchEncounter.match}
           team={matchEncounter.teamHome}
           teamStats={teamHomeStats}
           dataGridRows={homeRows}
         />
+      ) : (
+        <Alert severity='info'>No stats found for home team</Alert>
       )}
 
-      { isLoaded && (
+      { teamAwayStats !== null && awayRows.length > 0 ? (
         <MatchTeamStats
           match={matchEncounter.match}
           team={matchEncounter.teamAway}
           teamStats={teamAwayStats}
           dataGridRows={awayRows}
         />
-      )} */}
+      ) : (
+        <Alert severity='info'>No stats found for away team</Alert>
+      )}
     
     </>
   )

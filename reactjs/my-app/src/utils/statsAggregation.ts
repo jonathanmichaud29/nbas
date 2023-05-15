@@ -242,22 +242,22 @@ export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) =
   return combinedLineupStats;
 }
 
-export const generateDatagridPlayerRows = (allPlayersStats: IBattingStatsExtended[], listPlayers: IPlayer[]) => {
-  return allPlayersStats.map((playerStats) => {
+export const generateDatagridPlayerRows = (allStats: IBattingStatsExtended[], listPlayers: IPlayer[]) => {
+  return allStats.map((battingStats) => {
     return {
-      id: playerStats.id,
-      playerName: getPlayerName(playerStats.id, listPlayers),
-      atBats: playerStats.atBats,
-      out: playerStats.out,
-      single: playerStats.single,
-      double: playerStats.double,
-      triple: playerStats.triple,
-      homerun: playerStats.homerun,
-      runsBattedIn: playerStats.runsBattedIn,
-      battingAverage: playerStats.battingAverage,
-      onBasePercentage: playerStats.onBasePercentage,
-      sluggingPercentage: playerStats.sluggingPercentage,
-      onBaseSluggingPercentage: playerStats.onBaseSluggingPercentage,
+      id: battingStats.id,
+      playerName: getPlayerName(battingStats.id, listPlayers),
+      atBats: battingStats.atBats,
+      out: battingStats.out,
+      single: battingStats.single,
+      double: battingStats.double,
+      triple: battingStats.triple,
+      homerun: battingStats.homerun,
+      runsBattedIn: battingStats.runsBattedIn,
+      battingAverage: battingStats.battingAverage,
+      onBasePercentage: battingStats.onBasePercentage,
+      sluggingPercentage: battingStats.sluggingPercentage,
+      onBaseSluggingPercentage: battingStats.onBaseSluggingPercentage,
     }
   }) || [];
 }
