@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 
 import { Alert, Box, Divider, Paper, Stack, Typography } from "@mui/material";
 
-import { ITeamProfileProps, ITeam } from '../Interfaces/team'
+import { ITeam } from '../Interfaces/team'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
 import { IPlayer } from '../Interfaces/player'
+import { ILeagueSeason } from '../Interfaces/league';
 
 import { fetchHistoryMatches, IApiFetchHistoryMatchesParams } from '../ApiCall/matches';
 
@@ -14,9 +15,14 @@ import YearStats from '../Stats/YearStats'
 import LoaderInfo from '../Generic/LoaderInfo';
 
 
+interface ITeamProfileProps{
+  team: ITeam;
+  leagueSeason: ILeagueSeason;
+}
+
 function ViewTeamProfile(props: ITeamProfileProps) {
 
-  const { team, league } = props;
+  const { team, leagueSeason } = props;
 
   const [apiError, changeApiError] = useState("");
   const [listPlayers, setListPlayers] = useState<IPlayer[] | null>(null);
@@ -50,7 +56,7 @@ function ViewTeamProfile(props: ITeamProfileProps) {
   return (
     <Paper component={Box} m={3} p={3}>
       <Stack spacing={3} alignItems="center">
-        <Typography variant="h1">{team.name} - {league.name}</Typography>
+        <Typography variant="h1">{team.name} - {leagueSeason.name}</Typography>
         <LoaderInfo
           isLoading={isLoaded}
           msgError={apiError}
