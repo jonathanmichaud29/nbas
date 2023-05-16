@@ -9,7 +9,8 @@ import { setDefaultAdminMetas } from '../utils/metaTags';
 import { getStorageLeagueId } from "../utils/localStorage";
 
 import ChangeAdminLeague from "../League/ChangeAdminLeague";
-import PublicMenu from "../Menu/PublicMenu";
+import AdminMenu from "../Menu/AdminMenu";
+import LoaderInfo from "../Generic/LoaderInfo";
 
 function AdminApp() {
   const navigate = useNavigate();
@@ -56,11 +57,18 @@ function AdminApp() {
   setDefaultAdminMetas();
   return (
     <>
-      <PublicMenu />
-      {dataRetrieved && (
-        <ChangeAdminLeague />
-      )}
-      <Outlet />
+      <LoaderInfo
+        hasWrapper={true}
+        isLoading={dataRetrieved}
+      />
+      
+      {dataRetrieved ? (
+        <>
+          <AdminMenu />
+          <ChangeAdminLeague />
+          <Outlet />
+        </>
+      ) : ''}
     </>
   )
 }

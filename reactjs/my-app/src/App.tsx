@@ -31,6 +31,7 @@ import CalendarManager from './Admin/CalendarManager';
 
 import { setDefaultMetas } from './utils/metaTags';
 import { quickLinkCompare, quickLinkMatch, quickLinkPlayer, quickLinkTeam } from "./utils/constants";
+import SelectLeague from "./League/SelectLeague";
 
 
 
@@ -42,24 +43,28 @@ function App() {
         <Routes>
 
           <Route path="/" element={<PublicApp />}>
-            <Route path="" element={<HomeLeague />} />
-            
-            <Route path={quickLinkMatch.link}>
-              <Route path="" element={<PublicCalendar />} />
-              <Route path=":id" element={<PublicMatch />} />
-            </Route>
+            <Route path="" element={<SelectLeague />} />
+            <Route path=":idSeason">
+              <Route path="" element={<HomeLeague />} />
+              
+              <Route path={quickLinkMatch.link}>
+                <Route path="" element={<PublicCalendar />} />
+                <Route path=":id" element={<PublicMatch />} />
+              </Route>
 
-            <Route path={quickLinkPlayer.link}>
-              <Route path="" element={<PublicPlayersStats />} />
-              <Route path=":id" element={<PublicPlayer />} />
+              <Route path={quickLinkPlayer.link}>
+                <Route path="" element={<PublicPlayersStats />} />
+                <Route path=":id" element={<PublicPlayer />} />
+              </Route>
+              
+              <Route path={quickLinkTeam.link}>
+                <Route path="" element={<PublicTeamsStats />} />
+                <Route path=":id" element={<PublicTeam />} />
+              </Route>
+              
+              <Route path={quickLinkCompare.link} element={<PublicCompare />} />
             </Route>
             
-            <Route path={quickLinkTeam.link}>
-              <Route path="" element={<PublicTeamsStats />} />
-              <Route path=":id" element={<PublicTeam />} />
-            </Route>
-            
-            <Route path={quickLinkCompare.link} element={<PublicCompare />} />
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>

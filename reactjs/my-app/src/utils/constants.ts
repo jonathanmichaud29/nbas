@@ -6,22 +6,22 @@ interface ILinks {
 export const newlistLinks: ILinks[] = [
   {
     id:'player',
-    link: '/players',
+    link: '/:idSeason/players',
     label : 'Player Stats'
   },
   {
     id:'team',
-    link: '/teams',
+    link: '/:idSeason/teams',
     label : 'Team Stats'
   },
   {
     id:'match',
-    link: '/matches',
+    link: '/:idSeason/matches',
     label : 'Calendar'
   },
   {
     id:'compare',
-    link: '/compare',
+    link: '/:idSeason/compare',
     label : 'Compare'
   },
   

@@ -10,62 +10,55 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
-import { newlistLinks } from '../utils/constants';
-import { usePublicContext } from '../Public/PublicApp';
+export default function AdminMenu() {
 
-function PublicMenu() {
-
-  const {league, leagueSeason} = usePublicContext();
-  
   const [user, loading] = useAuthState(auth);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
 
   const renderPublicLinks = (isDrawer?:boolean) => {
-    return newlistLinks.map((link, index) => {
-      if( isDrawer ) {
-        return (
-          <ListItem key={`public-menu-${index}`} 
+    if( isDrawer ) {
+      return (
+        <ListItem key={`public-menu`} 
+          sx={{
+            padding:0,
+            margin:'5px 0',
+          }}
+        >
+          <Link 
+            component={NavLink} 
+            to={`/`} 
+            onClick={() => setMobileMenuOpen(false)}
+            p={1} 
             sx={{
-              padding:0,
-              margin:'5px 0',
-            }}
-          >
-            <Link 
-              component={NavLink} 
-              to={leagueSeason ? link.link.replace(':idSeason', leagueSeason.id.toString()) : link.link} 
-              onClick={() => setMobileMenuOpen(false)}
-              p={1} 
-              sx={{
-                display:'block',
-                width:'100%',
-                textAlign:'center',
-                '&:hover':{
-                  color:(theme) => theme.palette.primary.light,
-                  backgroundColor:(theme) => theme.palette.primary.main,
-                  textDecoration:"none",
-                }
-              }}
-            >{link.label}</Link>
-          </ListItem>
-        )
-      }
-      else {
-        return (
-          <ListItem key={`public-menu-${index}`}>
-            <Link 
-              component={NavLink} 
-              to={leagueSeason ? link.link.replace(':idSeason', leagueSeason.id.toString()) : link.link} 
-              sx={{ 
+              display:'block',
+              width:'100%',
+              textAlign:'center',
+              '&:hover':{
                 color:(theme) => theme.palette.primary.light,
-                textAlign: 'center',
-                whiteSpace:'nowrap',
-              }}
-            >{link.label}</Link>
-          </ListItem>
-        )
-      }
-    })
+                backgroundColor:(theme) => theme.palette.primary.main,
+                textDecoration:"none",
+              }
+            }}
+          >Public site</Link>
+        </ListItem>
+      )
+    }
+    else {
+      return (
+        <ListItem key={`public-menu`}>
+          <Link 
+            component={NavLink} 
+            to={`/`} 
+            sx={{ 
+              color:(theme) => theme.palette.primary.light,
+              textAlign: 'center',
+              whiteSpace:'nowrap',
+            }}
+          >Public site</Link>
+        </ListItem>
+      )
+    }
   }
   
   const getUserLinks = () => {
@@ -120,32 +113,28 @@ function PublicMenu() {
           alignItems: 'center',
           justifyContent: 'flex-start',
         }}>
-          { league ? 
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <MenuIcon />
-            </IconButton>
-          : ''}
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
 
           <Link href="/" variant="h6" color="inherit" style={{textDecoration:'none'}}>
             JLM BB
           </Link>
         </Box>
 
-        { league ? 
-          <List sx={{
-            display:{xs:'none', sm:'flex'},
-            flexFlow: 'row nowrap',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            { renderPublicLinks() }
-          </List>
-        : '' }
+        <List sx={{
+          display:{xs:'none', sm:'flex'},
+          flexFlow: 'row nowrap',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          { renderPublicLinks() }
+        </List>
 
         <PopupState variant="popover" popupId="popup-admin">
           {(popupState) => (
@@ -205,5 +194,3 @@ function PublicMenu() {
     </>
   )
 }
-
-export default PublicMenu;

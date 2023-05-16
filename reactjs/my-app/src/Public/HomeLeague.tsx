@@ -11,6 +11,8 @@ import ClosestMatches from "../Matchs/ClosestMatches";
 import BestLeaguePlayers from "../Players/BestLeaguePlayers";
 import AllTeamsStanding from "../Teams/AllTeamsStanding";
 import LoaderInfo from "../Generic/LoaderInfo";
+import Breadcrumb from "../Menu/Breadcrumb";
+import PublicMenu from "../Menu/PublicMenu";
 
 
 function HomeLeague() {
@@ -46,6 +48,8 @@ function HomeLeague() {
 
   return (
     <>
+      <PublicMenu />
+      <Breadcrumb />
       <LoaderInfo
         isLoading={isLoaded}
         msgError={apiError}

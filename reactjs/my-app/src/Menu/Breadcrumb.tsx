@@ -4,20 +4,31 @@ import { Box, Breadcrumbs, Link, Paper, Typography } from "@mui/material";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeIcon from '@mui/icons-material/Home';
 
+import { usePublicContext } from "../Public/PublicApp";
+
 import { newlistLinks } from "../utils/constants";
+
 
 
 
 export default function Breadcrumb(){
   const location = useLocation();
 
+  const {league, leagueSeason} = usePublicContext();
+  
   let currentLink = '';
   const crumbs = location.pathname.split('/')
     .filter((crumb) => crumb !== '')
-    .map((crumb) => {
+    .map((crumb, index) => {
       currentLink += `/${crumb}`;
-      const myLink = newlistLinks.filter((listLink) => listLink.link === `/${crumb}`)[0]
-      if( myLink !== undefined ){
+      if( index === 0 ){
+        return {
+          link: currentLink,
+          label: ( league && leagueSeason ? `${league.name} - ${leagueSeason.name}` : 'Undefined League' )
+        }
+      }
+      const myLink = newlistLinks.find((listLink) => listLink.link === `/${crumb}`)
+      if( myLink ){
         return {
           link: currentLink,
           label: myLink.label
@@ -34,16 +45,16 @@ export default function Breadcrumb(){
   return (
     <>
       { crumbs.length > 0 ? (
-        <Paper component={Box} p={1} pt={2} sx={{borderRadius:0}}>
+        <Paper component={Box} p={1} sx={{borderRadius:0}}>
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />}>
             <Link 
               key={`breadcrumb-home`} 
-              href="/" sx={{
+              href="/" 
+              sx={{
                 display:'flex'
               }}
             >
               <HomeIcon fontSize="small" />
-              Home
             </Link>
             {crumbs.map((crumb, index) => {
               if( index < crumbs.length - 1) {

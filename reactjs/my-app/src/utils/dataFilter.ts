@@ -116,3 +116,9 @@ export const sortPlayersPerTeams = (listPlayers:IPlayer[], listTeams:ITeam[], ma
     })
     .sort((a,b) => a.priority - b.priority || -(b.currentTeamName).localeCompare(a.currentTeamName) || -(b.name).localeCompare(a.name) );
 }
+
+export function getLeagueAndSeason(leagues:ILeague[], leagueSeasons: ILeagueSeason[], idLeagueSeason:number): [ILeague | null, ILeagueSeason| null] {
+  let leagueSeason = leagueSeasons.find((myLeagueSeason) => myLeagueSeason.id === idLeagueSeason) || null; 
+  let league = leagues.find((myLeague) => myLeague.id === leagueSeason?.idLeague) || null;
+  return [league, leagueSeason]
+}

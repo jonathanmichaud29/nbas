@@ -28,10 +28,7 @@ export interface ITeamPlayers{
   teamName:string;
 }
 
-export interface ITeamProfileProps{
-  team: ITeam;
-  league: ILeague;
-}
+
 
 export interface ITeamPlayersProps {
   isOpen: boolean;
