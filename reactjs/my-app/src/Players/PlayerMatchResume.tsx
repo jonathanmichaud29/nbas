@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Stack } from "@mui/material";
 
 import { ITeam } from "../Interfaces/team";
 import { IPlayerMatchResumeProps } from '../Interfaces/player';
@@ -13,20 +13,26 @@ function PlayerMatchResume(props: IPlayerMatchResumeProps) {
   const playingForTeam: ITeam = ( playerLineup.idTeam === teamHome.id ? teamHome : teamAway);
   
   return (
-    <Stack alignItems="center" spacing={3} width="100%" pb={3}>
-      <Scoreboard
-        match={match}
-        teamHome={teamHome}
-        teamAway={teamAway}
-        hasLinkMatchDetails={true}
+    <Card raised={true} component={Box} width="100%">
+      <CardHeader 
+        title={`Played with ${playingForTeam.name}`}
+        titleTypographyProps={{variant:'h3'}}
       />
-      <Typography align="center">Played for <b>{playingForTeam.name}</b></Typography>
-      <YearStats
-        matchLineups={[playerLineup]}
-        players={[player]}
-        title={`match stats`}
-      />
-    </Stack>
+      <CardContent component={Stack} spacing={3}>
+        <Scoreboard
+          match={match}
+          teamHome={teamHome}
+          teamAway={teamAway}
+          hasLinkMatchDetails={true}
+        />
+        
+        <YearStats
+          matchLineups={[playerLineup]}
+          players={[player]}
+          title={`match stats`}
+        />
+      </CardContent>
+    </Card>
   )
 }
 

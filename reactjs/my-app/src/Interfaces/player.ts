@@ -18,11 +18,7 @@ export interface IPlayerProps{
   hasFilter?: boolean;
 }
 
-export interface IPlayerProfileProps{
-  player: IPlayer;
-  playersLeagues: ILeaguePlayer[];
-  league: ILeague | null;
-}
+
 
 export interface IPlayerMatchResumeProps {
   player:       IPlayer;

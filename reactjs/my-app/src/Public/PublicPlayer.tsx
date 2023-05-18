@@ -1,97 +1,56 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux';
 
-import { RootState } from '../redux/store';
+import { usePublicContext } from './PublicApp';
 
-import { IPlayer } from "../Interfaces/player";
-import { ILeague, ILeaguePlayer } from '../Interfaces/league';
-
-import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
-import { fetchPlayersLeagues, IApiFetchPlayersLeaguesParams } from '../ApiCall/leagues';
-
+import PublicMenu from '../Menu/PublicMenu';
+import Breadcrumb from '../Menu/Breadcrumb';
 import ViewPlayerProfile from '../Players/ViewPlayerProfile';
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { setMetas } from '../utils/metaTags';
-import { getStoragePublicLeagueId } from '../utils/localStorage';
 import { castNumber } from '../utils/castValues';
 
 function PublicPlayer() {
   let { id } = useParams();
   const idPlayer = castNumber(id);
 
-  const [player, setPlayer] = useState<IPlayer | null>(null);
-  const [playersLeagues, setPlayersLeagues] = useState<ILeaguePlayer[] | null>(null);
-  const [apiError, changeApiError] = useState("");
+  const { league, leagueSeason, leaguePlayers } = usePublicContext();
 
-  const publicLeagueId = getStoragePublicLeagueId();
-  const listLeagues = useSelector((state: RootState) => state.leagues )
-  const selectedLeague: ILeague | null = listLeagues.find((league) => league.id === publicLeagueId) || null;
+  const [apiError, changeApiError] = useState<string>("");
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
+  const player = leaguePlayers.find((player) => player.id === idPlayer) || null;
 
-  const isLoaded = player !== null && playersLeagues !== null;
+  useEffect(() => {
+    if( player === null){
+      changeApiError("This player does not exists in this league")
+    } else {
+      setMetas({
+        title:`${player.name} profile - ${league.name} ${leagueSeason.name}`,
+        description:`${player.name} profile that included its standing, batting stats and each match summary played during this season`
+      });
+      setDataLoaded(true);
+    }
+  }, [league.name, leagueSeason.name, player])
 
-  if( isLoaded ){
-    setMetas({
-      title:`${player.name} Player profile`,
-      description:`${selectedLeague?.name} ${player.name} profile that included its standing, batting stats and each match summary played this season`
-    });
-  }
   
-  /**
-   * Fetch Player details
-   */
-  useMemo( () => {
-    if ( idPlayer === null ) return;
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      playerIds: [idPlayer],
-      allLeagues: true
-    }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        setPlayer(response.data[0])
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
-      });
-  }, [idPlayer]);
-
-  useMemo(() => {
-    if ( idPlayer === null ) return;
-    const paramsFetchPlayersLeagues: IApiFetchPlayersLeaguesParams = {
-      playerIds:[idPlayer]
-    }
-    fetchPlayersLeagues(paramsFetchPlayersLeagues)
-      .then(response => {
-        setPlayersLeagues(response.data);
-      })
-      .catch(error => {
-        
-      })
-      .finally(() => {
-        
-      });
-  }, [idPlayer])
-
 
   return (
     <>
+      <PublicMenu />
+      <Breadcrumb />
+
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
-      { player && playersLeagues && (
+      { player ? (
         <ViewPlayerProfile 
           player={player}
-          playersLeagues={playersLeagues}
-          league={selectedLeague}
         />
-      ) }
+      ) : '' }
     </>
   )
 }

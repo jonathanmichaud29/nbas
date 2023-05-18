@@ -75,6 +75,10 @@ exports.getHistoryMatches = async (req, res, next) => {
   let listMatchIds = [];
   let listTeamIds = [];
   let listPlayerIds = [];
+  
+  let wheres=[];
+  let values=[];
+
   let customData = {
     matchLineups:[],
     matches:[],
@@ -83,20 +87,28 @@ exports.getHistoryMatches = async (req, res, next) => {
   }
 
 
-  let query="SELECT * FROM match_lineup WHERE ";
-  let values=[];
+  let query="SELECT * FROM match_lineup ";
   if( req.body.teamId !== undefined ){
-    query += "`idTeam`=?";
+    wheres.push("`idTeam`=?");
+    /* query += "`idTeam`=?"; */
     values.push(req.body.teamId)
   }
-  else if( req.body.playerId !== undefined ){
-    query += "`idPlayer`=?";
+  if( req.body.playerId !== undefined ){
+    wheres.push("`idPlayer`=?");
+    /* query += "`idPlayer`=?"; */
     values.push(req.body.playerId)
   }
-  else {
-    return appResponse(res, next, true, {}, {});
+  if( req.body.leagueId !== undefined){
+    wheres.push("`idLeague`=?");
+    values.push(req.body.leagueId);
   }
-
+  if( req.body.leagueSeasonId !== undefined){
+    wheres.push("`idSeason`=?");
+    values.push(req.body.leagueSeasonId);
+  }
+  if( wheres.length ){
+    query += "WHERE " + wheres.join(" AND ");
+  }
   const resultMainQuery = await mysqlQuery(query, values);
   if( resultMainQuery.status ){
     customData.matchLineups = resultMainQuery.data;
