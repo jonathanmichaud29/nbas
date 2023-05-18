@@ -30,6 +30,7 @@ function Scoreboard(props: IScoreboardProps) {
   const isTeamStandings = standingTeams && teamHomeStanding && teamAwayStanding;
 
   const linkMatchDetails = quickLinkMatch.link.replace(':idSeason', match.idSeason.toString()) + '/' + match.id;
+  const baseLinkTeamDetails = quickLinkTeam.link.replace(':idSeason', match.idSeason.toString()) + '/';
 
   return (
     
@@ -60,7 +61,7 @@ function Scoreboard(props: IScoreboardProps) {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell><Link href={`${quickLinkTeam.link}/${teamHome.id}`}>{teamHome.name}</Link></TableCell>
+              <TableCell><Link href={`${baseLinkTeamDetails}${teamHome.id}`}>{teamHome.name}</Link></TableCell>
               { match.isCompleted === 1 && (
                 <TableCell align="center">{match.teamHomePoints}</TableCell> 
               )}
@@ -73,7 +74,7 @@ function Scoreboard(props: IScoreboardProps) {
               )}
             </TableRow>
             <TableRow>
-            <TableCell><Link href={`${quickLinkTeam}/${teamAway.id}`}>{teamAway.name}</Link></TableCell>
+            <TableCell><Link href={`${baseLinkTeamDetails}${teamAway.id}`}>{teamAway.name}</Link></TableCell>
               { match.isCompleted === 1 && (
                 <TableCell align="center">{match.teamAwayPoints}</TableCell> 
               )}

@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
+import { batch } from 'react-redux';
 
-import { Alert, Box, Divider, Paper, Stack, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
+
+import { usePublicContext } from '../Public/PublicApp';
 
 import { ITeam } from '../Interfaces/team'
 import { IMatch, IMatchLineup } from '../Interfaces/match'
-import { IPlayer } from '../Interfaces/player'
-import { ILeagueSeason } from '../Interfaces/league';
 
 import { fetchHistoryMatches, IApiFetchHistoryMatchesParams } from '../ApiCall/matches';
 
@@ -14,92 +15,106 @@ import TeamMatchResume from './TeamMatchResume'
 import YearStats from '../Stats/YearStats'
 import LoaderInfo from '../Generic/LoaderInfo';
 
-
 interface ITeamProfileProps{
   team: ITeam;
-  leagueSeason: ILeagueSeason;
 }
 
 function ViewTeamProfile(props: ITeamProfileProps) {
 
-  const { team, leagueSeason } = props;
+  const { team } = props;
 
-  const [apiError, changeApiError] = useState("");
-  const [listPlayers, setListPlayers] = useState<IPlayer[] | null>(null);
-  const [listTeams, setListTeams] = useState<ITeam[] | null>(null);
-  const [listMatches, setListMatches] = useState<IMatch[] | null>(null);
-  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[] | null>(null);
+  const { league, leagueSeason, leaguePlayers, leagueSeasonTeams } = usePublicContext();
 
-  const isLoaded = listMatches !== null && listMatchLineups !== null && listTeams !== null && listPlayers !== null;
+  const [apiError, changeApiError] = useState<string>("");
+  const [listMatches, setListMatches] = useState<IMatch[]>([]);
+  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[]>([]);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+
+  const listCompletedMatches = listMatches?.filter((match) => match.isCompleted === 1) || []
 
   useMemo(() => {
     const paramsHistoryMatches: IApiFetchHistoryMatchesParams = {
-      teamId: team.id
+      teamId: team.id,
+      leagueSeasonId: leagueSeason.id
     }
     fetchHistoryMatches(paramsHistoryMatches)
       .then((response) => {
-        setListPlayers(response.data.players);
-        setListTeams(response.data.teams);
-        setListMatches(response.data.matches);
-        setListMatchLineups(response.data.matchLineups);
+        batch(() => {
+          setListMatches(response.data.matches || []);
+          setListMatchLineups(response.data.matchLineups || []);
+          setDataLoaded(true);
+        })
       })
       .catch((error) => {
-        changeApiError(error);
+        batch(() => {
+          changeApiError(error);
+          setDataLoaded(true);
+        })
+        
       })
       .finally(() => {
 
       })
-  }, [team])
+  }, [leagueSeason.id, team.id])
 
-  const listCompletedMatches = listMatches?.filter((match) => match.isCompleted === 1) || []
+  
 
   return (
-    <Paper component={Box} m={3} p={3}>
-      <Stack spacing={3} alignItems="center">
-        <Typography variant="h1">{team.name} - {leagueSeason.name}</Typography>
-        <LoaderInfo
-          isLoading={isLoaded}
-          msgError={apiError}
-        />
-        { isLoaded && (
-          <StandingTeam
-            key={`team-standing-${team.id}`}
-            team={team}
-            matches={listMatches}
+    <>
+      <Paper component={Box} m={3} p={3}>
+        <Stack spacing={3} alignItems="center" pb={3} width="100%">
+          <Box>
+            <Typography variant="h1" textAlign='center'>{team.name}</Typography>
+            <Typography variant="h1" textAlign='center'>{league.name} - {leagueSeason.name}</Typography>
+          </Box>
+          <LoaderInfo
+            isLoading={dataLoaded}
+            msgError={apiError}
           />
-        )}
-        {isLoaded && (
-          <YearStats
-            key={`team-year-stat-${team.id}`}
-            matchLineups={listMatchLineups}
-            players={listPlayers}
-            title={`Season batting stats`}
-          /> 
-        )}
-
-        <Divider />
-        <Typography variant="h2">Matches history</Typography>
-        
-        { listCompletedMatches.length > 0 ? listCompletedMatches.map((match) => {
-          const teamHome = listTeams?.find((team) => team.id === match.idTeamHome)
-          const teamAway = listTeams?.find((team) => team.id === match.idTeamAway)
-          const matchLineups = listMatchLineups?.filter((lineup) => lineup.idMatch === match.id)
-          if( teamHome === undefined || teamAway === undefined || matchLineups === undefined ) return '';
-          return (
-            <TeamMatchResume
-              key={`team-match-resume-${match.id}`}
-              matchLineups={matchLineups}
-              match={match}
-              players={listPlayers || []}
-              teamHome={teamHome}
-              teamAway={teamAway}
-            />
-          )
-        }) : (
-          <Alert severity='info'>No Match found</Alert>
-        )}
-      </Stack>
-    </Paper>
+          { dataLoaded ? (
+            <>
+              <StandingTeam
+                key={`team-standing-${team.id}`}
+                team={team}
+                matches={listMatches}
+              />
+              <YearStats
+                key={`team-year-stat-${team.id}`}
+                matchLineups={listMatchLineups}
+                players={leaguePlayers}
+                title={`Season batting stats`}
+              /> 
+            </>
+          ) : '' }
+        </Stack>
+      </Paper>
+      
+      { dataLoaded && listCompletedMatches.length > 0 
+      ? 
+        <Paper component={Box} p={3} m={3}>
+          <Stack spacing={3} alignItems="center" pb={3} width="100%">
+            <Typography variant="h2">Team matches history</Typography>
+          
+            { listCompletedMatches.map((match) => {
+              const teamHome = leagueSeasonTeams.find((team) => team.id === match.idTeamHome) || null
+              const teamAway = leagueSeasonTeams.find((team) => team.id === match.idTeamAway) || null
+              const matchLineups = listMatchLineups.filter((lineup) => lineup.idMatch === match.id)
+              if( teamHome === null || teamAway === null ) return '';
+              return (
+                <TeamMatchResume
+                  key={`team-match-resume-${match.id}`}
+                  matchLineups={matchLineups}
+                  match={match}
+                  players={leaguePlayers}
+                  teamHome={teamHome}
+                  teamAway={teamAway}
+                />
+              )
+            })} 
+          </Stack>
+        </Paper>
+      : '' }
+    </>
   )
 }
 

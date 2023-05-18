@@ -3,6 +3,7 @@
 ## IMPROVEMENTS
 - Refactor API params
 - Add public GET url arguments for league and/or season ID
+- Filter public year team stats with original rooster only
 
 ## Todos Javascript
 

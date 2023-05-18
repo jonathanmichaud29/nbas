@@ -1,12 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 
 import { usePublicContext } from './PublicApp';
 
-import { ITeam } from "../Interfaces/team";
-
-import { fetchTeams, IApiFetchTeamsParams } from '../ApiCall/teams';
-
+import Breadcrumb from '../Menu/Breadcrumb';
+import PublicMenu from '../Menu/PublicMenu';
 import ViewTeamProfile from '../Teams/ViewTeamProfile';
 import LoaderInfo from '../Generic/LoaderInfo';
 
@@ -14,61 +12,45 @@ import { setMetas } from '../utils/metaTags';
 import { castNumber } from '../utils/castValues';
 
 
+
 function PublicTeam() {
   const { id } = useParams();
   const idTeam = castNumber(id);
 
-  const { leagueSeason } = usePublicContext();
+  const { league, leagueSeason, leagueSeasonTeams } = usePublicContext();
 
-  const [team, setTeam] = useState<ITeam | null>(null);
   const [apiError, changeApiError] = useState("");
-
-  const isLoaded = team !== null;
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
   
-  useMemo(() => {
-    if( team === null) return;
-    setMetas({
-      title:`${team.name} Team profile - ${leagueSeason.name}`,
-      description:`${leagueSeason.name} ${team.name} team profile that included its standing, batting stats and each match summary played the current season`
-    });
-  },[team, leagueSeason])
-    
-  /**
-   * Fetch Team
-   */  
+  const team = leagueSeasonTeams.find((team) => team.id === idTeam) || null;
+
   useEffect(() => {
-    
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: [idTeam],
-      leagueIds: [leagueSeason.idLeague]
-    }
-    fetchTeams(paramsFetchTeams)
-      .then(response => {
-        setTeam(response.data[0])
-      })
-      .catch(error => {
-        changeApiError(error);
-      })
-      .finally(() => {
-        
+    if( team === null){
+      changeApiError("This player does not exists in this league")
+    } else {
+      setMetas({
+        title:`${team.name} profile - ${league.name} ${leagueSeason.name}`,
+        description:`${league.name} ${team.name} team profile that included its standing, batting stats and each match summary played the season ${leagueSeason.name}`
       });
-  },[idTeam, leagueSeason])
-
-  
-
+      setDataLoaded(true);
+    }
+  }, [league.name, leagueSeason.name, team])
+    
   return (
     <>
+      <PublicMenu />
+      <Breadcrumb />
+      
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
-      { isLoaded && (
+      { team ? (
         <ViewTeamProfile 
           team={team}
-          leagueSeason={leagueSeason}
         />
-      ) }
+      ) : '' }
     </>
   )
 }
