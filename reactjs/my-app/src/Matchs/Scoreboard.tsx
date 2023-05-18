@@ -29,13 +29,17 @@ function Scoreboard(props: IScoreboardProps) {
 
   const isTeamStandings = standingTeams && teamHomeStanding && teamAwayStanding;
 
+  const linkMatchDetails = quickLinkMatch.link.replace(':idSeason', match.idSeason.toString()) + '/' + match.id;
+
   return (
     
     <Stack alignItems="center" spacing={1} sx={{width:'100%'}}>
-      <Typography variant={titleLevel || 'h6'}>
+      <Typography variant={titleLevel || 'h6'} textAlign='center'>
         {hasLinkMatchDetails ? (
-        <Link href={`${quickLinkMatch.link}/${match.id}`}>{tableTitle}</Link>
-        ) : tableTitle }
+        <Link href={linkMatchDetails}>{teamHome.name}<br/>Receives<br/>{teamAway.name}</Link>
+        ) : (
+          `${teamHome.name} Receives ${teamAway.name}`
+        ) }
       </Typography>
       <Typography variant="subtitle1">{dateReadable}</Typography>
       

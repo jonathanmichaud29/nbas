@@ -4,20 +4,18 @@ import { batch } from 'react-redux';
 import { Alert, Box, Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material"
 
+import { usePublicContext } from '../Public/PublicApp';
+
 import { IMatchLineup } from '../Interfaces/match'
 import { IBattingStatsExtended } from '../Interfaces/stats'
 import { ILeagueSeason } from '../Interfaces/league';
-import { IPlayer } from '../Interfaces/player';
 
 import { IApiFetchMatchLineups, fetchMatchLineups } from '../ApiCall/matches';
-import { fetchPlayers, IApiFetchPlayersParams } from '../ApiCall/players';
 
 import LoaderInfo from '../Generic/LoaderInfo';
 
 import { getPlayerName } from '../utils/dataAssociation';
 import { getCombinedPlayersStats } from '../utils/statsAggregation';
-
-
 
 interface IBestLeaguePlayersProps {
   leagueSeason: ILeagueSeason;
@@ -26,10 +24,11 @@ interface IBestLeaguePlayersProps {
 function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
   const { leagueSeason } = props;
 
+  const { league, leaguePlayers } = usePublicContext();
+
   const [apiError, changeApiError] = useState("");
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
   const [playersStats, setPlayersStats] = useState<IBattingStatsExtended[]>([]);
-  const [listPlayers, setListPlayers] = useState<IPlayer[]>([]);
 
   /**
    * Fetch All players and their stats for this league season
@@ -42,30 +41,19 @@ function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
       .then(response => {
         const listMatchLineups: IMatchLineup[] = response.data;
         const newPlayersStats = getCombinedPlayersStats(listMatchLineups)
+        batch(() => {
+          setPlayersStats(newPlayersStats);
+          setDataLoaded(true);
+        })
         
-        const paramsFetchPlayers: IApiFetchPlayersParams = {
-          playerIds: newPlayersStats.map((playerStats) => playerStats.id)
-        }
-        fetchPlayers(paramsFetchPlayers)
-          .then(response => {
-            batch(()=>{
-              const newListPlayers: IPlayer[] = response.data;
-              setPlayersStats(newPlayersStats);
-              setListPlayers(newListPlayers);
-            })
-            
-          })
-          .catch(error => {
-            changeApiError(error);
-          })
-          .finally(() => {
-            setIsLoaded(true);
-          });
-
+        
       })
       .catch(error => {
-        changeApiError(error);
-        setIsLoaded(true);
+        batch(() => {
+          changeApiError(error);
+          setDataLoaded(true);
+        })
+        
       })
       .finally(() => {
         
@@ -81,29 +69,26 @@ function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
   return (
     <>
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
       
-      { isLoaded ? (
+      { dataLoaded ? (
         <Paper component={Box} p={3} m={3}>
-          <Typography variant="h1" textAlign="center">
-            Best League Players
-          </Typography>
-          
-          <Grid container columnGap={3} rowGap={3} justifyContent="space-between" 
+          <Typography variant="h1" textAlign="center" mb={3}>Best Season Players</Typography>
+          <Grid container gap={3} justifyContent="space-between" 
             flexDirection={{xs:"column", lg:"row"}}
             alignItems={{xs:"flex-start", lg:"stretch"}}
           >
-            <Grid item xs={12} lg component={Card} width="100%">
-              { bestSluggers.length > 0 ? (
-                <>
-                  <CardHeader
-                    title="Sluggers"
-                    titleTypographyProps={{variant:'h2'}}
-                  />
-                  <CardContent>
+            <Grid item xs={12} lg width="100%">
+              <Card raised={true}>
+                <CardHeader
+                  title="Sluggers"
+                  titleTypographyProps={{variant:'h2'}}
+                />
+                <CardContent>
+                  { bestSluggers.length > 0 ? (
                     <TableContainer component={Paper}>
                       <Table>
                         <TableHead>
@@ -115,28 +100,28 @@ function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
                         <TableBody>
                           { bestSluggers.map((statPlayer) => (
                             <TableRow key={`best-player-stat-${statPlayer.id}`}>
-                              <TableCell>{getPlayerName(statPlayer.id, listPlayers)}</TableCell>
+                              <TableCell>{getPlayerName(statPlayer.id, leaguePlayers)}</TableCell>
                               <TableCell align="center">{statPlayer.sluggingPercentage}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
                     </TableContainer>
-                  </CardContent>
-                </>
-              ) : (
-                <Alert severity='info'>There is no slugger stats</Alert> 
-              ) }
+                  ) : (
+                    <Alert severity='info'>There is no slugger stats</Alert> 
+                  ) }
+                </CardContent>
+              </Card>
             </Grid>
 
-            <Grid item xs={12} lg component={Card} width="100%">
-              { bestRBI.length > 0 ? (
-                <>
-                  <CardHeader
-                    title="RBI"
-                    titleTypographyProps={{variant:'h2'}}
-                  />
-                  <CardContent>
+            <Grid item xs={12} lg width="100%">
+              <Card raised={true}>
+                <CardHeader
+                  title="RBI"
+                  titleTypographyProps={{variant:'h2'}}
+                />
+                <CardContent>
+                  { bestRBI.length > 0 ? (
                     <TableContainer component={Paper}>
                       <Table>
                         <TableHead>
@@ -148,29 +133,28 @@ function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
                         <TableBody>
                           { bestRBI.map((statPlayer) => (
                             <TableRow key={`best-player-stat-${statPlayer.id}`}>
-                              <TableCell>{getPlayerName(statPlayer.id, listPlayers)}</TableCell>
+                              <TableCell>{getPlayerName(statPlayer.id, leaguePlayers)}</TableCell>
                               <TableCell align="center">{statPlayer.runsBattedIn}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
                     </TableContainer>
-
-                  </CardContent>
-                </>
-              ) : (
-                <Alert severity='info'>There is no RBI stats</Alert> 
-              ) }
+                  ) : (
+                    <Alert severity='info'>There is no RBI stats</Alert> 
+                  ) }
+                </CardContent>
+              </Card>
             </Grid>
 
-            <Grid item xs={12} lg component={Card} width="100%">
-              { bestBattingAverage.length > 0 ? (
-                <>
-                  <CardHeader
-                    title="Batting Average"
-                    titleTypographyProps={{variant:'h2'}}
-                  />
-                  <CardContent>
+            <Grid item xs={12} lg width="100%">
+              <Card raised={true}>
+                <CardHeader
+                  title="Batting Average"
+                  titleTypographyProps={{variant:'h2'}}
+                />
+                <CardContent>
+                  { bestRBI.length > 0 ? (
                     <TableContainer component={Paper}>
                       <Table>
                         <TableHead>
@@ -182,19 +166,18 @@ function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
                         <TableBody>
                           { bestBattingAverage.map((statPlayer) => (
                             <TableRow key={`best-player-stat-${statPlayer.id}`}>
-                              <TableCell>{getPlayerName(statPlayer.id, listPlayers)}</TableCell>
+                              <TableCell>{getPlayerName(statPlayer.id, leaguePlayers)}</TableCell>
                               <TableCell align="center">{statPlayer.battingAverage}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
                     </TableContainer>
-
-                  </CardContent>
-                </>
-              ) : (
-                <Alert severity='info'>There is no Batting Average stats</Alert> 
-              ) }
+                  ) : (
+                    <Alert severity='info'>There is no Batting Average stats</Alert> 
+                  ) }
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </Paper>

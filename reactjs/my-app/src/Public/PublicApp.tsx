@@ -4,19 +4,22 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch, RootState } from "../redux/store";
-import { addPublicLeagues, addPublicLeagueSeasons,/*  setPublicLeague, setPublicLeagueSeason */ } from "../redux/publicContextSlice";
+import { addPublicLeagues, addPublicLeagueSeasons } from "../redux/publicContextSlice";
 
 import { auth } from "../Firebase/firebase";
 
 import { ILeague, ILeagueSeason } from "../Interfaces/league";
+import { IPlayer } from "../Interfaces/player";
+import { ITeam } from "../Interfaces/team";
 
 import { IApiSetUserFirebaseTokenParams, setUserFirebaseToken } from "../ApiCall/users";
 import { fetchLeagues, IApiFetchLeaguesParams } from "../ApiCall/leagues";
 import { IApiFetchLeagueSeasonsParams, fetchLeagueSeasons } from "../ApiCall/seasons";
+import { IApiFetchTeamsParams, fetchTeams } from "../ApiCall/teams";
+import { IApiFetchPlayersParams, fetchPlayers } from "../ApiCall/players";
 
 import LoaderInfo from "../Generic/LoaderInfo";
 
-/* import { getStoragePublicLeagueId, getStoragePublicLeagueSeasonId, setStoragePublicLeagueId, setStoragePublicLeagueSeasonId } from "../utils/localStorage"; */
 import { getLeagueAndSeason } from "../utils/dataFilter";
 import { castNumber } from "../utils/castValues";
 
@@ -32,6 +35,8 @@ export function useAdminData() {
 type TPublicContext = {
   league: ILeague;
   leagueSeason: ILeagueSeason;
+  leaguePlayers: IPlayer[];
+  leagueSeasonTeams: ITeam[];
 }
 
 
@@ -46,14 +51,18 @@ function PublicApp() {
   const navigate = useNavigate()
   
   const [user, loading] = useAuthState(auth);
+  const [apiError, changeApiError] = useState<string>('');
   const [adminValidate, setAdminValidate] = useState<boolean>(false);
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
+  const [leaguePlayers, setLeaguePlayers] = useState<IPlayer[]>([]);
+  const [leagueSeasonTeams, setLeagueSeasonTeams] = useState<ITeam[]>([]);
   
   const statePublicContext = useSelector((state: RootState) => state.publicContext )
   
   const crumbs = location.pathname.split('/')
     .filter((crumb) => crumb !== '');
-  const [league, leagueSeason] = getLeagueAndSeason(statePublicContext.leagues, statePublicContext.leagueSeasons, crumbs.length > 0 ? castNumber(crumbs[0]) : 0);
+  const isLeagueSelected = crumbs.length > 0 && castNumber(crumbs[0]) !== 0;
+  const [league, leagueSeason] = getLeagueAndSeason(statePublicContext.leagues, statePublicContext.leagueSeasons, isLeagueSelected ? castNumber(crumbs[0]) : 0);
   
   useEffect(() => {
     if ( ! dataRetrieved ) return;
@@ -96,8 +105,6 @@ function PublicApp() {
     }
     let listLeagues: ILeague[] = [];
     let listLeagueSeasons: ILeagueSeason[] = [];
-    /* let currentLeague: ILeague;
-    let currentLeagueSeason: ILeagueSeason; */
 
     const paramsFetchLeagues: IApiFetchLeaguesParams = {
       allLeagues:true
@@ -114,43 +121,15 @@ function PublicApp() {
             listLeagueSeasons = response.data;
           })
           .catch(error => {
+            batch(() => {
+              changeApiError(error);
+            })
             
           })
           .finally(() => {
-            /* const publicLeagueId = getStoragePublicLeagueId();
-            const publicLeagueSeasonId = getStoragePublicLeagueSeasonId();
-            let newLeagueId = 0;
-            let newLeagueSeasonId = 0;
-            if( publicLeagueId === 0 || publicLeagueSeasonId === 0 ){
-              currentLeague = listLeagues[0];
-              newLeagueId = currentLeague.id;
-              
-              listLeagueSeasons.sort((a,b) => b.id - a.id).every((leagueSeason) => {
-                if( leagueSeason.idLeague === newLeagueId){
-                  newLeagueSeasonId = leagueSeason.id;
-                  return false;
-                }
-                return true;
-              })
-            }
-            else {
-              newLeagueId = publicLeagueId;
-              newLeagueSeasonId = publicLeagueSeasonId;
-            }
-            if( newLeagueId !== 0 ){
-              currentLeague = listLeagues.filter((league) => league.id === newLeagueId)[0];
-            }
-            if( newLeagueSeasonId !== 0 ){
-              currentLeagueSeason = listLeagueSeasons.filter((leagueSeason) => leagueSeason.id === newLeagueSeasonId)[0];
-            } */
             batch(()=>{
-              // setStoragePublicLeagueId(newLeagueId);
-              // setStoragePublicLeagueSeasonId(newLeagueSeasonId);
               dispatch(addPublicLeagues(listLeagues));
               dispatch(addPublicLeagueSeasons(listLeagueSeasons));
-              // dispatch(setPublicLeague(currentLeague));
-              // dispatch(setPublicLeagueSeason(currentLeagueSeason));
-              setDataRetrieved(true);
             })
           });
       })
@@ -162,17 +141,59 @@ function PublicApp() {
       });
   }, [dispatch, adminValidate]);
 
+  useEffect(() => {
+    if( leagueSeason === null) {
+      if( ! isLeagueSelected ) {
+        setDataRetrieved(true);
+      }
+      return;
+    }
+
+    let newError: string = '';
+    let newPlayers: IPlayer[] = [];
+    let newTeams: ITeam[] = []
+    const paramsFetchPlayers: IApiFetchPlayersParams = {
+      leagueIds: [leagueSeason.idLeague],
+      allPlayers:true
+    }
+    const paramsFetchTeams: IApiFetchTeamsParams = {
+      leagueSeasonIds: [leagueSeason.id]
+    }
+    Promise.all([fetchPlayers(paramsFetchPlayers), fetchTeams(paramsFetchTeams)])
+      .catch((error) => {
+        newError = error;
+      })
+      .then((values) => {
+        if( ! values) return;
+
+        newPlayers = values[0].data || [];
+        newTeams = values[1].data || [];
+      })
+      .finally(() => {
+        batch(() => {
+          changeApiError(newError);
+          setLeaguePlayers(newPlayers);
+          setLeagueSeasonTeams(newTeams);
+          setDataRetrieved(true);
+        })
+      })
+    
+  },[isLeagueSelected, leagueSeason])
+
   return (
     <>
       <LoaderInfo
         isLoading={dataRetrieved}
         hasWrapper={true}
+        msgError={apiError}
       />
       { dataRetrieved ? (
         <Outlet 
           context={{
             league: league,
-            leagueSeason: leagueSeason
+            leagueSeason: leagueSeason,
+            leaguePlayers: leaguePlayers,
+            leagueSeasonTeams: leagueSeasonTeams,
           }} 
         />
       ) : ''}

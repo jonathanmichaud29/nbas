@@ -1,60 +1,78 @@
 import { useEffect, useState } from "react";
 import { batch } from "react-redux";
 
-import { Card, CardContent, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Card, CardContent, Divider, Grid, Stack, Typography } from "@mui/material";
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 
-import { IMatchResumeProps } from '../Interfaces/match'
-import { ITeam, IStandingTeam } from "../Interfaces/team";
+import { usePublicContext } from "../Public/PublicApp";
 
-import { fetchTeams, fetchStandingTeams, IApiFetchTeamsParams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
+import { IStandingTeam } from "../Interfaces/team";
+import { IMatch, IMatchLineup } from "../Interfaces/match";
+
+import { fetchStandingTeams, IApiFetchStandingTeamsParams } from "../ApiCall/teams";
+import { IApiFetchMatchLineups, fetchMatchLineups } from "../ApiCall/matches";
 
 import Scoreboard from './Scoreboard';
 import BestMatchPlayers from '../Players/BestMatchPlayers'
 import LoaderInfo from "../Generic/LoaderInfo";
 
+interface IMatchResumeProps {
+  title: string;
+  match: IMatch | null;
+}
 
 function MatchResume(props: IMatchResumeProps) {
   
   const { title, match } = props;
 
-  const [apiError, changeApiError] = useState("");
-  const [teamHome, setTeamHome] = useState<ITeam | null>(null);
-  const [teamAway, setTeamAway] = useState<ITeam | null>(null);
-  const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
-  
-  const isLoaded = teamHome !== null && teamAway !== null && standingTeams.length > 0;
+  const { leagueSeasonTeams } = usePublicContext();
 
+  const [apiError, changeApiError] = useState("");
+  const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
+  const [matchLineups, setMatchLineups] = useState<IMatchLineup[]>([]);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(match === null);
+
+  const teamHome = leagueSeasonTeams.find((team) => team.id === match?.idTeamHome) || null;
+  const teamAway = leagueSeasonTeams.find((team) => team.id === match?.idTeamAway) || null;
+  
   useEffect(() => {
-    const listTeamIds = [match.idTeamHome, match.idTeamAway]
-    const paramsFetchTeams: IApiFetchTeamsParams = {
-      teamIds: listTeamIds,
+    if( match === null ) {
+      return;
     }
+
+    let newError: string = '';
+    let newTeamStanding: IStandingTeam[] = [];
+    let newMatchLineups: IMatchLineup[] = [];
+
+    const listTeamIds = [match.idTeamHome, match.idTeamAway]
+    
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
       teamIds: listTeamIds,
       seasonId: match.idSeason
     }
-    Promise.all([fetchStandingTeams(paramsFetchStandingTeams), fetchTeams(paramsFetchTeams)])
+    const paramsMatchLineups:IApiFetchMatchLineups = {
+      matchId:match.id,
+      leagueSeasonIds:[match.idSeason]
+    }
+    Promise.all([fetchStandingTeams(paramsFetchStandingTeams), fetchMatchLineups(paramsMatchLineups)])
       .catch((error)=>{
-        changeApiError(error);
+        newError = error;
       })
       .then((values) => {
         if( ! values ) return;
 
-        batch(() => {
-          setStandingTeams(values[0].data)
-          values[1].data.forEach((team: ITeam) => {
-            if ( team.id === match.idTeamHome) {
-              setTeamHome(team);
-            }
-            else {
-              setTeamAway(team);
-            }
-          })
-        })
+        newTeamStanding = values[0].data;
+        
+        newMatchLineups = values[1].data;
       })
       .finally(()=>{
-
+        batch(() => {
+          changeApiError(newError);
+          setStandingTeams(newTeamStanding);
+          setMatchLineups(newMatchLineups);
+          setDataLoaded(true);
+        })
+        
       });
     
   }, [match])
@@ -62,7 +80,7 @@ function MatchResume(props: IMatchResumeProps) {
 
 
   return (
-    <Card>
+    <Card component={Box} m={3} mt={0} raised={true}>
       <CardContent>
         <Grid container spacing={1} alignItems="baseline" justifyContent="center">
           <Grid item><SportsBaseballIcon color="primary"/></Grid>
@@ -75,37 +93,45 @@ function MatchResume(props: IMatchResumeProps) {
       </CardContent>
       
       <Divider />
-
-      <CardContent>
-        <Stack spacing={3}>
-          <LoaderInfo
-            isLoading={isLoaded}
-            msgError={apiError}
-          />
-          { isLoaded ? (
-            <Scoreboard
-              teamHome={teamHome}
-              teamAway={teamAway}
-              match={match}
-              standingTeams={standingTeams}
-              hasLinkMatchDetails={true}
-            /> 
-          ) : ''}
-          <Typography variant="h3" textAlign="center">Best players this {match.isCompleted === 0 ? 'season' : 'game'}</Typography>
-          { isLoaded ? (
-            <BestMatchPlayers 
-              match={match}
-              team={teamHome}
+      { match === null 
+      ?
+        <LoaderInfo
+          msgWarning="No match found"
+        />
+      : 
+        <CardContent>
+          <Stack spacing={3}>
+            <LoaderInfo
+              isLoading={dataLoaded}
+              msgError={apiError}
             />
-          ) : ''}
-          { isLoaded ? (
-            <BestMatchPlayers 
-              match={match}
-              team={teamAway}
-            />
-          ) : ''}
-        </Stack>
-      </CardContent>
+            { dataLoaded && teamHome && teamAway ? (
+              <>
+                <Scoreboard
+                  teamHome={teamHome}
+                  teamAway={teamAway}
+                  match={match}
+                  standingTeams={standingTeams}
+                  hasLinkMatchDetails={true}
+                /> 
+                <Divider />
+                <Typography variant="h3" textAlign="center">{`Best players this ` + ( match?.isCompleted === 0 ? 'season' : 'game' )}</Typography>
+                <BestMatchPlayers 
+                  match={match}
+                  team={teamHome}
+                  matchLineups={matchLineups}
+                />
+                <BestMatchPlayers 
+                  match={match}
+                  matchLineups={matchLineups}
+                  team={teamAway}
+                />
+              </>
+            ) : ''}
+            
+          </Stack>
+        </CardContent>
+      }
     </Card>
   )
 }

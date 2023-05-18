@@ -3,7 +3,8 @@ import { batch } from "react-redux";
 
 import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
 
-import { IClosestMatchesProps, IMatch } from "../Interfaces/match";
+import { IMatch } from "../Interfaces/match";
+import { ILeagueSeason } from "../Interfaces/league";
 
 import { IApiFetchMatchesParams, fetchMatches } from "../ApiCall/matches";
 
@@ -11,6 +12,9 @@ import LoaderInfo from "../Generic/LoaderInfo";
 import MatchResume from "./MatchResume";
 
 
+interface IClosestMatchesProps {
+  leagueSeason: ILeagueSeason;
+}
 
 export default function ClosestMatches(props: IClosestMatchesProps) {
 
@@ -19,12 +23,13 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
   const [apiError, changeApiError] = useState<string>('');
   const [matchPast, setMatchPast] = useState<IMatch | null>(null);
   const [matchUpcoming, setMatchUpcoming] = useState<IMatch | null>(null);
-  const [matchesLoaded, setMatchesLoaded] = useState<boolean>(false);
-
-  const isLoaded = matchesLoaded ? true : false;
-
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
   useEffect( () => {
+    let newError: string = '';
+    let newMatchPast: IMatch | null = null;
+    let newMatchUpcoming: IMatch | null = null;
+
     const queryPastParams: IApiFetchMatchesParams = {
       isPast: true,
       valueCompleted: 1,
@@ -39,19 +44,22 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
     }
     Promise.all([fetchMatches(queryPastParams), fetchMatches(queryUpcomingParams)])
       .catch((error)=>{
-        changeApiError(error);
+        newError = error;
+        
       })
       .then((values) => {
         if( ! values ) return;
 
-        batch(() => {
-          setMatchPast(values[0].data[0] || null)
-          setMatchUpcoming(values[1].data[0] || null);
-          setMatchesLoaded(true);
-        })
+        newMatchPast = values[0].data[0] || null;
+        newMatchUpcoming = values[1].data[0] || null;
       })
       .finally(()=>{
-        setMatchesLoaded(true);
+        batch(() => {
+          changeApiError(newError);
+          setMatchPast(newMatchPast)
+          setMatchUpcoming(newMatchUpcoming);
+          setDataLoaded(true);
+        });
       });
     
   }, [leagueSeason])
@@ -59,37 +67,33 @@ export default function ClosestMatches(props: IClosestMatchesProps) {
   return (
     <>
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
-      { ( matchesLoaded && ( matchPast || matchUpcoming ) ) ? (
-        <Paper component={Box} m={3} p={3}>
+      { dataLoaded ? 
+        <Paper component={Box} m={3} pt={3} pb={3}>
           <Stack spacing={3} alignItems="center">
             <Typography variant="h1">
               Closest Match
             </Typography>
-            <Grid container justifyContent="space-around" rowSpacing={3}>
-              { matchPast && (
-                <Grid item sm={12} md={6} sx={{maxWidth:'100%'}}>
-                  <MatchResume 
-                    title="Latest match"
-                    match={matchPast}
-                  />
-                </Grid>
-              )}
-              { matchUpcoming && (
-                <Grid item sm={12}  md={6} sx={{maxWidth:'100%'}}>
-                  <MatchResume 
-                    title="Upcoming match"
-                    match={matchUpcoming}
-                  />
-                </Grid>
-              )}
+            <Grid container rowSpacing={3}>
+              <Grid item sm={12} md={6} sx={{maxWidth:'100%'}}>
+                <MatchResume 
+                  title="Latest match"
+                  match={matchPast}
+                />
+              </Grid>
+              <Grid item sm={12}  md={6} sx={{maxWidth:'100%'}}>
+                <MatchResume 
+                  title="Upcoming match"
+                  match={matchUpcoming}
+                /> 
+              </Grid>
             </Grid>
           </Stack>
         </Paper>
-      ) : '' }
+      : '' }
       
     </>
   )

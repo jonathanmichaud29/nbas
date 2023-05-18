@@ -36,15 +36,6 @@ export interface IAdminMatchHeaderProps{
   teamAway: ITeam;
 }
 
-export interface IMatchResumeProps {
-  title: string;
-  match: IMatch;
-}
-
-export interface IClosestMatchesProps {
-  leagueSeason: ILeagueSeason;
-}
-
 export interface IMatchDetailsProps {
   // match: IMatch;
   matchEncounter: IMatchEncounter;
