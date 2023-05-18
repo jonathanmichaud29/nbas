@@ -59,10 +59,12 @@ export interface IStandingTeam {
   nbNulls: number;
 }
 
-
-export interface IAllTeamsStandingProps {
-  /* standingTeams: IStandingTeam[]; */
-  teams: ITeam[];
+export const defaultStandingTeam:IStandingTeam = {
+  id: 0,
+  nbGamePlayed: 0,
+  nbWins: 0,
+  nbLosts: 0,
+  nbNulls: 0,
 }
 
 export interface IAllTeamsStatsProps {

@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from 
 
 import { usePublicContext } from "../Public/PublicApp";
 
-import { IAllTeamsStandingProps, IStandingTeam }  from '../Interfaces/team'
+import { IStandingTeam, ITeam, defaultStandingTeam }  from '../Interfaces/team'
 
 import { IApiFetchStandingTeamsParams, fetchStandingTeams } from "../ApiCall/teams";
 
@@ -16,6 +16,10 @@ import { getTeamName } from '../utils/dataAssociation'
 import { sxGroupStyles } from '../utils/theme';
 import { quickLinkTeam } from '../utils/constants';
 
+interface IAllTeamsStandingProps {
+  /* standingTeams: IStandingTeam[]; */
+  teams: ITeam[];
+}
 
 function AllTeamsStanding(props: IAllTeamsStandingProps){
 
@@ -30,15 +34,27 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
   useEffect(() => {
     let newError: string = '';
     let newStandingTeams: IStandingTeam[] = [];
-
+    const listTeamIds = teams.map((team) => team.id);
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
-      teamIds: teams.map((team) => team.id) || [0],
+      teamIds: listTeamIds || [0],
       seasonId: leagueSeason.id
     }
     fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
         newStandingTeams = response.data;
-        newStandingTeams.sort((a,b) => b.nbWins - a.nbWins || a.nbGamePlayed - b.nbGamePlayed );
+        if( newStandingTeams.length < teams.length ){
+          newStandingTeams = teams.map((team) => {
+            const standingTeam = newStandingTeams.find((standingTeam) => standingTeam.id === team.id) || null
+            if( standingTeam !== null ){
+              return standingTeam;
+            }
+            else {
+              return {...defaultStandingTeam, id:team.id}
+            }
+            
+          })
+        }
+        newStandingTeams.sort((a,b) => b.nbWins - a.nbWins || b.nbGamePlayed - a.nbGamePlayed );
       })
       .catch(error => {
         newError = error;
@@ -81,9 +97,10 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
                   <TableBody>
                     {standingTeams.map((standingTeam) => {
                       const teamName = getTeamName(standingTeam.id, teams);
+                      const linkTeamDetails = `${quickLinkTeam.link}/${standingTeam.id}`.replace(':idSeason', leagueSeason.id.toString())
                       return (
                         <TableRow key={`team-standing-${standingTeam.id}`}>
-                          <TableCell><Link href={`${quickLinkTeam.link}/${standingTeam.id}`}>{teamName}</Link></TableCell>
+                          <TableCell><Link href={linkTeamDetails}>{teamName}</Link></TableCell>
                           <TableCell align="center">{standingTeam.nbGamePlayed}</TableCell>
                           <TableCell align="center">{standingTeam.nbWins}</TableCell>
                           <TableCell align="center">{standingTeam.nbLosts}</TableCell>
