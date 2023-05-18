@@ -104,13 +104,14 @@ export const playerExtendedStatsColumns: GridColDef[] = [
     field: 'actions',
     headerName: 'Links',
     renderCell: (params: GridRenderCellParams<any>) => {
+      let linkProfile = `${quickLinkPlayer.link}/${params.row.id}`.replace(':idSeason', params.row.idLeagueSeason);
       return (
         <IconButton 
           key={`action-view-player-${params.row.id}`}
           aria-label={`${params.row.playerName} Profile`}
           title={`${params.row.playerName} Profile`}
           >
-          <Link href={`${quickLinkPlayer.link}/${params.row.id}`}>
+          <Link href={linkProfile}>
             <AccountBoxIcon />
           </Link>
         </IconButton>

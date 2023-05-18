@@ -242,9 +242,10 @@ export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) =
   return combinedLineupStats;
 }
 
-export const generateDatagridPlayerRows = (allStats: IBattingStatsExtended[], listPlayers: IPlayer[]) => {
+export const generateDatagridPlayerRows = (allStats: IBattingStatsExtended[], listPlayers: IPlayer[], idLeagueSeason: number) => {
   return allStats.map((battingStats) => {
     return {
+      idLeagueSeason: idLeagueSeason,
       id: battingStats.id,
       playerName: getPlayerName(battingStats.id, listPlayers),
       atBats: battingStats.atBats,

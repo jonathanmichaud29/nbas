@@ -32,7 +32,7 @@ function TeamMatchResume(props: ITeamMatchResumeProps) {
   }, [matchLineups])
 
   const playersStats = getCombinedPlayersStats(matchLineups);
-  const rows = generateDatagridPlayerRows(playersStats, players)
+  const rows = generateDatagridPlayerRows(playersStats, players, match.idSeason)
   
   
   return (

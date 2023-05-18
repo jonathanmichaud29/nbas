@@ -3,7 +3,11 @@ import { batch } from 'react-redux';
 
 import { Grid, Stack, Typography } from "@mui/material";
 
-import { IBattingStatsExtended, IYearStatsProps, defaultBattingStatsExtended } from '../Interfaces/stats';
+import { usePublicContext } from '../Public/PublicApp';
+
+import { IBattingStatsExtended, defaultBattingStatsExtended } from '../Interfaces/stats';
+import { IMatchLineup } from '../Interfaces/match';
+import { IPlayer } from '../Interfaces/player';
 
 import StatBatResults from '../Stats/StatBatResults';
 import StatBattingPercentage from '../Stats/StatBattingPercentage';
@@ -12,10 +16,19 @@ import CustomDataGrid from '../Generic/CustomDataGrid';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns'
 import { generateDatagridPlayerRows, getCombinedPlayersStats, getCombinedStats } from '../utils/statsAggregation'
 
+interface IYearStatsProps {
+  matchLineups:   IMatchLineup[];
+  players:        IPlayer[];
+  title:          string;
+}
 
 function YearStats(props: IYearStatsProps) {
 
   const {matchLineups, players, title} = props;
+
+  const { leagueSeason } = usePublicContext();
+
+  const idLeagueSeason = leagueSeason.id;
 
   const [allStats, setAllStats] = useState<IBattingStatsExtended>(defaultBattingStatsExtended);
   const [allPlayerStats, setAllPlayerStats] = useState<IBattingStatsExtended[]>([]);
@@ -32,7 +45,7 @@ function YearStats(props: IYearStatsProps) {
     
   }, [matchLineups]);
 
-  const rows = generateDatagridPlayerRows(allPlayerStats, players)
+  const rows = generateDatagridPlayerRows(allPlayerStats, players, idLeagueSeason)
   
   if( ! dataLoaded) return (<></>);
   return (

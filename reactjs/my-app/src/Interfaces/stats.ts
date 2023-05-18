@@ -2,11 +2,7 @@ import { IMatch, IMatchLineup } from './match'
 import { IPlayer } from './player'
 import { ITeam } from './team';
 
-export interface IYearStatsProps {
-  matchLineups:   IMatchLineup[];
-  players:        IPlayer[];
-  title:          string;
-}
+
 
 export interface IBattingPercentageStats {
   battingAverage: number;

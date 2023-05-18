@@ -85,7 +85,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     
     // Aggregate Match Data
     const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchEncounter.matchLineups);
-    const matchRows = generateDatagridPlayerRows(allStats, matchEncounter.players);
+    const matchRows = generateDatagridPlayerRows(allStats, matchEncounter.players, matchEncounter.match.idSeason);
     
 
     // Aggregate Home Team data
@@ -93,7 +93,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const homeTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const homePlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamHomeLineups);
-    const homeRows = generateDatagridPlayerRows(homePlayerStats, matchEncounter.players);
+    const homeRows = generateDatagridPlayerRows(homePlayerStats, matchEncounter.players, matchEncounter.match.idSeason);
     
     
     // Aggregate Away Team data
@@ -101,7 +101,7 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
     teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
     const awayTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
     const awayPlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamAwayLineups);
-    const awayRows = generateDatagridPlayerRows(awayPlayerStats, matchEncounter.players);
+    const awayRows = generateDatagridPlayerRows(awayPlayerStats, matchEncounter.players, matchEncounter.match.idSeason);
 
     batch(() => {
       setMatchRows(matchRows);
