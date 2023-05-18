@@ -4,9 +4,10 @@ import { batch } from 'react-redux';
 import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Typography  } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 
+import { usePublicContext } from '../Public/PublicApp';
+
 import { IMatch } from '../Interfaces/match';
 import { ITeam } from '../Interfaces/team';
-import { ILeagueSeason} from '../Interfaces/league';
 
 import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches'
 
@@ -16,18 +17,21 @@ import { extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter'
 import { quickLinkMatch } from '../utils/constants';
 
 interface ISeasonMatchesProps{
-  leagueSeason: ILeagueSeason;
-  listTeams: ITeam[];
+  
 }
 
 function SeasonMatches(props: ISeasonMatchesProps) {
 
-  const { leagueSeason, listTeams } = props;
+  const { leagueSeason, leagueSeasonTeams } = usePublicContext();
+
+
 
   const [apiError, changeApiError] = useState("");
   const [listMatches, setListMatches] = useState<IMatch[]>([]);
   
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+
+  const baseLinkMatchDetails = `${quickLinkMatch.link}/`.replace(':idSeason', leagueSeason.id.toString())
 
   listMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -66,13 +70,13 @@ function SeasonMatches(props: ISeasonMatchesProps) {
         { listMatches.map((match: IMatch) => {
           let listActions = [];
           
-          const teamHome = listTeams.find((team: ITeam) => team.id === match.idTeamHome);
-          const teamAway = listTeams.find((team: ITeam) => team.id === match.idTeamAway);
+          const teamHome = leagueSeasonTeams.find((team: ITeam) => team.id === match.idTeamHome) || null;
+          const teamAway = leagueSeasonTeams.find((team: ITeam) => team.id === match.idTeamAway) || null;
           const hourDate = extractHourFromDate(match.date);
           const currentMatchCalendarDay = extractCalendarDay(match.date);
           const isNewDay = currentMatchCalendarDay !== lastMatchCalendarDay;
           lastMatchCalendarDay = currentMatchCalendarDay;
-          if( teamHome === undefined || teamAway === undefined) return "";
+          if( teamHome === null || teamAway === null ) return "";
 
           let actionLabel;
           if( match.isCompleted ){
@@ -82,7 +86,7 @@ function SeasonMatches(props: ISeasonMatchesProps) {
                 key={`action-view-match-${match.id}`}
                 aria-label={actionLabel}
                 title={actionLabel}
-                href={`${quickLinkMatch.link}/${match.id}`}
+                href={`${baseLinkMatchDetails}${match.id}`}
                 >
                 <InfoIcon />
               </IconButton>
@@ -146,8 +150,6 @@ function SeasonMatches(props: ISeasonMatchesProps) {
         />
         {htmlMatches}
       </Stack>
-
-      
     </Paper>
   )
 }
