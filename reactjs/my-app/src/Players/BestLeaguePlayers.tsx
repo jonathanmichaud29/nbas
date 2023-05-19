@@ -24,7 +24,7 @@ interface IBestLeaguePlayersProps {
 function BestLeaguePlayers(props: IBestLeaguePlayersProps) {
   const { leagueSeason } = props;
 
-  const { league, leaguePlayers } = usePublicContext();
+  const { leaguePlayers } = usePublicContext();
 
   const [apiError, changeApiError] = useState("");
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);

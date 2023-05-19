@@ -1,6 +1,6 @@
 import { IPlayer } from './player';
 import { IMatch, IMatchLineup } from './match';
-import { ILeague, ILeagueSeason } from './league';
+import { ILeagueSeason } from './league';
 
 export interface ITeam{
   id: number;

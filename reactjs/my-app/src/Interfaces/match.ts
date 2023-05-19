@@ -1,6 +1,6 @@
 import { ITeam } from './team'
 import { IPlayer } from './player'
-import { ILeague, ILeagueSeason } from './league';
+import { ILeague } from './league';
 import { IBattingStatsExtended } from './stats';
 
 export interface IMatch{
@@ -34,11 +34,6 @@ export interface IAdminMatchHeaderProps{
   match: IMatch;
   teamHome: ITeam;
   teamAway: ITeam;
-}
-
-export interface IMatchDetailsProps {
-  // match: IMatch;
-  matchEncounter: IMatchEncounter;
 }
 
 export interface IListMatchProps{
@@ -88,12 +83,6 @@ export interface IMatchPlayer {
   lineupPlayer: IMatchLineup
 }
 
-export interface IMatchTeamStatsProps{
-  match: IMatch;
-  team: ITeam;
-  teamStats: IBattingStatsExtended;
-  dataGridRows: any;
-}
 
 export interface ITeamMatchLineupProps {
   isAdmin?: boolean;

@@ -2,14 +2,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { batch } from 'react-redux';
 
-import { Alert, Box, Button, Paper, Stack } from "@mui/material";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 
 import { useAdminData } from '../Public/PublicApp';
 
 import { IStandingTeam } from '../Interfaces/team'
-import { IMatchDetailsProps } from '../Interfaces/match'
-import { IBattingStatsExtended, defaultBattingStatsExtended } from '../Interfaces/stats';
+import { IBattingStatsExtended } from '../Interfaces/stats';
+import { IMatchEncounter } from '../Interfaces/match';
 
 import { fetchStandingTeams, IApiFetchStandingTeamsParams } from '../ApiCall/teams';
 
@@ -19,20 +19,21 @@ import CustomDataGrid from '../Generic/CustomDataGrid';
 import MatchTeamStats from './MatchTeamStats';
 
 import { filterTeamLineups } from '../utils/dataFilter';
-import { createDateReadable } from '../utils/dateFormatter';
-import { setMetas } from '../utils/metaTags';
 import { generateDatagridPlayerRows, getCombinedPlayersStats, getCombinedTeamsStats } from '../utils/statsAggregation';
 import { playerExtendedStatsColumns, defaultStateStatsColumns } from '../utils/dataGridColumns';
 
 
-
+interface IMatchDetailsProps {
+  matchEncounter: IMatchEncounter;
+}
 function ViewMatchDetails(props: IMatchDetailsProps) {
 
   const { matchEncounter } = props;
   
   const {isAdmin} = useAdminData();
-  const [apiError, changeApiError] = useState("");
+  const [apiError, changeApiError] = useState<string>("");
   const [standingTeams, setStandingTeams] = useState<IStandingTeam[]>([]);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
   const [matchRows, setMatchRows] = useState<Array<{}>>([]);
   const [homeRows, setHomeRows] = useState<Array<{}>>([]);
@@ -41,65 +42,57 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   const [teamHomeStats, setTeamHomeStats] = useState<IBattingStatsExtended | null>(null);
   const [teamAwayStats, setTeamAwayStats] = useState<IBattingStatsExtended | null>(null);
 
-  
-  const isLoaded =  ( matchEncounter && standingTeams !== null && teamHomeStats !== null && teamAwayStats !== null &&
-    matchRows !== null && homeRows !== null && awayRows !== null ? true : false );
 
-
-  useMemo(() => {
-    
-    /**
-     * Fetch Teams Standing
-     */
+  /**
+   * Fetch Teams Standing
+   */
+  useEffect(() => {
+    let newError: string = '';
+    let newStandingTeams: IStandingTeam[] = []
     const paramsFetchStandingTeams: IApiFetchStandingTeamsParams = {
       teamIds: [matchEncounter.teamHome.id, matchEncounter.teamAway.id],
       seasonId: matchEncounter.match.idSeason
     }
     fetchStandingTeams(paramsFetchStandingTeams)
       .then(response => {
-        setStandingTeams(response.data)
+        newStandingTeams = response.data || []
+        
       })
       .catch(error => {
-        changeApiError(error);
+        newError = error;
+        
       })
       .finally(() => {
-        
+        batch(() => {
+          setStandingTeams(newStandingTeams)
+          changeApiError(newError);
+          setDataLoaded(true);
+        })
       });
-  }, [matchEncounter])
-
-  /**
-   * Set Meta Tags values
-   */
-  useEffect(() => {
-    if( ! matchEncounter.teamHome || ! matchEncounter.teamAway ) return;
-    setMetas({
-      title:`Match summary - ${matchEncounter.teamHome.name} receives ${matchEncounter.teamAway.name}`,
-      description:`NBAS match summary ${matchEncounter.teamHome.name} receives ${matchEncounter.teamAway.name} on date ${createDateReadable(matchEncounter.match.date)}`
-    });
   }, [matchEncounter])
 
   /**
    * Aggregate data for DataGrid and Charts
    */
-  useEffect(() => {
+  useMemo(() => {
     
-    // Aggregate Match Data
+    // Match Data
     const allStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(matchEncounter.matchLineups);
     const matchRows = generateDatagridPlayerRows(allStats, matchEncounter.players, matchEncounter.match.idSeason);
     
 
-    // Aggregate Home Team data
+    // Home Team data
     const teamHomeLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamHome.id);
     teamHomeLineups.sort((a,b) => a.hitOrder - b.hitOrder);
-    const homeTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
+    const homeTeamStats: IBattingStatsExtended | null = getCombinedTeamsStats(teamHomeLineups).find((battingStat) => battingStat.id !== undefined) || null;
     const homePlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamHomeLineups);
     const homeRows = generateDatagridPlayerRows(homePlayerStats, matchEncounter.players, matchEncounter.match.idSeason);
     
     
-    // Aggregate Away Team data
+    // Away Team data
     const teamAwayLineups = filterTeamLineups(matchEncounter.matchLineups, matchEncounter.teamAway.id);
     teamAwayLineups.sort((a,b) => a.hitOrder - b.hitOrder);
-    const awayTeamStats: IBattingStatsExtended = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || Object.assign({}, defaultBattingStatsExtended);
+    const awayTeamStats: IBattingStatsExtended | null = getCombinedTeamsStats(teamAwayLineups).find((battingStat) => battingStat.id !== undefined) || null;
     const awayPlayerStats: Array<IBattingStatsExtended> = getCombinedPlayersStats(teamAwayLineups);
     const awayRows = generateDatagridPlayerRows(awayPlayerStats, matchEncounter.players, matchEncounter.match.idSeason);
 
@@ -117,12 +110,12 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
   return (
     <>
       <LoaderInfo
-        isLoading={isLoaded}
+        isLoading={dataLoaded}
         msgError={apiError}
         hasWrapper={true}
       />
       
-      { isLoaded ? (
+      { dataLoaded ? (
         <Paper component={Box} p={3} m={3}>
           <Stack spacing={3} alignItems="center" >
             <Scoreboard 
@@ -132,47 +125,48 @@ function ViewMatchDetails(props: IMatchDetailsProps) {
               teamHome={matchEncounter.teamHome}
               titleLevel={'h1'}
             />
-            { isAdmin && (
+            { isAdmin 
+            ? 
               <Button 
                 variant="contained" 
                 startIcon={<EditIcon />} 
                 href={`/admin/match/${matchEncounter.match.id}`}
               >Edit match</Button>
-            )}
-            { matchRows.length > 0 && (
-              <CustomDataGrid
-                pageSize={10}
-                rows={matchRows}
-                columns={playerExtendedStatsColumns}
-                initialState={defaultStateStatsColumns}
-                getRowId={(row:any) => row.id + "-match-" + matchEncounter.match.id}
-              />
-            )}
+            : ''}
+            { matchRows.length > 0 
+            ? 
+              <>
+                <Typography variant="h2" textAlign="center">Match statistics</Typography>
+                <CustomDataGrid
+                  pageSize={10}
+                  rows={matchRows}
+                  columns={playerExtendedStatsColumns}
+                  initialState={defaultStateStatsColumns}
+                  getRowId={(row:any) => row.id + "-match-" + matchEncounter.match.id}
+                />
+              </>
+            : ''}
           </Stack>
         </Paper>
       ) : ''}
       
-      { teamHomeStats !== null && homeRows.length > 0 ? (
-        <MatchTeamStats
-          match={matchEncounter.match}
-          team={matchEncounter.teamHome}
-          teamStats={teamHomeStats}
-          dataGridRows={homeRows}
-        />
-      ) : (
-        <Alert severity='info'>No stats found for home team</Alert>
-      )}
-
-      { teamAwayStats !== null && awayRows.length > 0 ? (
-        <MatchTeamStats
-          match={matchEncounter.match}
-          team={matchEncounter.teamAway}
-          teamStats={teamAwayStats}
-          dataGridRows={awayRows}
-        />
-      ) : (
-        <Alert severity='info'>No stats found for away team</Alert>
-      )}
+      { dataLoaded
+      ? 
+        <>
+          <MatchTeamStats
+            match={matchEncounter.match}
+            team={matchEncounter.teamHome}
+            teamStats={teamHomeStats}
+            dataGridRows={homeRows}
+          />
+          <MatchTeamStats
+            match={matchEncounter.match}
+            team={matchEncounter.teamAway}
+            teamStats={teamAwayStats}
+            dataGridRows={awayRows}
+          />
+        </>
+      : ''}
     
     </>
   )
