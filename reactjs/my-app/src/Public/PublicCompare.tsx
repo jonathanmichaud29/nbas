@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { usePublicContext } from "./PublicApp";
 
+import Breadcrumb from "../Menu/Breadcrumb";
+import PublicMenu from "../Menu/PublicMenu";
 import ToolStats from "../Tools/ToolStats";
 import ToolCategoryCompare, { ICompareCategory } from "../Tools/ToolCategoryCompare";
 
@@ -10,12 +12,15 @@ import { setMetas } from "../utils/metaTags";
 
 export default function PublicCompare(){
   
-  const { leagueSeason } = usePublicContext();
+  const { league, leagueSeason } = usePublicContext();
 
-  setMetas({
-    title:`Compare Stats`,
-    description:`Compare statistics betweens teams or players`
-  });
+  useMemo(() => {
+    setMetas({
+      title:`${league.name} Compare Stats for season ${leagueSeason.name}`,
+      description:`Compare ${league.name} statistics betweens teams or players for season ${leagueSeason.name}`
+    });
+  }, [league.name, leagueSeason.name])
+  
 
   /**
    * Comparaison Types : Team or Player
@@ -27,6 +32,9 @@ export default function PublicCompare(){
 
   return (
     <>
+      <PublicMenu />
+      <Breadcrumb />
+      
       <ToolCategoryCompare 
         category={selectedCategory}
         onCategoryChange={changeSelectedCategory}
@@ -34,7 +42,6 @@ export default function PublicCompare(){
       
       <ToolStats
         key={`tool-stats-${leagueSeason.id}-${selectedCategory}`}
-        leagueSeason={leagueSeason}
         category={selectedCategory}
       />
     </>

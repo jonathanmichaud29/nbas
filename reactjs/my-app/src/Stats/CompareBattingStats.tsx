@@ -4,10 +4,11 @@ import { Bar } from 'react-chartjs-2';
 
 import { Box, FormControlLabel, Grid, Switch, Typography } from '@mui/material';
 
-import { ICompareBattingStatsProps } from '../Interfaces/stats';
-
 import { colorHex, colorRgb } from '../utils/colorCodes'
 import { castNumber } from '../utils/castValues';
+import { IPlayer } from '../Interfaces/player';
+import { IBattingStatsExtended } from '../Interfaces/stats';
+import { ITeam } from '../Interfaces/team';
 
 ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend );
 
@@ -26,6 +27,11 @@ const statCumulativeOptions = [
   "RBI"
 ]
 
+interface ICompareBattingStatsProps {
+  battingStats: IBattingStatsExtended[];
+  players?:IPlayer[];
+  teams?:ITeam[];
+}
 function CompareBattingStats(props: ICompareBattingStatsProps){
 
   const { battingStats, players, teams } = props;
@@ -241,7 +247,7 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
   return (
     <>
       <Box width="100%">
-        <Typography variant="h2" textAlign="center">Percentage Filters</Typography>
+        <Typography variant="h2" textAlign="center">Average Stats</Typography>
         <Grid container flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="space-around">
           {statPercentageOptions.map((statOption, index) => {
             return (
@@ -267,7 +273,7 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
       </Box>
 
       <Box width="100%">
-        <Typography variant="h2" textAlign="center">Cumulative Filters</Typography>
+        <Typography variant="h2" textAlign="center">Cumulative Stats</Typography>
         <Grid container flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="space-around">
           {statCumulativeOptions.map((statOption, index) => {
             return (

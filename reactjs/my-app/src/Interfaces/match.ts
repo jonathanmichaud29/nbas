@@ -1,7 +1,6 @@
 import { ITeam } from './team'
 import { IPlayer } from './player'
 import { ILeague } from './league';
-import { IBattingStatsExtended } from './stats';
 
 export interface IMatch{
   id: number;

@@ -1,20 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { batch } from "react-redux";
 
 import { Autocomplete, TextField, Button } from "@mui/material";
 
-import { ILeagueSeason } from "../Interfaces/league";
+import { usePublicContext } from "../Public/PublicApp";
+
 import { IPlayer } from "../Interfaces/player";
 import { IBattingStatsExtended } from "../Interfaces/stats";
-
-import { IApiFetchMatchLineups, fetchMatchLineups } from "../ApiCall/matches";
-import { IApiFetchPlayersParams, fetchPlayers } from "../ApiCall/players";
+import { IMatchLineup } from "../Interfaces/match";
 
 import CompareBattingStats from "../Stats/CompareBattingStats";
 
 import { getCombinedPlayersStats } from "../utils/statsAggregation";
-import { IMatchLineup } from "../Interfaces/match";
-import { batch } from "react-redux";
 
 interface IFormInput {
   player: IPlayer;
@@ -24,73 +22,34 @@ const defaultValues = {
 }
 
 interface IToolComparePlayersProps{
-  leagueSeason: ILeagueSeason;
+  matchesLineups: IMatchLineup[];
 }
 
 export default function ToolComparePlayers(props: IToolComparePlayersProps) {
 
-  const { leagueSeason } = props;
+  const { matchesLineups } = props;
 
-  const [listPlayers, setListPlayers] = useState<IPlayer[]>([]);
+  const { leaguePlayers } = usePublicContext();
 
   const [selectedPlayers, setSelectedPlayers] = useState<IPlayer[]>([]);
-  const [listMatchLineups, setListMatchLineups] = useState<IMatchLineup[]>([]);
   const [playersBattingStats, setPlayersBattingStats] = useState<IBattingStatsExtended[]>([]);
-
-  useEffect(() => {
-    const paramsFetchPlayers: IApiFetchPlayersParams = {
-      allPlayers: true,
-      leagueIds:[leagueSeason.idLeague]
-    }
-    fetchPlayers(paramsFetchPlayers)
-      .then(response => {
-        batch(()=>{
-          setListPlayers(response.data);
-        })
-        
-      })
-      .catch(error => {
-        
-      })
-      .finally(() => {
-        
-      });
-  }, [leagueSeason])
-
-  
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( selectedPlayers.find((player) => player.id === data.player.id) !== undefined) return;
     const newSelectedPlayers = selectedPlayers.concat(data.player);
+    const listSelectedPlayerIds = newSelectedPlayers.map((player) => player.id) || []
     
-    const paramsMatchLineups: IApiFetchMatchLineups = {
-      leagueIds:[leagueSeason.idLeague],
-      playerIds:[data.player.id]
-    }
-    fetchMatchLineups(paramsMatchLineups)
-      .then(response => {
-        batch(() => {
-          setSelectedPlayers(newSelectedPlayers);
-          const newLineups = listMatchLineups.concat(response.data);
-          setListMatchLineups(newLineups);
-        })
-      })
-      .catch(error => {
-        
-      })
-      .finally(() => {
-        
-      });
+    const newListMatchLineups = matchesLineups.filter((matchLineup) => listSelectedPlayerIds.includes(matchLineup.idPlayer)) || []
+    const listBattingStats  = getCombinedPlayersStats(newListMatchLineups);
+
+    batch(() => {
+      setSelectedPlayers(newSelectedPlayers);
+      setPlayersBattingStats( listBattingStats );
+    })
   }
 
-  useEffect(() => {
-    const filteredLineups = listMatchLineups.filter((matchLineup) => matchLineup.idSeason === leagueSeason.id)
-    const listBattingStats  = getCombinedPlayersStats(filteredLineups);
-    setPlayersBattingStats( listBattingStats );
-  }, [leagueSeason.id, listMatchLineups])
-  
   return (
     <>
     
@@ -109,7 +68,7 @@ export default function ToolComparePlayers(props: IToolComparePlayersProps) {
               onChange(data);
               return data;
             }}
-            options={listPlayers}
+            options={leaguePlayers}
             getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.id === value.id }
             renderInput={(params) => (

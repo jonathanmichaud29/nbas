@@ -1,5 +1,4 @@
 import { IMatch, IMatchLineup } from './match'
-import { IPlayer } from './player'
 import { ITeam } from './team';
 
 
@@ -118,9 +117,4 @@ export interface IProgressionStatsProps {
   teams: ITeam[];
 }
 
-export interface ICompareBattingStatsProps {
-  battingStats: IBattingStatsExtended[];
-  players?:IPlayer[];
-  teams?:ITeam[];
-}
 
