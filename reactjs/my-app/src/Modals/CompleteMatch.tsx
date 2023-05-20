@@ -251,8 +251,8 @@ function CompleteMatch(props: ICompleteMatchProps) {
     
     /* setRequestStatus(true); */
     reinitializeApiMessages();
-
-    let updatedMatch = Object.assign({},match);
+    
+    let updatedMatch = {...match};
     updatedMatch.isCompleted = 1;
     updatedMatch.teamHomePoints = data.teamHomePoints;
     updatedMatch.teamAwayPoints = data.teamAwayPoints;
@@ -289,6 +289,7 @@ function CompleteMatch(props: ICompleteMatchProps) {
       match: updatedMatch,
       playersLineupsStats: formattedPlayerStats
     }
+    
     updateMatchLineup(paramsUpdateMatchLineup)
       .then((response) =>{
         changeApiSuccess(response.message);

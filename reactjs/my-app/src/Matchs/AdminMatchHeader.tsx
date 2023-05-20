@@ -15,7 +15,7 @@ import { createHumanDate } from '../utils/dateFormatter';
 import { quickLinkMatch } from '../utils/constants';
 
 export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
-console.info(props);
+
   const {match, teamHome, teamAway} = props;
 
   const stateAdminContext = useSelector((state: RootState) => state.adminContext )
