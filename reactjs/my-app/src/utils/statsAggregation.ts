@@ -46,6 +46,7 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
         onBasePercentage: 0,
         onBaseSluggingPercentage: 0,
         runsBattedIn: matchLineup.runsBattedIn,
+        plateAppearance: matchLineup.plateAppearance,
       });
     }
     else {
@@ -59,6 +60,7 @@ export const getCombinedPlayersStats = (matchLineups: IMatchLineup[]) => {
       playerFound.hitByPitch += matchLineup.hitByPitch;
       playerFound.sacrificeFly += matchLineup.sacrificeFly;
       playerFound.runsBattedIn += matchLineup.runsBattedIn;
+      playerFound.plateAppearance += matchLineup.plateAppearance;
     }
   })
   
@@ -89,6 +91,7 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
         onBasePercentage: 0,
         onBaseSluggingPercentage: 0,
         runsBattedIn: 0,
+        plateAppearance: matchLineup.plateAppearance,
       });
     }
     else {
@@ -102,6 +105,7 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
       teamFound.hitByPitch += matchLineup.hitByPitch;
       teamFound.sacrificeFly += matchLineup.sacrificeFly;
       teamFound.runsBattedIn += matchLineup.runsBattedIn;
+      teamFound.plateAppearance += matchLineup.plateAppearance;
     }
   })
   
@@ -111,7 +115,7 @@ export const getCombinedTeamsStats = (matchLineups: IMatchLineup[]) => {
 }
 
 export const getCombinedStats = (matchLineups: IMatchLineup[]) => {
-  let stats: IBattingStatsExtended = Object.assign({}, defaultBattingStatsExtended);
+  let stats: IBattingStatsExtended = {...defaultBattingStatsExtended};
   
   matchLineups.forEach((matchLineup) => {
     stats.atBats += matchLineup.atBats;
@@ -124,10 +128,28 @@ export const getCombinedStats = (matchLineups: IMatchLineup[]) => {
     stats.hitByPitch += matchLineup.hitByPitch;
     stats.sacrificeFly += matchLineup.sacrificeFly;
     stats.runsBattedIn += matchLineup.runsBattedIn;
+    stats.plateAppearance += matchLineup.plateAppearance;
   });
 
 
   setExtendedStats([stats]);
+
+  return stats;
+}
+
+export const getAverageBattingStats = (battingStats: IBattingStatsExtended[], nbEntities: number) => {
+  let stats: IBattingStatsExtended = {...defaultBattingStatsExtended};
+
+  battingStats.forEach((battingStat) => {
+    stats.battingAverage += battingStat.battingAverage;
+    stats.onBasePercentage += battingStat.onBasePercentage;
+    stats.onBaseSluggingPercentage += battingStat.onBaseSluggingPercentage;
+    stats.sluggingPercentage += battingStat.sluggingPercentage;
+  })
+  stats.battingAverage = stats.battingAverage / nbEntities;
+  stats.onBasePercentage = stats.onBasePercentage / nbEntities;
+  stats.onBaseSluggingPercentage = stats.onBaseSluggingPercentage / nbEntities;
+  stats.sluggingPercentage = stats.sluggingPercentage / nbEntities;
 
   return stats;
 }
@@ -156,7 +178,7 @@ export const setExtendedStats = (listPlayersStats: IBattingStatsExtended[]) => {
     }
 
     // On Base Percentage
-    playerStats.onBasePercentage = (nbHits + playerStats.walk + playerStats.hitByPitch) / ( playerStats.atBats + playerStats.hitByPitch + playerStats.sacrificeFly);
+    playerStats.onBasePercentage = (nbHits + playerStats.walk + playerStats.hitByPitch) / ( playerStats.atBats + playerStats.walk + playerStats.hitByPitch + playerStats.sacrificeFly);
     if( isNaN(playerStats.onBasePercentage) ) {
       playerStats.onBasePercentage = 0;
     }

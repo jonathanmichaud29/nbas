@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { batch } from "react-redux";
 
@@ -7,12 +7,12 @@ import { Autocomplete, TextField, Button } from "@mui/material";
 import { usePublicContext } from "../Public/PublicApp";
 
 import { IPlayer } from "../Interfaces/player";
-import { IBattingStatsExtended } from "../Interfaces/stats";
+import { IBattingStatsExtended, defaultBattingStatsExtended } from "../Interfaces/stats";
 import { IMatchLineup } from "../Interfaces/match";
 
 import CompareBattingStats from "../Stats/CompareBattingStats";
 
-import { getCombinedPlayersStats } from "../utils/statsAggregation";
+import { getAverageBattingStats, getCombinedPlayersStats } from "../utils/statsAggregation";
 
 interface IFormInput {
   player: IPlayer;
@@ -33,6 +33,7 @@ export default function ToolComparePlayers(props: IToolComparePlayersProps) {
 
   const [selectedPlayers, setSelectedPlayers] = useState<IPlayer[]>([]);
   const [playersBattingStats, setPlayersBattingStats] = useState<IBattingStatsExtended[]>([]);
+  const [leagueAverageBattingStats, setLeagueAverageBattingStats] = useState<IBattingStatsExtended>({...defaultBattingStatsExtended});
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
@@ -49,6 +50,13 @@ export default function ToolComparePlayers(props: IToolComparePlayersProps) {
       setPlayersBattingStats( listBattingStats );
     })
   }
+
+  useMemo(() => {
+    const listBattingStats = getCombinedPlayersStats(matchesLineups).filter((battingStats) => battingStats.plateAppearance !== 0);
+    const nbPlayers = listBattingStats.length;
+    const averageStats = getAverageBattingStats(listBattingStats, nbPlayers);
+    setLeagueAverageBattingStats(averageStats);
+  }, [matchesLineups])
 
   return (
     <>
@@ -91,6 +99,7 @@ export default function ToolComparePlayers(props: IToolComparePlayersProps) {
         <CompareBattingStats
           battingStats={playersBattingStats}
           players={selectedPlayers}
+          leagueStats={leagueAverageBattingStats}
         />
       )}
     </>

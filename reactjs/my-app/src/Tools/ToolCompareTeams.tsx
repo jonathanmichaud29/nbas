@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { batch } from "react-redux";
 
@@ -6,13 +6,13 @@ import { Autocomplete, TextField, Button } from "@mui/material";
 
 import { usePublicContext } from "../Public/PublicApp";
 
-import { IBattingStatsExtended } from "../Interfaces/stats";
+import { IBattingStatsExtended, defaultBattingStatsExtended } from "../Interfaces/stats";
 import { ITeam} from "../Interfaces/team";
 import { IMatchLineup } from "../Interfaces/match";
 
 import CompareBattingStats from "../Stats/CompareBattingStats";
 
-import { getCombinedTeamsStats } from "../utils/statsAggregation";
+import { getAverageBattingStats, getCombinedTeamsStats } from "../utils/statsAggregation";
 
 
 interface IFormInput {
@@ -33,6 +33,7 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
 
   const [selectedTeams, setSelectedTeams] = useState<ITeam[]>([]);
   const [teamsBattingStats, setTeamsBattingStats] = useState<IBattingStatsExtended[]>([]);
+  const [leagueAverageBattingStats, setLeagueAverageBattingStats] = useState<IBattingStatsExtended>({...defaultBattingStatsExtended});
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
   const { handleSubmit, control, formState: { errors } } = methods;
@@ -50,6 +51,13 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
       setTeamsBattingStats(listBattingStats);
     })
   }
+
+  useEffect(() => {
+    const listBattingStats  = getCombinedTeamsStats(matchesLineups).filter((battingStats) => battingStats.plateAppearance !== 0);
+    const nbTeams = listBattingStats.length;
+    const averageStats = getAverageBattingStats(listBattingStats, nbTeams);
+    setLeagueAverageBattingStats(averageStats);
+  }, [matchesLineups])
   
   
   return (
@@ -91,6 +99,7 @@ export default function ToolCompareTeams(props: IToolCompareTeamsProps) {
       { teamsBattingStats.length > 0 && (
         <CompareBattingStats
           battingStats={teamsBattingStats}
+          leagueStats={leagueAverageBattingStats}
           teams={selectedTeams}
         />
       )}

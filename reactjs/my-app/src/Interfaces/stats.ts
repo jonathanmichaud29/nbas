@@ -31,6 +31,7 @@ export interface IPlayerStats {
   hitByPitch: number;
   sacrificeFly: number;
   runsBattedIn: number;
+  plateAppearance: number;
 }
 
 export interface IBattingStatsExtended extends IPlayerStats, IBattingPercentageStats {};
@@ -47,6 +48,7 @@ export const defaultPlayerStats = {
   hitByPitch: 0,
   sacrificeFly: 0,
   runsBattedIn: 0,
+  plateAppearance: 0,
 }
 export const defaultBattingPercentageStats = {
   battingAverage: 0,

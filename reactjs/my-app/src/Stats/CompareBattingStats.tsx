@@ -29,12 +29,13 @@ const statCumulativeOptions = [
 
 interface ICompareBattingStatsProps {
   battingStats: IBattingStatsExtended[];
+  leagueStats: IBattingStatsExtended;
   players?:IPlayer[];
   teams?:ITeam[];
 }
 function CompareBattingStats(props: ICompareBattingStatsProps){
 
-  const { battingStats, players, teams } = props;
+  const { battingStats, leagueStats, players, teams } = props;
 
   const [shownPercentageStats, setShownPercentageStats] = useState<Array<number>>(statPercentageOptions.map((option, index) => index))
   const [shownCumulativeStats, setShownCumulativeStats] = useState<Array<number>>(statCumulativeOptions.map((option, index) => index))
@@ -49,6 +50,35 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
   })
   shownCumulativeStats.forEach((value) => {
     cumulativeLabels.push([statCumulativeOptions[value]])
+  })
+
+  let dataFiltered: Array<number> = [];
+  shownPercentageStats.forEach((statIndex) => {
+    const labelStat = statPercentageOptions[statIndex]
+    let statNumber = 0;
+    
+    switch(labelStat){
+      case "Batting Average": 
+        statNumber = leagueStats.battingAverage;
+        break;
+      case "On Base %": 
+        statNumber = leagueStats.onBasePercentage;
+        break; 
+      case "Slugging %": 
+        statNumber = leagueStats.sluggingPercentage;
+        break; 
+      case "On Base Slugging %": 
+        statNumber = leagueStats.onBaseSluggingPercentage;
+        break;
+    }
+    dataFiltered.push(statNumber);
+  })
+  percentageDatasets.push({
+    label: 'League',
+    data: dataFiltered,
+    borderColor: colorHex(0),
+    backgroundColor: colorRgb(0, 0.5),
+    
   })
   
   players?.forEach((player, index) => {
@@ -78,8 +108,8 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
       percentageDatasets.push({
         label: player.name,
         data: dataFiltered,
-        borderColor: colorHex(index),
-        backgroundColor: colorRgb(index, 0.5),
+        borderColor: colorHex(index+1),
+        backgroundColor: colorRgb(index+1, 0.5),
         
       })
 
@@ -112,8 +142,8 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
       cumulativeDatasets.push({
         label: player.name,
         data: dataFiltered,
-        borderColor: colorHex(index),
-        backgroundColor: colorRgb(index, 0.5),
+        borderColor: colorHex(index+1),
+        backgroundColor: colorRgb(index+1, 0.5),
         
       })
 
@@ -147,8 +177,8 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
       percentageDatasets.push({
         label: team.name,
         data: dataFiltered,
-        borderColor: colorHex(index),
-        backgroundColor: colorRgb(index, 0.5),
+        borderColor: colorHex(index+1),
+        backgroundColor: colorRgb(index+1, 0.5),
         
       })
 
@@ -181,8 +211,8 @@ function CompareBattingStats(props: ICompareBattingStatsProps){
       cumulativeDatasets.push({
         label: team.name,
         data: dataFiltered,
-        borderColor: colorHex(index),
-        backgroundColor: colorRgb(index, 0.5),
+        borderColor: colorHex(index+1),
+        backgroundColor: colorRgb(index+1, 0.5),
         
       })
 
