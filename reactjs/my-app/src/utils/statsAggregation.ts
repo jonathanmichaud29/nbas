@@ -207,7 +207,7 @@ export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) =
     let indexCombinedLineup = combinedLineupStats.findIndex((combineLineupStat) => combineLineupStat.lineupId === playerBatResult.lineupId)
     
     if( indexCombinedLineup === -1 ){
-      indexCombinedLineup = combinedLineupStats.push(Object.assign({},defaultPlayerLineupStats));
+      indexCombinedLineup = combinedLineupStats.push({...defaultPlayerLineupStats});
       indexCombinedLineup--;
       combinedLineupStats[indexCombinedLineup].lineupId = playerBatResult.lineupId;
     }
@@ -260,7 +260,7 @@ export const groupBatResultsPerLineup = (playerBatResults: IPlayerBatResult[]) =
     }
     return true;
   })
-  /* console.log(combinedLineupStats); */
+  
   return combinedLineupStats;
 }
 

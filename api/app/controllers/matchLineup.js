@@ -124,7 +124,7 @@ exports.updateMatchLineups = async (req, res, next) => {
 
   queries.push({
     query: "UPDATE matches SET isCompleted=?, teamHomePoints=?, teamAwayPoints=?, idTeamWon=?, idTeamLost=? WHERE id=?",
-    values: [myMatch.isCompleted, myMatch.teamHomePoints, myMatch.teamAwayPoints, idTeamWon, idTeamLost, myMatch.id]
+    values: [myMatch.isCompleted, castNumber(myMatch.teamHomePoints), castNumber(myMatch.teamAwayPoints), idTeamWon, idTeamLost, myMatch.id]
   })
   const queryLineup = "UPDATE match_lineup SET `hitOrder`=?, `atBats`=?, `single`=?, `double`=?, `triple`=?, `homerun`=?, `out`=?, "+
     "`hitByPitch`=?, `walk`=?, `strikeOut`=?, `stolenBase`=?, `caughtStealing`=?, `plateAppearance`=?, "+
@@ -141,7 +141,7 @@ exports.updateMatchLineups = async (req, res, next) => {
     })
     return true;
   })
-  
+  console.log(queries);
   const resultMainQuery = await mysqlQueryPoolMixUpdates(queries);
   
   let customMessage = '';
