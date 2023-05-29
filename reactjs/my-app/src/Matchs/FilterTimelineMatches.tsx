@@ -26,13 +26,12 @@ export default function FilterTimelineMatches(props: IFilterTimetlineMatchesProp
 
   return (
     <Paper
-      elevation={3}
       component={Box}
       square={true}
       variant="outlined"
-      mb={2} p={2} 
+      p={1} 
     >
-      <Stack direction='row' spacing={1} alignItems='center'
+      <Stack direction='row' flexWrap='wrap' spacing={1} alignItems='center'
       >
         <Typography pl={2}>Matches</Typography>
         <ToggleButtonGroup

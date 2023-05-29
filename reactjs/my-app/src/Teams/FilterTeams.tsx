@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Box, Checkbox, FormControlLabel, FormGroup, Grid, Paper, Switch } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, FormGroup, Grid, Paper, Stack, Switch } from "@mui/material";
 
 import { ITeam } from "../Interfaces/team";
 
@@ -42,45 +42,46 @@ export default function FilterTeams(props: IFilterTeamsProps){
 
   return (
     <Paper
-      elevation={3}
       component={Box}
       square={true}
       variant="outlined"
-      mb={2} p={2} 
+      p={1} 
     >
-      <FormControlLabel 
-        label="Select Teams"
-        labelPlacement="start"
-        control={
-          <Switch 
-            checked={activeFilter} 
-            onChange={handleActiveFilter}
-          />
-          }
-      />
-      { activeFilter 
-      ? 
-        <Grid container >
-          <Grid item>
-            <FormGroup row>
-              {teams.map((team) => {
-                const isChecked = listTeamIds.includes(team.id)
-                return (
-                  <FormControlLabel key={`team-${team.id}`} 
-                    label={team.name}
-                    control={
-                      <Checkbox 
-                        checked={isChecked}
-                        value={JSON.stringify(team)}
-                        onChange={handleTeamCheck}
-                      />
-                    }  />
-                )
-              })}
-            </FormGroup>
-          </Grid>
-        </Grid>
-      : '' }
+      <Stack direction={{xs:'column', sm:'row'}} alignItems='flex-start' flexWrap='wrap'>
+        <FormControlLabel 
+          label="Select Teams"
+          labelPlacement="start"
+          sx={{
+            marginLeft:0,
+            marginRight:3
+          }}
+          control={
+            <Switch 
+              checked={activeFilter} 
+              onChange={handleActiveFilter}
+            />
+            }
+        />
+        { activeFilter 
+        ? 
+              <FormGroup row >
+                {teams.map((team) => {
+                  const isChecked = listTeamIds.includes(team.id)
+                  return (
+                    <FormControlLabel key={`team-${team.id}`} 
+                      label={team.name}
+                      control={
+                        <Checkbox 
+                          checked={isChecked}
+                          value={JSON.stringify(team)}
+                          onChange={handleTeamCheck}
+                        />
+                      }  />
+                  )
+                })}
+              </FormGroup>
+        : '' }
+      </Stack>
     </Paper>
   )
 }
