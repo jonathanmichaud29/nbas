@@ -16,7 +16,7 @@ export default function PublicCompare(){
 
   useMemo(() => {
     setMetas({
-      title:`${league.name} Compare Stats for season ${leagueSeason.name}`,
+      title:`${league.name} Compare Stats - season ${leagueSeason.name}`,
       description:`Compare ${league.name} statistics betweens teams or players for season ${leagueSeason.name}`
     });
   }, [league.name, leagueSeason.name])

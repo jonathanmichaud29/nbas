@@ -29,6 +29,7 @@ import LoaderInfo from "../Generic/LoaderInfo";
 import { getPlayerName } from '../utils/dataAssociation';
 import { castNumber } from '../utils/castValues';
 import { groupBatResultsPerLineup } from "../utils/statsAggregation";
+import { sxGroupStyles } from '../utils/theme';
 
 
 
@@ -373,12 +374,7 @@ function CompleteMatch(props: ICompleteMatchProps) {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
-                    sx={{
-                      backgroundColor:"#e4e4e4",
-                      '&:hover':{
-                        backgroundColor:"#f1f1f1"
-                      }
-                    }}
+                    sx={sxGroupStyles.accordionSummary}
                   >
                     <Typography variant="h6">{playerName}</Typography>
                   </AccordionSummary>

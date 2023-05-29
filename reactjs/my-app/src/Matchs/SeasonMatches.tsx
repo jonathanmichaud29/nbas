@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { batch } from 'react-redux';
 
-import { Alert, Box, Card, CardActions, CardHeader, Grid, IconButton, Paper, Stack, Typography  } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, 
+  Card, CardActions, CardHeader, Grid,
+  Alert, Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { usePublicContext } from '../Public/PublicApp';
 
-import { IMatch } from '../Interfaces/match';
+import { IMatch, IMatchTimeline } from '../Interfaces/match';
 import { ITeam } from '../Interfaces/team';
 
 import { fetchMatches, IApiFetchMatchesParams } from '../ApiCall/matches'
 
 import LoaderInfo from '../Generic/LoaderInfo';
+import FilterTeams from '../Teams/FilterTeams';
+import FilterTimelineMatches from './FilterTimelineMatches';
 
 import { extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
-import { quickLinkMatch } from '../utils/constants';
+import { listMatchTimeline, quickLinkMatch } from '../utils/constants';
+import { sxGroupStyles } from '../utils/theme';
 
 interface ISeasonMatchesProps{
   
@@ -24,14 +30,18 @@ function SeasonMatches(props: ISeasonMatchesProps) {
 
   const { leagueSeason, leagueSeasonTeams } = usePublicContext();
 
-
-
   const [apiError, changeApiError] = useState("");
   const [listMatches, setListMatches] = useState<IMatch[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<ITeam[]>(leagueSeasonTeams);
+  const [matchTimeline, setMatchTimeline] = useState<IMatchTimeline>(listMatchTimeline[0]);
   
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
   const baseLinkMatchDetails = `${quickLinkMatch.link}/`.replace(':idSeason', leagueSeason.id.toString())
+  
+  const tomorrow = new Date();
+  const lowerDate = new Date().setHours(0,0,0,0);
+  const upperDate = new Date(tomorrow.setDate(tomorrow.getDate()+1)).setHours(0,0,0,0);
 
   listMatches.sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -59,15 +69,24 @@ function SeasonMatches(props: ISeasonMatchesProps) {
       
   }, [leagueSeason.id]);
   
+  const listSelectedTeamIds = selectedTeams.map((team) => team.id);
+  let filteredMatches = listMatches.filter((match) => listSelectedTeamIds.includes(match.idTeamAway) || listSelectedTeamIds.includes(match.idTeamHome))
+  if( matchTimeline.key === 'past') {
+    filteredMatches = filteredMatches.filter((match) => new Date(match.date).getTime() < upperDate)
+  } else if( matchTimeline.key === 'upcoming') {
+    filteredMatches = filteredMatches.filter((match) => new Date(match.date).getTime() > lowerDate)
+  }
+
+
   let lastMatchCalendarDay = '';
-  const htmlMatches = ( listMatches.length > 0 ? (
+  const htmlMatches = ( filteredMatches.length > 0 ? (
     <Box p={3} width="100%">
       <Grid container spacing={3} flexWrap="wrap"
         sx={{
           flexDirection:{xs:"column", sm:"row"}
         }}
       >
-        { listMatches.map((match: IMatch) => {
+        { filteredMatches.map((match: IMatch) => {
           let listActions = [];
           
           const teamHome = leagueSeasonTeams.find((team: ITeam) => team.id === match.idTeamHome) || null;
@@ -139,7 +158,22 @@ function SeasonMatches(props: ISeasonMatchesProps) {
   ) : (
     <Alert severity='info'>No match found in this league</Alert>
   ));
-  
+
+  const updateFilteredTeams = (activeFilter: boolean, teams: ITeam[]) => {
+    
+    if( activeFilter ) {
+      setSelectedTeams(teams);
+    }
+    else{
+      setSelectedTeams(leagueSeasonTeams);
+    }
+    
+  }
+
+  const updateSelectTimeline = (matchTimeline: IMatchTimeline) => {
+    setMatchTimeline(matchTimeline);
+  }
+
   return (
     <Paper component={Box} p={3} m={3}>
       <Stack spacing={3} alignItems="center">
@@ -148,6 +182,31 @@ function SeasonMatches(props: ISeasonMatchesProps) {
           isLoading={dataLoaded}
           msgError={apiError}
         />
+
+        <Accordion
+          sx={{
+            width:'100%'
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            id="toggle-filter-matches"
+            sx={sxGroupStyles.accordionSummary}
+          >
+            <Typography variant="h6">Filters</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <FilterTeams 
+              teams={leagueSeasonTeams}
+              cbSelectTeams={updateFilteredTeams}
+            />
+
+            <FilterTimelineMatches 
+              cbSelectTimeline={updateSelectTimeline}
+            /> 
+          </AccordionDetails>
+        </Accordion>
+
         {htmlMatches}
       </Stack>
     </Paper>

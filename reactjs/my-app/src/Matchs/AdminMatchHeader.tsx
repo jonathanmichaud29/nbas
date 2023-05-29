@@ -23,6 +23,10 @@ export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
   const currentLeagueName = stateAdminContext.currentLeague?.name || '';
   const currentSeasonName = stateAdminContext.currentLeagueSeason?.name || '';
 
+  const seasonId:string = stateAdminContext.currentLeagueSeason?.id.toString() || '';
+
+  const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+
   const listPlayers = useSelector((state: RootState) => state.players )
 
   /**
@@ -57,7 +61,7 @@ export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
             <Button 
               variant="outlined"
               startIcon={<PageviewIcon />} 
-              href={`${quickLinkMatch.link}/${match.id}`}
+              href={`${baseLinkPublicMatchDetails}/${match.id}`}
             >View match details</Button>
           )}
         </Stack>

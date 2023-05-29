@@ -1,3 +1,11 @@
+import { IMatchTimeline } from "../Interfaces/match";
+
+export const listMatchTimeline:IMatchTimeline[] = [
+  {key:'all', label:'All'},
+  {key:'past', label: "Past"},
+  {key:'upcoming', label: "Upcoming"}
+];
+
 interface ILinks {
   id: string;
   link : string;

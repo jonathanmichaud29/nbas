@@ -105,6 +105,11 @@ export interface IPlayerBatResult {
   batResults:EBatResult;
 }
 
+export interface IMatchTimeline {
+  key: string;
+  label: string;
+}
+
 export enum EBatResult {
   none = "None",
   single = "Single",

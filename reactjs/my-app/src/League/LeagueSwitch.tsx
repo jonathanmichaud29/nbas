@@ -58,7 +58,6 @@ function LeagueSwitch() {
         dispatch(addAdminLeagueSeasons(response.data.leagueSeasons));
         response.data.leagues.every((league: ILeague) => {
           if( currentLeagueId === 0  || currentLeagueId === league.id ){
-            console.log("new league found and set");
             selectNewLeague(league);
             return false;
           }

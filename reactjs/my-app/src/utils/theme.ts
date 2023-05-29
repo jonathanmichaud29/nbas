@@ -113,6 +113,12 @@ export const defaultTheme = createTheme({
 });
 
 export const sxGroupStyles = {
+  accordionSummary:{
+    backgroundColor:"#e4e4e4",
+    '&:hover':{
+      backgroundColor:"#f1f1f1"
+    }
+  },
   tableContainerSmallest:{
     width:{
       xs:'100%', 

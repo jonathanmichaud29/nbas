@@ -37,6 +37,10 @@ function ListMatches(props: IListMatchProps) {
 
   const filteredMatches = filterMatchesBySeason(stateAdminContext.currentLeagueSeason, listMatches)
     .sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const seasonId:string = stateAdminContext.currentLeagueSeason?.id.toString() || '';
+  const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+
   const reinitializeApiMessages = () => {
     changeApiError('');
     changeApiSuccess('');
@@ -138,7 +142,7 @@ function ListMatches(props: IListMatchProps) {
                 key={`action-view-match-${match.id}`}
                 aria-label={actionLabel}
                 title={actionLabel}
-                href={`${quickLinkMatch.link}/${match.id}`}
+                href={`${baseLinkPublicMatchDetails}/${match.id}`}
                 >
                 <InfoIcon />
               </IconButton>
