@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useAuthState } from "react-firebase-hooks/auth";
-import { NavLink, useOutletContext } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 import { auth } from "../Firebase/firebase";
+import { usePublicContext } from '../Public/PublicApp';
 
 import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, Link, List, ListItem, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-
-import { newlistLinks } from '../utils/constants';
-import { usePublicContext } from '../Public/PublicApp';
+import { adminlistLinks, newlistLinks, quickLinkAdminHome, quickLinkHome, quickLinkLogin } from '../utils/constants';
 
 function PublicMenu() {
 
@@ -19,6 +18,9 @@ function PublicMenu() {
   
   const [user, loading] = useAuthState(auth);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+
+  const availableAdminLinks = leagueSeason === null ? adminlistLinks.filter((link) => ! link.requireAdminSeason) : adminlistLinks;
+
 
 
   const renderPublicLinks = (isDrawer?:boolean) => {
@@ -68,36 +70,19 @@ function PublicMenu() {
     })
   }
   
-  const getUserLinks = () => {
+  const getAdminLinks = () => {
     if( loading ) return [];
-    return ( user ? [
-      {
-        label:"Dashboard",
-        url: "/admin/dashboard",
-      },
-      {
-        label:"Leagues",
-        url: "/admin/leagues",
-      },
-      {
-        label:"Players",
-        url: "/admin/players",
-      },
-      {
-        label:"Teams",
-        url: "/admin/teams",
-      },
-      {
-        label:"Calendar",
-        url: "/admin/calendar",
-      },
-    ]
-    : [
-      {
-        label:"Login",
-        url: "/admin/login",
+    return ( user ? availableAdminLinks.map((adminLink) => {
+      return {
+        label: adminLink.label,
+        url: adminLink.link.replace(':idSeason', leagueSeason?.id.toString() || ''),
       }
-    ]);
+    }) : [
+      {
+        label:quickLinkLogin.label,
+        url: quickLinkLogin.link,
+      }
+    ] );
   }
 
   
@@ -156,7 +141,21 @@ function PublicMenu() {
                 </Avatar>
               </Button>
               <Menu {...bindMenu(popupState)}>
-                { getUserLinks().map((link, index) => (
+                <MenuItem key={`admin-menu-public`}>
+                  <Link 
+                    component={NavLink} 
+                    to={quickLinkHome.link}
+                    onClick={popupState.close}
+                  >{quickLinkHome.label}</Link>
+                </MenuItem>
+                <MenuItem key={`admin-menu-admin`}>
+                  <Link 
+                    component={NavLink} 
+                    to={quickLinkAdminHome.link}
+                    onClick={popupState.close}
+                  >{quickLinkAdminHome.label}</Link>
+                </MenuItem>
+                { getAdminLinks().map((link, index) => (
                   <MenuItem key={`user-menu-${index}`}>
                     <Link 
                       component={NavLink} 

@@ -38,7 +38,9 @@ export const fetchPlayersLeagues = async (bodyParams: IApiFetchPlayersLeaguesPar
  */
 
 export interface IApiCreateLeagueParams {
-  name: string;
+  leagueName: string;
+  seasonName: string;
+  seasonYear: number;
 }
 export const createLeague = async (bodyParams: IApiCreateLeagueParams) => {
   

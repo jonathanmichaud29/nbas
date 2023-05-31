@@ -1,20 +1,29 @@
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 
 import { Paper, Box, Stack, Typography, Button, CircularProgress } from "@mui/material";
 
 import { AppDispatch } from "../redux/store";
 import { addLeague } from "../redux/leagueSlice";
+import { addLeagueSeason } from "../redux/leagueSeasonSlice";
+import { addAdminLeagues, addAdminLeagueSeasons } from "../redux/adminContextSlice";
+
+import { ILeague, ILeagueSeason } from "../Interfaces/league";
 
 import { createLeague, IApiCreateLeagueParams } from "../ApiCall/leagues";
 
 import FormTextInput from "../Forms/FormTextInput";
+import FormNumberInput from "../Forms/FormNumberInput";
 import LoaderInfo from "../Generic/LoaderInfo";
-import { addAdminLeagues } from "../redux/adminContextSlice";
+
+import { castNumber } from "../utils/castValues";
+
 
 interface IFormInput {
-  name: string;
+  leagueName: string;
+  seasonName: string;
+  seasonYear: number;
 }
 
 export default function CreateLeague(){
@@ -33,8 +42,12 @@ export default function CreateLeague(){
     changeApiSuccess('');
   }
 
+  const currentYear = new Date().getFullYear();
+
   const defaultValues = {
-    name: ""
+    leagueName: "",
+    seasonName: "",
+    seasonYear: castNumber(currentYear)
   }
 
   const methods = useForm<IFormInput>({ defaultValues: defaultValues });
@@ -42,25 +55,51 @@ export default function CreateLeague(){
   const onSubmit: SubmitHandler<IFormInput> = data => {
     if( requestStatus ) return;
 
+    let newLeague: ILeague;
+    let newLeagueSeason: ILeagueSeason;
+    let newError: string = '';
+    let newSuccess: string = '';
+
     setRequestStatus(true);
     reinitializeApiMessages();
     
     const paramsCreateLeague: IApiCreateLeagueParams = {
-      name: data.name
+      leagueName: data.leagueName,
+      seasonName: data.seasonName,
+      seasonYear: data.seasonYear
     }
     createLeague(paramsCreateLeague)
       .then((response) =>{
         reset()
-        dispatch(addLeague(response.data));
-        dispatch(addAdminLeagues([response.data]));
-        changeApiSuccess(response.message);
-
+        newLeague = {
+          id: response.data.leagueId,
+          name: response.data.leagueName
+        };
+        newLeagueSeason = {
+          id: response.data.seasonId,
+          idLeague: response.data.leagueId,
+          name: response.data.seasonName,
+          year: response.data.seasonYear,
+        };
+        newSuccess = response.message;
+        
       })
       .catch(error => {
-        changeApiError(error);
+        newError = error;
       })
       .finally(() => {
-        setRequestStatus(false);
+        batch(() => {
+          if( newLeague && newLeagueSeason ){
+            dispatch(addLeague(newLeague));
+            dispatch(addLeagueSeason(newLeagueSeason));
+            dispatch(addAdminLeagues([newLeague]));
+            dispatch(addAdminLeagueSeasons([newLeagueSeason]));
+          }
+          changeApiError(newError);
+          changeApiSuccess(newSuccess);
+          setRequestStatus(false);
+        })
+        
       })
       
   }
@@ -79,9 +118,22 @@ export default function CreateLeague(){
           <Stack spacing={1} alignItems="center">
             <FormTextInput
               label={`League name`}
-              controllerName={`name`}
+              controllerName={`leagueName`}
               type="text"
               isRequired={true}
+            />
+            <FormTextInput
+              label={`Season Name`}
+              controllerName={`seasonName`}
+              type="text"
+              isRequired={true}
+            />
+            <FormNumberInput
+              label={`Season Year`}
+              controllerName={`seasonYear`}
+              isRequired={true}
+              fieldMinValue={currentYear}
+              fieldMaxValue={currentYear+1}
             />
             <Button 
               onClick={handleSubmit(onSubmit)}

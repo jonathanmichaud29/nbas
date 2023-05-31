@@ -34,7 +34,7 @@ exports.getLeagues = async (req, res, next) => {
 exports.createLeague = async (req, res, next) => {
   if (!req.body) return next(new AppError("No form data found", 404));
 
-  const bodyRequiredKeys = ["name"]
+  const bodyRequiredKeys = ["leagueName", "seasonName", "seasonYear"]
   if( is_missing_keys(bodyRequiredKeys, req.body) ) {
     return next(new AppError(`Missing body parameters`, 404));
   }
@@ -50,10 +50,31 @@ exports.createLeague = async (req, res, next) => {
   await promiseConn.beginTransaction();
 
   let leagueId = 0;
+  let seasonId = 0;
+
+  // Insert new league
   try{
-    const resultLeague = await promiseConn.execute("INSERT INTO leagues (name) VALUES (?)", [req.body.name])
+    const resultLeague = await promiseConn.execute("INSERT INTO leagues (name) VALUES (?)", [req.body.leagueName])
       .then( ([rows]) => {
         leagueId = rows.insertId;
+        return Promise.resolve(true);
+      })
+      .catch( (err) => {
+        error = err;
+        success = false;
+        return Promise.reject(err);
+      })
+  } catch( e ){
+    success=false;
+    error = e;
+    
+  }
+
+  // Insert new season
+  try{
+    const resultLeagueSeason = await promiseConn.query("INSERT INTO league_season (idLeague, name, year) VALUES (?)", [[leagueId, req.body.seasonName, req.body.seasonYear]])
+      .then( ([rows]) => {
+        seasonId = rows.insertId;
         return Promise.resolve(true);
       })
       .catch( (err) => {
@@ -87,8 +108,11 @@ exports.createLeague = async (req, res, next) => {
     await promiseConn.commit();
     promiseConn.release()
     const customData = {
-      id: leagueId,
-      name: req.body.name
+      leagueId: leagueId,
+      seasonId: seasonId,
+      leagueName: req.body.leagueName,
+      seasonName: req.body.seasonName,
+      seasonYear: req.body.seasonYear
     }
     const customMessage = `league '${req.body.name}' created!`
     return appResponse(res, next, success, customData, null, customMessage);

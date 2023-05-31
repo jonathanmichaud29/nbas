@@ -32,6 +32,7 @@ import CalendarManager from './Admin/CalendarManager';
 import { setDefaultMetas } from './utils/metaTags';
 import { quickLinkCompare, quickLinkMatch, quickLinkPlayer, quickLinkTeam } from "./utils/constants";
 import SelectLeague from "./League/SelectLeague";
+import SelectAdminLeague from "./League/SelectAdminLeague";
 
 
 
@@ -68,13 +69,17 @@ function App() {
           </Route>
 
           <Route path="/admin/" element={<AdminApp />}>
+            <Route path="" element={<DashboardHome />} />
             <Route path="login" element={<Login />} />
-            <Route path="dashboard" element={<DashboardHome />} />
-            <Route path="leagues" element={<LeagueManager />} />
-            <Route path="teams" element={<TeamManager />} />
-            <Route path="players" element={<PlayerManager />} />
-            <Route path="calendar" element={<CalendarManager />} />
-            <Route path="match/:id" element={<MatchManager />} />
+            <Route path=":idSeason">
+              <Route path="" element={<LeagueManager />} />
+              <Route path="teams" element={<TeamManager />} />
+              <Route path="players" element={<PlayerManager />} />
+              <Route path="calendar">
+                <Route path="" element={<CalendarManager />} />
+                <Route path=":id" element={<MatchManager />} />
+              </Route>
+            </Route>
           </Route>
 
         </Routes>

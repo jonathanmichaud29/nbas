@@ -1,96 +1,88 @@
 import { useState } from 'react';
 import { useAuthState } from "react-firebase-hooks/auth";
-import { NavLink, useOutletContext } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 import { auth } from "../Firebase/firebase";
+import { useAdminContext } from '../Admin/AdminApp';
 
 import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, Link, List, ListItem, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import { adminlistLinks, quickLinkAdminHome, quickLinkHome, quickLinkLogin } from '../utils/constants';
 
 export default function AdminMenu() {
+  
+  const {leagueSeason} = useAdminContext();
 
   const [user, loading] = useAuthState(auth);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
+  const availableAdminLinks = leagueSeason === null ? adminlistLinks.filter((link) => ! link.requireAdminSeason) : adminlistLinks;
 
-  const renderPublicLinks = (isDrawer?:boolean) => {
-    if( isDrawer ) {
-      return (
-        <ListItem key={`public-menu`} 
-          sx={{
-            padding:0,
-            margin:'5px 0',
-          }}
-        >
-          <Link 
-            component={NavLink} 
-            to={`/`} 
-            onClick={() => setMobileMenuOpen(false)}
-            p={1} 
+
+  const renderAdminLinks = (isDrawer?:boolean) => {
+    return availableAdminLinks.map((myLink, index) => {
+      if( isDrawer ) {
+        return (
+          <ListItem key={`admin-menu-drawer-${index}`} 
             sx={{
-              display:'block',
-              width:'100%',
-              textAlign:'center',
-              '&:hover':{
+              padding:0,
+              margin:'5px 0',
+            }}
+          >
+            <Link 
+              component={NavLink} 
+              to={myLink.link.replace(':idSeason', leagueSeason?.id.toString() || '')} 
+              onClick={() => setMobileMenuOpen(false)}
+              p={1} 
+              sx={{
+                display:'block',
+                width:'100%',
+                textAlign:'center',
+                '&:hover':{
+                  color:(theme) => theme.palette.primary.light,
+                  backgroundColor:(theme) => theme.palette.primary.main,
+                  textDecoration:"none",
+                }
+              }}
+            >{myLink.label}</Link>
+          </ListItem>
+        )
+      }
+      else {
+        return (
+          <ListItem key={`admin-topmenu-${index}`}>
+            <Link 
+              component={NavLink} 
+              to={myLink.link.replace(':idSeason', leagueSeason?.id.toString())} 
+              sx={{ 
                 color:(theme) => theme.palette.primary.light,
-                backgroundColor:(theme) => theme.palette.primary.main,
-                textDecoration:"none",
-              }
-            }}
-          >Public site</Link>
-        </ListItem>
-      )
-    }
-    else {
-      return (
-        <ListItem key={`public-menu`}>
-          <Link 
-            component={NavLink} 
-            to={`/`} 
-            sx={{ 
-              color:(theme) => theme.palette.primary.light,
-              textAlign: 'center',
-              whiteSpace:'nowrap',
-            }}
-          >Public site</Link>
-        </ListItem>
-      )
-    }
+                textAlign: 'center',
+                whiteSpace:'nowrap',
+              }}
+            >{myLink.label}</Link>
+          </ListItem>
+        )
+      }
+    })
+    
   }
   
-  const getUserLinks = () => {
+  const getAdminLinks = () => {
     if( loading ) return [];
-    return ( user ? [
-      {
-        label:"Dashboard",
-        url: "/admin/dashboard",
-      },
-      {
-        label:"Leagues",
-        url: "/admin/leagues",
-      },
-      {
-        label:"Players",
-        url: "/admin/players",
-      },
-      {
-        label:"Teams",
-        url: "/admin/teams",
-      },
-      {
-        label:"Calendar",
-        url: "/admin/calendar",
-      },
-    ]
-    : [
-      {
-        label:"Login",
-        url: "/admin/login",
+    return ( user ? availableAdminLinks.map((adminLink) => {
+      return {
+        label: adminLink.label,
+        url: adminLink.link.replace(':idSeason', leagueSeason?.id.toString() || ''),
       }
-    ]);
+    }) : [
+      {
+        label:quickLinkLogin.label,
+        url: quickLinkLogin.link,
+      }
+    ] );
   }
 
   
@@ -122,7 +114,7 @@ export default function AdminMenu() {
             <MenuIcon />
           </IconButton>
 
-          <Link href="/" variant="h6" color="inherit" style={{textDecoration:'none'}}>
+          <Link href={quickLinkHome.link} variant="h6" color="inherit" style={{textDecoration:'none'}}>
             JLM BB
           </Link>
         </Box>
@@ -133,7 +125,18 @@ export default function AdminMenu() {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          { renderPublicLinks() }
+          <ListItem key={`admin-topmenu-home`}>
+            <Link 
+              component={NavLink} 
+              to={quickLinkHome.link} 
+              sx={{ 
+                color:(theme) => theme.palette.primary.light,
+                textAlign: 'center',
+                whiteSpace:'nowrap',
+              }}
+            >{quickLinkHome.label}</Link>
+          </ListItem>
+          { renderAdminLinks() }
         </List>
 
         <PopupState variant="popover" popupId="popup-admin">
@@ -145,13 +148,27 @@ export default function AdminMenu() {
                 </Avatar>
               </Button>
               <Menu {...bindMenu(popupState)}>
-                { getUserLinks().map((link, index) => (
-                  <MenuItem key={`user-menu-${index}`}>
+                <MenuItem key={`admin-menu-public`}>
+                  <Link 
+                    component={NavLink} 
+                    to={quickLinkHome.link}
+                    onClick={popupState.close}
+                  >{quickLinkHome.label}</Link>
+                </MenuItem>
+                <MenuItem key={`admin-menu-admin`}>
+                  <Link 
+                    component={NavLink} 
+                    to={quickLinkAdminHome.link}
+                    onClick={popupState.close}
+                  >{quickLinkAdminHome.label}</Link>
+                </MenuItem>
+                { getAdminLinks().map((myLink, index) => (
+                  <MenuItem key={`admin-menu-${index}`}>
                     <Link 
                       component={NavLink} 
-                      to={link.url}
+                      to={myLink.url}
                       onClick={popupState.close}
-                    >{link.label}</Link>
+                    >{myLink.label}</Link>
                   </MenuItem>
                 ))}
               </Menu>
@@ -188,7 +205,53 @@ export default function AdminMenu() {
           display:"flex",
           flexFlow:"column nowrap",
         }}>
-          { renderPublicLinks(true) }
+          <ListItem key={`admin-menu-drawer-home`} 
+            sx={{
+              padding:0,
+              margin:'5px 0',
+            }}
+          >
+            <Link 
+              component={NavLink} 
+              to={quickLinkHome.link} 
+              onClick={() => setMobileMenuOpen(false)}
+              p={1} 
+              sx={{
+                display:'block',
+                width:'100%',
+                textAlign:'center',
+                '&:hover':{
+                  color:(theme) => theme.palette.primary.light,
+                  backgroundColor:(theme) => theme.palette.primary.main,
+                  textDecoration:"none",
+                }
+              }}
+            >{quickLinkHome.label}</Link>
+          </ListItem>
+          <ListItem key={`admin-menu-drawer-admin-home`} 
+            sx={{
+              padding:0,
+              margin:'5px 0',
+            }}
+          >
+            <Link 
+              component={NavLink} 
+              to={quickLinkAdminHome.link} 
+              onClick={() => setMobileMenuOpen(false)}
+              p={1} 
+              sx={{
+                display:'block',
+                width:'100%',
+                textAlign:'center',
+                '&:hover':{
+                  color:(theme) => theme.palette.primary.light,
+                  backgroundColor:(theme) => theme.palette.primary.main,
+                  textDecoration:"none",
+                }
+              }}
+            >{quickLinkAdminHome.label}</Link>
+          </ListItem>
+          { renderAdminLinks(true) }
         </List>
       </Drawer>
     </>

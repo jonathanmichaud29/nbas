@@ -12,20 +12,24 @@ const adminContextSlice = createSlice({
   name:"adminContext",
   initialState,
   reducers: {
-    addAdminLeagues: (state, action: PayloadAction<[ILeague]>) => {
+    addAdminLeagues: (state, action: PayloadAction<ILeague[]>) => {
+      let newState = {...state};
       action.payload.forEach((league: ILeague) => {
-        if ( state.leagues.find(element => element.id === league.id) === undefined ){
-          state.leagues.push(league);
+        if ( newState.leagues.find(element => element.id === league.id) === undefined ){
+          newState.leagues.push(league);
         }
       });
+      state = newState;
     },
 
-    addAdminLeagueSeasons: (state, action: PayloadAction<[ILeagueSeason]>) => {
+    addAdminLeagueSeasons: (state, action: PayloadAction<ILeagueSeason[]>) => {
+      let newState = {...state};
       action.payload.forEach((leagueSeason: ILeagueSeason) => {
-        if ( state.leagueSeasons.find(element => element.id === leagueSeason.id) === undefined ){
-          state.leagueSeasons.push(leagueSeason);
+        if ( newState.leagueSeasons.find(element => element.id === leagueSeason.id) === undefined ){
+          newState.leagueSeasons.push(leagueSeason);
         }
       });
+      state = newState;
     },
 
     setAdminLeague: {
