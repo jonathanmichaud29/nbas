@@ -13,6 +13,7 @@ import CompleteMatch from '../Modals/CompleteMatch';
 
 import { createHumanDate } from '../utils/dateFormatter';
 import { quickLinkMatch } from '../utils/constants';
+import { replaceSeasonLink } from '../utils/linksGenerator';
 
 export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
 
@@ -25,7 +26,8 @@ export default function AdminMatchHeader(props: IAdminMatchHeaderProps) {
 
   const seasonId:string = stateAdminContext.currentLeagueSeason?.id.toString() || '';
 
-  const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+  // const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+  const baseLinkPublicMatchDetails = replaceSeasonLink(quickLinkMatch.link, seasonId);
 
   const listPlayers = useSelector((state: RootState) => state.players )
 

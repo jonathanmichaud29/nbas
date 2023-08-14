@@ -11,6 +11,7 @@ import MenuIcon from "@mui/icons-material/Menu"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import { adminlistLinks, newlistLinks, quickLinkAdminHome, quickLinkHome, quickLinkLogin } from '../utils/constants';
+import { replaceSeasonLink } from '../utils/linksGenerator';
 
 function PublicMenu() {
 
@@ -24,7 +25,8 @@ function PublicMenu() {
 
 
   const renderPublicLinks = (isDrawer?:boolean) => {
-    return newlistLinks.map((link, index) => {
+    return newlistLinks.map((myLink, index) => {
+      const myFullLink = replaceSeasonLink(myLink.link, leagueSeason?.id.toString());
       if( isDrawer ) {
         return (
           <ListItem key={`public-menu-${index}`} 
@@ -35,7 +37,8 @@ function PublicMenu() {
           >
             <Link 
               component={NavLink} 
-              to={leagueSeason ? link.link.replace(':idSeason', leagueSeason.id.toString()) : link.link} 
+              // to={leagueSeason ? myLink.link.replace(':idSeason', leagueSeason.id.toString()) : myLink.link} 
+              to={myFullLink}
               onClick={() => setMobileMenuOpen(false)}
               p={1} 
               sx={{
@@ -48,7 +51,7 @@ function PublicMenu() {
                   textDecoration:"none",
                 }
               }}
-            >{link.label}</Link>
+            >{myLink.label}</Link>
           </ListItem>
         )
       }
@@ -57,13 +60,14 @@ function PublicMenu() {
           <ListItem key={`public-menu-${index}`}>
             <Link 
               component={NavLink} 
-              to={leagueSeason ? link.link.replace(':idSeason', leagueSeason.id.toString()) : link.link} 
+              to={myFullLink}
+              // to={leagueSeason ? myLink.link.replace(':idSeason', leagueSeason.id.toString()) : myLink.link} 
               sx={{ 
                 color:(theme) => theme.palette.primary.light,
                 textAlign: 'center',
                 whiteSpace:'nowrap',
               }}
-            >{link.label}</Link>
+            >{myLink.label}</Link>
           </ListItem>
         )
       }

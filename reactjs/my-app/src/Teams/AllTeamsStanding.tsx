@@ -15,6 +15,7 @@ import LoaderInfo from "../Generic/LoaderInfo";
 import { getTeamName } from '../utils/dataAssociation'
 import { sxGroupStyles } from '../utils/theme';
 import { quickLinkTeam } from '../utils/constants';
+import { replaceSeasonLink } from "../utils/linksGenerator";
 
 interface IAllTeamsStandingProps {
   /* standingTeams: IStandingTeam[]; */
@@ -97,7 +98,8 @@ function AllTeamsStanding(props: IAllTeamsStandingProps){
                   <TableBody>
                     {standingTeams.map((standingTeam) => {
                       const teamName = getTeamName(standingTeam.id, teams);
-                      const linkTeamDetails = `${quickLinkTeam.link}/${standingTeam.id}`.replace(':idSeason', leagueSeason.id.toString())
+                      const linkTeamDetails = replaceSeasonLink(quickLinkTeam.link, leagueSeason.id.toString());
+                      // const linkTeamDetails = `${quickLinkTeam.link}/${standingTeam.id}`.replace(':idSeason', leagueSeason.id.toString())
                       return (
                         <TableRow key={`team-standing-${standingTeam.id}`}>
                           <TableCell><Link href={linkTeamDetails}>{teamName}</Link></TableCell>

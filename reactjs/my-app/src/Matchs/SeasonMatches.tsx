@@ -21,6 +21,7 @@ import FilterTimelineMatches from './FilterTimelineMatches';
 import { extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
 import { listMatchTimeline, quickLinkMatch } from '../utils/constants';
 import { sxGroupStyles } from '../utils/theme';
+import { replaceSeasonLink } from '../utils/linksGenerator';
 
 interface ISeasonMatchesProps{
   
@@ -37,7 +38,8 @@ function SeasonMatches(props: ISeasonMatchesProps) {
   
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
-  const baseLinkMatchDetails = `${quickLinkMatch.link}/`.replace(':idSeason', leagueSeason.id.toString())
+  // const baseLinkMatchDetails = `${quickLinkMatch.link}/`.replace(':idSeason', leagueSeason.id.toString())
+  const baseLinkMatchDetails = replaceSeasonLink(quickLinkMatch.link, leagueSeason.id.toString());
   
   const tomorrow = new Date();
   const lowerDate = new Date().setHours(0,0,0,0);

@@ -6,6 +6,8 @@ import SendIcon from '@mui/icons-material/Send';
 import { RootState } from "../redux/store"
 
 import { quickLinkAdminLeague } from "../utils/constants";
+import { ILeagueSeason } from "../Interfaces/league";
+import { replaceSeasonLink } from "../utils/linksGenerator";
 
 export default function SelectAdminLeague() {
 
@@ -49,7 +51,8 @@ export default function SelectAdminLeague() {
                   >
                     <Stack spacing={1} pb={3}>
                       {myLeagueSeasons.map((leagueSeason) => {
-                        const link = quickLinkAdminLeague.link.replace(':idSeason', leagueSeason.id.toString())
+                        const link = replaceSeasonLink(quickLinkAdminLeague.link, leagueSeason.id.toString());
+                        // const link = quickLinkAdminLeague.link.replace(':idSeason', leagueSeason.id.toString())
                         return (
                           <Button 
                             key={`action-access-season-${leagueSeason.id}`}

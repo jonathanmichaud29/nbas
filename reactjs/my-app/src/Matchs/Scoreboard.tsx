@@ -8,6 +8,7 @@ import { IMatch } from '../Interfaces/match';
 import { createHumanDate } from '../utils/dateFormatter'
 import { sxGroupStyles } from '../utils/theme';
 import { quickLinkMatch, quickLinkTeam } from "../utils/constants";
+import { replaceSeasonLink } from "../utils/linksGenerator";
 
 interface IScoreboardProps {
   teamHome:       ITeam;
@@ -28,9 +29,12 @@ function Scoreboard(props: IScoreboardProps) {
   const teamAwayStanding = standingTeams && standingTeams.find((standingTeam) => standingTeam.id === teamAway.id)
 
   const isTeamStandings = standingTeams && teamHomeStanding && teamAwayStanding;
-
-  const linkMatchDetails = quickLinkMatch.link.replace(':idSeason', match.idSeason.toString()) + '/' + match.id;
-  const baseLinkTeamDetails = quickLinkTeam.link.replace(':idSeason', match.idSeason.toString()) + '/';
+  
+  const seasonId = match.idSeason.toString();
+  // const linkMatchDetails = quickLinkMatch.link.replace(':idSeason', match.idSeason.toString()) + '/' + match.id;
+  const linkMatchDetails = replaceSeasonLink(quickLinkMatch.link, seasonId) + `/${match.id}`;
+  // const baseLinkTeamDetails = quickLinkTeam.link.replace(':idSeason', match.idSeason.toString()) + '/';
+  const baseLinkTeamDetails = replaceSeasonLink(quickLinkTeam.link, seasonId);
 
   return (
     

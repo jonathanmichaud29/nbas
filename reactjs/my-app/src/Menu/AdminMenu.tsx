@@ -11,6 +11,7 @@ import MenuIcon from "@mui/icons-material/Menu"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import { adminlistLinks, quickLinkAdminHome, quickLinkHome, quickLinkLogin } from '../utils/constants';
+import { replaceSeasonLink } from '../utils/linksGenerator';
 
 export default function AdminMenu() {
   
@@ -24,6 +25,7 @@ export default function AdminMenu() {
 
   const renderAdminLinks = (isDrawer?:boolean) => {
     return availableAdminLinks.map((myLink, index) => {
+      const myFullLink = replaceSeasonLink(myLink.link, leagueSeason?.id.toString());
       if( isDrawer ) {
         return (
           <ListItem key={`admin-menu-drawer-${index}`} 
@@ -34,7 +36,7 @@ export default function AdminMenu() {
           >
             <Link 
               component={NavLink} 
-              to={myLink.link.replace(':idSeason', leagueSeason?.id.toString() || '')} 
+              to={myFullLink} 
               onClick={() => setMobileMenuOpen(false)}
               p={1} 
               sx={{
@@ -56,7 +58,7 @@ export default function AdminMenu() {
           <ListItem key={`admin-topmenu-${index}`}>
             <Link 
               component={NavLink} 
-              to={myLink.link.replace(':idSeason', leagueSeason?.id.toString())} 
+              to={myFullLink} 
               sx={{ 
                 color:(theme) => theme.palette.primary.light,
                 textAlign: 'center',

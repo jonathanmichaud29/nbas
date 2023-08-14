@@ -21,6 +21,7 @@ import InfoDialog from '../Generic/InfoDialog';
 import { createHumanDate, extractCalendarDay, extractHourFromDate } from '../utils/dateFormatter';
 import { filterMatchesBySeason } from '../utils/dataFilter';
 import { quickLinkMatch } from '../utils/constants';
+import { replaceSeasonLink } from '../utils/linksGenerator';
 
 function ListMatches(props: IListMatchProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,7 +40,8 @@ function ListMatches(props: IListMatchProps) {
     .sort((a: IMatch,b: IMatch) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const seasonId:string = stateAdminContext.currentLeagueSeason?.id.toString() || '';
-  const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+  // const baseLinkPublicMatchDetails = quickLinkMatch.link.replace(':idSeason', seasonId);
+  const baseLinkPublicMatchDetails = replaceSeasonLink(quickLinkMatch.link, seasonId);
 
   const reinitializeApiMessages = () => {
     changeApiError('');
