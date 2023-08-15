@@ -24,8 +24,15 @@ export const setStoragePublicLeagueSeasonId = (id:number) => {
 export const getStorageLeagueId = () => {
   return castNumber(window.localStorage.getItem("currentLeagueId"))
 }
+export const setStorageLeagueId = (newLeagueId: number) => {
+  window.localStorage.setItem("currentLeagueId", newLeagueId.toString());
+}
+
 export const getStorageLeagueSeasonId = () => {
   return castNumber(window.localStorage.getItem("currentLeagueSeasonId"))
+}
+export const setStorageLeagueSeasonId = (newLeagueSeasonId: number) => {
+  window.localStorage.setItem("currentLeagueSeasonId", newLeagueSeasonId.toString() || '0');
 }
 
 // TODO : Remove this call and instead use Redux storage for context (admin or public)

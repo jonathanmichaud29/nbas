@@ -5,6 +5,7 @@ import { TextField } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
+
 interface IFormDateTimePickerProps {
   label: string;
   controllerName: string;
@@ -51,8 +52,8 @@ function FormDateTimePicker(props: IFormDateTimePickerProps) {
               minutesStep={minutesStep}
               minDate={minDate}
               maxDate={maxDate}
-              inputFormat={inputFormat}
-              disableMaskedInput={false}
+              format={inputFormat}
+              // disableMaskedInput={false}
               onError={(reason, value) => {
                 if (reason && value) {
                   callbackError(value);
@@ -64,13 +65,19 @@ function FormDateTimePicker(props: IFormDateTimePickerProps) {
                   setErrorDate(false);
                 }
               }}
-              renderInput={(params:any) => (
+              slotProps={{ 
+                textField:{
+                  /* error={!!error || errorDate}
+                  helperText={(error && error.message) || ( currentError ?? currentError)} */
+                }
+              }}
+              /* renderInput={(params:any) => (
                 <TextField 
                   {...params} 
                   error={!!error || errorDate}
                   helperText={(error && error.message) || ( currentError ?? currentError)}
                 />
-              )}
+              )} */
             />
           </LocalizationProvider>
 
